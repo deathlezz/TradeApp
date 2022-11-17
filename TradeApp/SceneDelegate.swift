@@ -16,6 +16,40 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+        
+        
+        // create "Saved" tab bar item
+        if let tabBarController = window?.rootViewController as? UITabBarController {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "NavController")
+            vc.tabBarItem = UITabBarItem(title: "Saved", image: .init(systemName: "heart"), tag: 1)
+            tabBarController.viewControllers?.append(vc)
+        }
+        
+        // create "Add" tab bar item
+        if let tabBarController = window?.rootViewController as? UITabBarController {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "NavController")
+            vc.tabBarItem = UITabBarItem(title: "Add", image: .init(systemName: "plus"), tag: 2)
+            tabBarController.viewControllers?.append(vc)
+        }
+        
+        // create "Messages" tab bar item
+        if let tabBarController = window?.rootViewController as? UITabBarController {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "NavController")
+            vc.tabBarItem = UITabBarItem(title: "Messages", image: .init(systemName: "ellipsis.message"), tag: 3)
+            tabBarController.viewControllers?.append(vc)
+        }
+        
+        // create "Account" tab bar item
+        if let tabBarController = window?.rootViewController as? UITabBarController {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "NavController")
+            vc.tabBarItem = UITabBarItem(title: "Account", image: .init(systemName: "person"), tag: 4)
+            tabBarController.viewControllers?.append(vc)
+        }
+        
         guard let _ = (scene as? UIWindowScene) else { return }
     }
 
