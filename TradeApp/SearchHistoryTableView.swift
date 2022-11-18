@@ -15,15 +15,18 @@ class SearchHistoryTableView: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.largeTitleDisplayMode = .never
+        
         textField = UITextField(frame: CGRect(x: 0, y: 0, width: (navigationController?.navigationBar.frame.width)!, height: 30))
         textField.borderStyle = .roundedRect
         textField.clearButtonMode = .whileEditing
         textField.placeholder = "Find something for yourself"
-        textField.addTarget(self, action: #selector(textFieldTapped), for: .editingDidBegin)
-        textField.becomeFirstResponder()
+        textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
+        textField.returnKeyType = .search
         navigationItem.titleView = textField
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
+        
     }
 
     // MARK: - Table view data source
@@ -46,12 +49,26 @@ class SearchHistoryTableView: UITableViewController {
         return cell
     }
     
-    @objc func textFieldTapped() {
+    @objc func returnTapped() {
+        if !textField.text!.isEmpty {
+            recentlySearched.append(textField.text!)
+            tableView.reloadData()
+        }
         
+        textField.endEditing(true)
+        navigationController?.popToRootViewController(animated: true)
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        textField.resignFirstResponder()
+    // swipe to delete
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            recentlySearched.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        textField.becomeFirstResponder()
     }
     
 
