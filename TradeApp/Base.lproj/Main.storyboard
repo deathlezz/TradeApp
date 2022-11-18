@@ -56,12 +56,49 @@
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rsd-KG-NQt" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3575.3846153846152" y="5.6872037914691944"/>
+            <point key="canvasLocation" x="3574.8091603053435" y="5.6338028169014089"/>
+        </scene>
+        <!--Search History Table View-->
+        <scene sceneID="Ksc-iU-NkS">
+            <objects>
+                <tableViewController storyboardIdentifier="searchHistoryTableView" automaticallyAdjustsScrollViewInsets="NO" id="uf8-9G-PF1" customClass="SearchHistoryTableView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="Vc4-zd-ZQi">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="historyCell" textLabel="D4L-DE-xGa" style="IBUITableViewCellStyleDefault" id="ffm-J3-E5t">
+                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ffm-J3-E5t" id="UV2-ee-sll">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="D4L-DE-xGa">
+                                            <rect key="frame" x="20" y="0.0" width="353" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="0.0"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="uf8-9G-PF1" id="GrV-nL-ULc"/>
+                            <outlet property="delegate" destination="uf8-9G-PF1" id="O5O-83-OLI"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Cub-Zg-kuq" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3575" y="685"/>
         </scene>
         <!--Category Table View-->
         <scene sceneID="ChW-Or-xg0">
             <objects>
-                <tableViewController storyboardIdentifier="categoryTableView" id="c4o-NF-Nwu" customClass="CategoryTableView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="categoryTableView" automaticallyAdjustsScrollViewInsets="NO" id="c4o-NF-Nwu" customClass="CategoryTableView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="80" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="2Jn-yY-49u">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -93,7 +130,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sec-WA-96w" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4494" y="6"/>
+            <point key="canvasLocation" x="3575" y="-683"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="kKH-oV-Ueq">

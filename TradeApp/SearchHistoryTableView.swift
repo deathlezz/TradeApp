@@ -1,23 +1,29 @@
 //
-//  CategoryTableView.swift
+//  SearchHistoryTableView.swift
 //  TradeApp
 //
-//  Created by deathlezz on 17/11/2022.
+//  Created by deathlezz on 18/11/2022.
 //
 
 import UIKit
 
-class CategoryTableView: UITableViewController {
+class SearchHistoryTableView: UITableViewController {
     
-    let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
+    var textField: UITextField!
+    var recentlySearched = ["dog", "cat", "bike", "car"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Categories"
-        navigationController?.navigationBar.prefersLargeTitles = true
+        textField = UITextField(frame: CGRect(x: 0, y: 0, width: (navigationController?.navigationBar.frame.width)!, height: 30))
+        textField.borderStyle = .roundedRect
+        textField.clearButtonMode = .whileEditing
+        textField.placeholder = "Find something for yourself"
+        textField.addTarget(self, action: #selector(textFieldTapped), for: .editingDidBegin)
+        textField.becomeFirstResponder()
+        navigationItem.titleView = textField
         
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "itemCell")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
     }
 
     // MARK: - Table view data source
@@ -25,20 +31,30 @@ class CategoryTableView: UITableViewController {
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categories.count
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Recently searched"
     }
 
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return recentlySearched.count
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath)
-        
-        cell.textLabel?.text = categories[indexPath.row]
-        cell.textLabel?.font = UIFont(name: "System", size: 30)
-        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "historyCell", for: indexPath)
+        cell.textLabel?.text = recentlySearched[indexPath.row]
         return cell
     }
     
+    @objc func textFieldTapped() {
+        
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        textField.resignFirstResponder()
+    }
+    
+
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)

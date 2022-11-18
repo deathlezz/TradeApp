@@ -8,9 +8,9 @@
 import UIKit
 
 class ViewController: UICollectionViewController {
-    
-    var textField: UITextField!
-    
+
+    var categoriesButton: UIBarButtonItem!
+    var searchButton: UIBarButtonItem!
     var items = [String]()
 
     override func viewDidLoad() {
@@ -21,12 +21,12 @@ class ViewController: UICollectionViewController {
             items.append("ABC")
         }
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: .init(systemName: "line.horizontal.3"), style: .plain, target: self, action: #selector(categoriesTapped))
+        categoriesButton = UIBarButtonItem(image: .init(systemName: "line.horizontal.3"), style: .plain, target: self, action: #selector(categoriesTapped))
         
-        textField = UITextField(frame: CGRect(x: 0, y: 0, width: (navigationController?.navigationBar.frame.width)!, height: 30))
-        textField.borderStyle = .roundedRect
-        textField.placeholder = "Find something for yourself"
-        navigationItem.titleView = textField
+        searchButton = UIBarButtonItem(image: .init(systemName: "magnifyingglass"), style: .plain, target: self, action: #selector(searchTapped))
+        
+        navigationItem.leftBarButtonItem = categoriesButton
+        navigationItem.rightBarButtonItem = searchButton
     }
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -51,6 +51,13 @@ class ViewController: UICollectionViewController {
     
     @objc func categoriesTapped() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "categoryTableView") {
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    @objc func searchTapped() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "searchHistoryTableView") {
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
