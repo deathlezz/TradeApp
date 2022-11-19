@@ -7,10 +7,9 @@
 
 import UIKit
 
-class SearchHistoryTableView: UITableViewController {
+class SearchTableView: UITableViewController {
     
     var textField: UITextField!
-    var recentlySearched = ["dog", "cat", "bike", "car"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,40 +25,63 @@ class SearchHistoryTableView: UITableViewController {
         navigationItem.titleView = textField
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
-        
     }
 
-    // MARK: - Table view data source
-
+    // set number of sections
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
+    // set section title
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Recently searched"
+        recentlySearched.count == 0 ? nil : "Recently searched"
     }
 
+    // set number of rows in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return recentlySearched.count
     }
     
+    // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "historyCell", for: indexPath)
         cell.textLabel?.text = recentlySearched[indexPath.row]
         return cell
     }
     
+    // set action for tapped cell
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        textField.text = recentlySearched[indexPath.row]
+        returnTapped()
+    }
+    
+    // set action for "return" keyboard button
     @objc func returnTapped() {
         if !textField.text!.isEmpty {
-            recentlySearched.append(textField.text!)
-            tableView.reloadData()
+            filteredItems.removeAll()
+
+            for item in items {
+                if item.title.lowercased().contains(textField.text!.lowercased()) {
+                    filteredItems.append(item)
+                }
+            }
+
+            if !recentlySearched.contains(textField.text!) {
+                let indexPath = IndexPath(row: 0, section: 0)
+                recentlySearched.insert(textField.text!, at: 0)
+                tableView.insertRows(at: [indexPath], with: .automatic)
+            }
+
+        } else {
+            filteredItems = items
         }
         
-        textField.endEditing(true)
+        textField.text = ""
+        textField.resignFirstResponder()
         navigationController?.popToRootViewController(animated: true)
     }
     
-    // swipe to delete
+    // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             recentlySearched.remove(at: indexPath.row)
@@ -67,8 +89,16 @@ class SearchHistoryTableView: UITableViewController {
         }
     }
     
+    // start editing textfield after view appeared
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         textField.becomeFirstResponder()
+    }
+    
+    // finish editing texfield after view disappeared
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        textField.resignFirstResponder()
     }
     
 

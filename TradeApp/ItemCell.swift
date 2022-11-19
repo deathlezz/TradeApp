@@ -8,5 +8,9 @@
 import UIKit
 
 class ItemCell: UICollectionViewCell {
-    @IBOutlet var titleLabel: UILabel!
+    @IBOutlet var image: UIImageView!
+    @IBOutlet var title: UILabel!
+    @IBOutlet var price: UILabel!
+    @IBOutlet var location: UILabel!
+    @IBOutlet var date: UILabel!
 }

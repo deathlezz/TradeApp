@@ -20,16 +20,17 @@ class CategoryTableView: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "itemCell")
     }
 
-    // MARK: - Table view data source
-
+    // number of sections
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
+    // number of row in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return categories.count
     }
 
+    // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath)
         
