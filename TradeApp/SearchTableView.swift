@@ -71,9 +71,11 @@ class SearchTableView: UITableViewController {
                 recentlySearched.insert(textField.text!, at: 0)
                 tableView.insertRows(at: [indexPath], with: .automatic)
             }
+            isFilterApplied = true
 
         } else {
-            filteredItems = items
+            filteredItems = recentlyAdded
+            isFilterApplied = false
         }
         
         textField.text = ""
