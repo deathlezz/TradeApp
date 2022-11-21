@@ -11,4 +11,5 @@ var items = [Item]()
 var filteredItems = [Item]()
 var recentlyAdded = [Item]()
 var recentlySearched = [String]()
+var savedItems = [Item]()
 var isFilterApplied = false

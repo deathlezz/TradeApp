@@ -63,11 +63,20 @@ class ViewController: UICollectionViewController {
         cell.title.text = filteredItems[indexPath.row].title
         cell.price.text = "£\(filteredItems[indexPath.row].price)"
         cell.location.text = filteredItems[indexPath.row].location
-        cell.date.text = "\(filteredItems[indexPath.row].date)"
+        cell.date.text = filteredItems[indexPath.row].date.formatDate()
         cell.layer.cornerRadius = 10
         cell.backgroundColor = .white
         
         return cell
+    }
+    
+    // set action for tapped cell
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "DetailView") as? DetailViewController {
+            vc.item = filteredItems[indexPath.row]
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // set action for categories button
@@ -95,8 +104,6 @@ class ViewController: UICollectionViewController {
     
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
-        print("Refresh!")
-        
         filteredItems.shuffle()
         collectionView.reloadData()
         refreshControl.endRefreshing()
@@ -116,9 +123,9 @@ class ViewController: UICollectionViewController {
     // load data in the background
     @objc func loadData() {
         for _ in 0...3 {
-            let tesla = Item(category: "Vehicles", subCategory: "Cars", title: "Tesla Model X", price: 6000, location: "London", date: Date())
-            let bmw = Item(category: "Vehicles", subCategory: "Cars", title: "BMW E36 2.0 LPG", price: 500, location: "Stirling", date: Date())
-            let fiat = Item(category: "Vehicles", subCategory: "Cars", title: "Fiat 1.9 TDI", price: 1200, location: "Glasgow", date: Date())
+            let tesla = Item(category: "Vehicles", title: "Tesla Model X", price: 6000, location: "London", date: Date())
+            let bmw = Item(category: "Vehicles", title: "BMW E36 2.0 LPG", price: 500, location: "Stirling", date: Date())
+            let fiat = Item(category: "Vehicles", title: "Fiat Punto 1.9 TDI", price: 1200, location: "Glasgow", date: Date())
             items.append(tesla)
             items.append(bmw)
             items.append(fiat)
