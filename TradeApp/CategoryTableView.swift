@@ -8,8 +8,6 @@
 import UIKit
 
 class CategoryTableView: UITableViewController {
-    
-    let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
 
     override func viewDidLoad() {
         super.viewDidLoad()

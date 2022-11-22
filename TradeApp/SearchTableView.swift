@@ -97,7 +97,7 @@ class SearchTableView: UITableViewController {
         textField.becomeFirstResponder()
     }
     
-    // finish editing texfield after view disappeared
+    // finish editing texfield before view disappeared
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         textField.resignFirstResponder()

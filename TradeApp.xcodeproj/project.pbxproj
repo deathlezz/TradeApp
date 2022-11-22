@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC17416F292D33680055A0B8 /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC17416E292D33680055A0B8 /* ItemView.swift */; };
+		BC174171292D46B30055A0B8 /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174170292D46B30055A0B8 /* FilterView.swift */; };
+		BC174175292D55760055A0B8 /* FilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174174292D55760055A0B8 /* FilterCell.swift */; };
+		BC174177292D59FF0055A0B8 /* PriceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174176292D59FF0055A0B8 /* PriceCell.swift */; };
 		BC5A4EE9292BAC3A003A20B7 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5A4EE8292BAC3A003A20B7 /* DetailViewController.swift */; };
 		BC5A4EEB292BAF86003A20B7 /* GalleryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5A4EEA292BAF86003A20B7 /* GalleryCell.swift */; };
 		BC5A4EED292C1754003A20B7 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5A4EEC292C1754003A20B7 /* Utilities.swift */; };
@@ -24,6 +28,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BC17416E292D33680055A0B8 /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
+		BC174170292D46B30055A0B8 /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
+		BC174174292D55760055A0B8 /* FilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCell.swift; sourceTree = "<group>"; };
+		BC174176292D59FF0055A0B8 /* PriceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceCell.swift; sourceTree = "<group>"; };
 		BC5A4EE8292BAC3A003A20B7 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		BC5A4EEA292BAF86003A20B7 /* GalleryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryCell.swift; sourceTree = "<group>"; };
 		BC5A4EEC292C1754003A20B7 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
@@ -76,13 +84,17 @@
 				BCF2F94729266D2400930252 /* SceneDelegate.swift */,
 				BC66A6E82929154B00F33E7D /* Item.swift */,
 				BCF2F9592926CFEB00930252 /* ItemCell.swift */,
+				BC5A4EEA292BAF86003A20B7 /* GalleryCell.swift */,
 				BCF2F94929266D2400930252 /* ViewController.swift */,
 				BCF2F95B2926D71E00930252 /* CategoryTableView.swift */,
 				BC67706F2927D4A600985CAB /* SearchTableView.swift */,
 				BC5A4EE8292BAC3A003A20B7 /* DetailViewController.swift */,
-				BC5A4EEC292C1754003A20B7 /* Utilities.swift */,
-				BC5A4EEA292BAF86003A20B7 /* GalleryCell.swift */,
+				BC174170292D46B30055A0B8 /* FilterView.swift */,
+				BC174174292D55760055A0B8 /* FilterCell.swift */,
+				BC174176292D59FF0055A0B8 /* PriceCell.swift */,
+				BC17416E292D33680055A0B8 /* ItemView.swift */,
 				BC66A6EA29296D8900F33E7D /* Storage.swift */,
+				BC5A4EEC292C1754003A20B7 /* Utilities.swift */,
 				BCF2F94B29266D2400930252 /* Main.storyboard */,
 				BCF2F94E29266D2600930252 /* Assets.xcassets */,
 				BCF2F95029266D2600930252 /* LaunchScreen.storyboard */,
@@ -162,16 +174,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC174171292D46B30055A0B8 /* FilterView.swift in Sources */,
 				BC5A4EE9292BAC3A003A20B7 /* DetailViewController.swift in Sources */,
 				BC6770702927D4A600985CAB /* SearchTableView.swift in Sources */,
 				BC5A4EED292C1754003A20B7 /* Utilities.swift in Sources */,
 				BCF2F95C2926D71E00930252 /* CategoryTableView.swift in Sources */,
 				BCF2F95A2926CFEB00930252 /* ItemCell.swift in Sources */,
 				BCF2F94A29266D2400930252 /* ViewController.swift in Sources */,
+				BC174175292D55760055A0B8 /* FilterCell.swift in Sources */,
 				BC66A6E92929154B00F33E7D /* Item.swift in Sources */,
+				BC17416F292D33680055A0B8 /* ItemView.swift in Sources */,
 				BC5A4EEB292BAF86003A20B7 /* GalleryCell.swift in Sources */,
 				BC66A6EB29296D8900F33E7D /* Storage.swift in Sources */,
 				BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */,
+				BC174177292D59FF0055A0B8 /* PriceCell.swift in Sources */,
 				BCF2F94829266D2400930252 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

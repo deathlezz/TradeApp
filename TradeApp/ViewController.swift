@@ -23,7 +23,7 @@ class ViewController: UICollectionViewController {
         
         searchButton = UIBarButtonItem(image: .init(systemName: "magnifyingglass"), style: .plain, target: self, action: #selector(searchTapped))
         
-        filterButton = UIBarButtonItem(image: .init(systemName: "slider.horizontal.3"), style: .plain, target: self, action: nil)
+        filterButton = UIBarButtonItem(image: .init(systemName: "slider.horizontal.3"), style: .plain, target: self, action: #selector(filterTapped))
         
         sortButton = UIBarButtonItem(image: .init(systemName: "arrow.up.arrow.down"), style: .plain, target: self, action: #selector(sort))
         
@@ -41,7 +41,13 @@ class ViewController: UICollectionViewController {
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
         
-        performSelector(inBackground: #selector(loadData), with: nil)
+        DispatchQueue.global().async { [weak self] in
+            self?.loadData()
+            
+            DispatchQueue.main.async {
+                self?.collectionView.reloadData()
+            }
+        }
     }
     
     // number of sections
@@ -96,7 +102,7 @@ class ViewController: UICollectionViewController {
     }
     
     // refresh collection view before view appeared
-    override func viewDidAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         hideButtons()
         collectionView.reloadData()
@@ -121,7 +127,7 @@ class ViewController: UICollectionViewController {
     }
     
     // load data in the background
-    @objc func loadData() {
+    func loadData() {
         for _ in 0...3 {
             let tesla = Item(category: "Vehicles", title: "Tesla Model X", price: 6000, location: "London", date: Date())
             let bmw = Item(category: "Vehicles", title: "BMW E36 2.0 LPG", price: 500, location: "Stirling", date: Date())
@@ -154,5 +160,12 @@ class ViewController: UICollectionViewController {
         present(ac, animated: true)
     }
     
+    // set action for filter button
+    @objc func filterTapped() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "filterView") as? FilterView {
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
 }
 

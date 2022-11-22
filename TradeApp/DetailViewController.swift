@@ -52,7 +52,7 @@ class DetailViewController: UITableViewController {
         switch sectionTitles[indexPath.section] {
         case "Image":
             if let cell = tableView.dequeueReusableCell(withIdentifier: "Image") as? GalleryCell {
-                
+                // cell image here
                 return cell
             }
             
@@ -62,6 +62,7 @@ class DetailViewController: UITableViewController {
             cell.detailTextLabel?.text = "£\(item.price)"
             cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
             cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 30)
+            cell.isUserInteractionEnabled = false
             return cell
             
         case "Tags":
@@ -69,12 +70,14 @@ class DetailViewController: UITableViewController {
             cell.textLabel?.numberOfLines = 0
             cell.textLabel?.text = "\(item.category) | \(item.location) | Added on \(item.date.formatDate())"
             cell.textLabel?.font = UIFont.systemFont(ofSize: 12)
+            cell.isUserInteractionEnabled = false
             return cell
             
         case "Description":
             let cell = tableView.dequeueReusableCell(withIdentifier: "Text", for: indexPath)
             cell.textLabel?.text = "Description here"
             cell.textLabel?.font = UIFont.systemFont(ofSize: 15)
+            cell.isUserInteractionEnabled = false
             return cell
             
         default:
@@ -82,6 +85,13 @@ class DetailViewController: UITableViewController {
         }
         
         return UITableViewCell()
+    }
+    
+    // set action for tapped cell
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "itemView") as? ItemView {
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // set action for save item button
@@ -104,6 +114,15 @@ class DetailViewController: UITableViewController {
         let vc = UIActivityViewController(activityItems: [title], applicationActivities: [])
         
         present(vc, animated: true)
+    }
+    
+    // set save/remove button icon
+    override func viewWillAppear(_ animated: Bool) {
+        if savedItems.contains(where: {$0.title == item.title}) {
+            navigationItem.rightBarButtonItems = [removeButton, actionButton]
+        } else {
+            navigationItem.rightBarButtonItems = [saveButton, actionButton]
+        }
     }
 
 }

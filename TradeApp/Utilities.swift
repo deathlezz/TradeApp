@@ -7,6 +7,7 @@
 
 import Foundation
 
+// date formatter extension
 extension Date {
     func formatDate() -> String {
         let dateFormatter = DateFormatter()
@@ -14,3 +15,6 @@ extension Date {
         return dateFormatter.string(from: self)
     }
 }
+
+// categories array
+let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
