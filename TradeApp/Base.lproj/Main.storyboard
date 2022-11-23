@@ -116,10 +116,10 @@
             </objects>
             <point key="canvasLocation" x="3574.8091603053435" y="686.61971830985919"/>
         </scene>
-        <!--Detail View Controller-->
+        <!--Detail View-->
         <scene sceneID="v3i-0l-WED">
             <objects>
-                <tableViewController storyboardIdentifier="DetailView" id="EBW-cH-FEI" customClass="DetailViewController" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="detailView" id="EBW-cH-FEI" customClass="DetailView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" contentInsetAdjustmentBehavior="never" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="2RO-hq-tql">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -204,10 +204,10 @@
             </objects>
             <point key="canvasLocation" x="3574.8091603053435" y="-675.35211267605632"/>
         </scene>
-        <!--Search Table View-->
+        <!--Search View-->
         <scene sceneID="Ksc-iU-NkS">
             <objects>
-                <tableViewController storyboardIdentifier="searchTableView" automaticallyAdjustsScrollViewInsets="NO" id="uf8-9G-PF1" customClass="SearchTableView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="searchView" automaticallyAdjustsScrollViewInsets="NO" id="uf8-9G-PF1" customClass="SearchView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" contentViewInsetsToSafeArea="NO" id="Vc4-zd-ZQi">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -241,10 +241,10 @@
             </objects>
             <point key="canvasLocation" x="2644" y="687"/>
         </scene>
-        <!--Category Table View-->
+        <!--Category View-->
         <scene sceneID="ChW-Or-xg0">
             <objects>
-                <tableViewController storyboardIdentifier="categoryTableView" automaticallyAdjustsScrollViewInsets="NO" id="c4o-NF-Nwu" customClass="CategoryTableView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="categoryView" automaticallyAdjustsScrollViewInsets="NO" id="c4o-NF-Nwu" customClass="CategoryView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="80" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="2Jn-yY-49u">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -78,7 +78,7 @@ class ViewController: UICollectionViewController {
     
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "DetailView") as? DetailViewController {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = filteredItems[indexPath.row]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
@@ -87,7 +87,7 @@ class ViewController: UICollectionViewController {
     
     // set action for categories button
     @objc func categoriesTapped() {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "categoryTableView") {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "categoryView") {
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -95,7 +95,7 @@ class ViewController: UICollectionViewController {
     
     // set action for search button
     @objc func searchTapped() {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "searchTableView") as? SearchTableView {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "searchView") as? SearchView {
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -146,14 +146,17 @@ class ViewController: UICollectionViewController {
         let ac = UIAlertController(title: "Sort items by", message: nil, preferredStyle: .actionSheet)
         ac.addAction(UIAlertAction(title: "Lowest price", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.price < $1.price})
+            currentFilters["Sort"] = "Lowest price"
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Highest price", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.price > $1.price})
+            currentFilters["Sort"] = "Highest price"
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Date added", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.date < $1.date})
+            currentFilters["Sort"] = "Date added"
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))

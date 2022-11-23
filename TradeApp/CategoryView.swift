@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CategoryTableView: UITableViewController {
+class CategoryView: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,6 +54,7 @@ class CategoryTableView: UITableViewController {
         }
         
         isFilterApplied = true
+        currentFilters["Category"] = word
         navigationController?.popToRootViewController(animated: true)
     }
 

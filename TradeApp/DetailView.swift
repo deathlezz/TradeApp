@@ -7,7 +7,7 @@
 
 import UIKit
 
-class DetailViewController: UITableViewController {
+class DetailView: UITableViewController {
     
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!

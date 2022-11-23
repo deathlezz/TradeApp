@@ -51,18 +51,21 @@ class FilterView: UITableViewController {
             switch sectionTitles[indexPath.section] {
             case "Sort":
                 cell.filterTextField.placeholder = "None"
+                cell.filterTextField.text = currentFilters["Sort"]
                 cell.filterTextField.isUserInteractionEnabled = false
                 cell.selectionStyle = .none
                 filterCells.append(cell)
                 return cell
             case "Category":
                 cell.filterTextField.placeholder = "None"
+                cell.filterTextField.text = currentFilters["Category"]
                 cell.filterTextField.isUserInteractionEnabled = false
                 cell.selectionStyle = .none
                 filterCells.append(cell)
                 return cell
             case "Location":
                 cell.filterTextField.placeholder = "None"
+                cell.filterTextField.text = currentFilters["Location"]
                 cell.selectionStyle = .none
                 cell.filterTextField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 filterCells.append(cell)
@@ -74,7 +77,9 @@ class FilterView: UITableViewController {
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "priceCell", for: indexPath) as? PriceCell {
             cell.firstTextField.placeholder = "From"
+            cell.firstTextField.text = currentFilters["PriceFrom"]
             cell.secondTextField.placeholder = "To"
+            cell.secondTextField.text = currentFilters["PriceTo"]
             cell.selectionStyle = .none
             priceCell = cell
             return cell
@@ -112,7 +117,69 @@ class FilterView: UITableViewController {
     
     // set action for apply button
     @objc func applyTapped() {
+        let categoryText = filterCells[1].filterTextField.text
+        let locationText = filterCells[2].filterTextField.text
+        let priceFrom = Int(priceCell.firstTextField.text ?? "")
+        let priceTo = Int(priceCell.secondTextField.text ?? "")
+        let sortText = filterCells[0].filterTextField.text
         
+        filteredItems.removeAll()
+        
+        for item in items {
+            
+            // category filter
+            if categoryText != nil {
+                if categoryText == categories[0] {
+                    filteredItems = items
+                } else if item.category == categoryText {
+                    filteredItems.append(item)
+                }
+                
+                currentFilters["Category"] = categoryText
+            }
+            
+            // location filter
+            if locationText != nil {
+                if item.location == locationText {
+                    filteredItems.append(item)
+                }
+                
+                currentFilters["Location"] = locationText
+            }
+            
+            // price filter
+            if priceFrom != nil && priceTo != nil {
+                if item.price >= priceFrom! && item.price <= priceTo! {
+                    filteredItems.append(item)
+                }
+            } else if priceFrom != nil {
+                if item.price >= priceFrom! {
+                    filteredItems.append(item)
+                }
+            } else if priceTo != nil {
+                if item.price <= priceTo! {
+                    filteredItems.append(item)
+                }
+            }
+            
+            currentFilters["PriceFrom"] = String(priceFrom!)
+            currentFilters["PriceTo"] = String(priceTo!)
+        }
+        
+        // sort filter
+        if sortText != nil {
+            if sortText == "Lowest price" {
+                filteredItems.sort(by: {$0.price < $1.price})
+            } else if sortText == "Highest price" {
+                filteredItems.sort(by: {$0.price > $1.price})
+            } else if sortText == "Date added" {
+                filteredItems.sort(by: {$0.date < $1.date})
+            }
+            
+            currentFilters["Sort"] = sortText
+        }
+        
+        navigationController?.popToRootViewController(animated: true)
     }
     
     // set action for clear button
@@ -128,6 +195,36 @@ class FilterView: UITableViewController {
     // set action for "return" keyboard button
     @objc func returnTapped(_ textField: UITextField) {
         textField.resignFirstResponder()
+    }
+    
+    // set "done" button for numeric keyboard
+    func addDoneButtonToKeyboard() {
+        let doneToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        doneToolbar.barStyle = .default
+        
+        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(doneTapped))
+        
+        let items = [spacer, done]
+        doneToolbar.items = items
+        doneToolbar.sizeToFit()
+        
+        priceCell.firstTextField.inputAccessoryView = doneToolbar
+        priceCell.secondTextField.inputAccessoryView = doneToolbar
+    }
+    
+    // add "done" button after view appeard
+    override func viewDidAppear(_ animated: Bool) {
+        addDoneButtonToKeyboard()
+    }
+    
+    // set action for "done" button
+    @objc func doneTapped() {
+        if priceCell.firstTextField.isEditing {
+            priceCell.firstTextField.resignFirstResponder()
+        } else {
+            priceCell.secondTextField.resignFirstResponder()
+        }
     }
 
 }

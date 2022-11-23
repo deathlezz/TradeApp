@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SearchTableView: UITableViewController {
+class SearchView: UITableViewController {
     
     var textField: UITextField!
 
@@ -20,6 +20,7 @@ class SearchTableView: UITableViewController {
         textField.borderStyle = .roundedRect
         textField.clearButtonMode = .whileEditing
         textField.placeholder = "Find something for yourself"
+        textField.text = currentFilters["Search"]
         textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
         textField.returnKeyType = .search
         navigationItem.titleView = textField
@@ -76,9 +77,10 @@ class SearchTableView: UITableViewController {
         } else {
             filteredItems = recentlyAdded
             isFilterApplied = false
+            currentFilters.removeAll()
         }
         
-        textField.text = ""
+        currentFilters["Search"] = textField.text
         textField.resignFirstResponder()
         navigationController?.popToRootViewController(animated: true)
     }

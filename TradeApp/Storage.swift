@@ -13,3 +13,5 @@ var recentlyAdded = [Item]()
 var recentlySearched = [String]()
 var savedItems = [Item]()
 var isFilterApplied = false
+var currentFilters = [String: String]()
+var filterArray = [Item]()
