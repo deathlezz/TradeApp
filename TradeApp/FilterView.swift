@@ -123,47 +123,43 @@ class FilterView: UITableViewController {
         let priceTo = Int(priceCell.secondTextField.text ?? "")
         let sortText = filterCells[0].filterTextField.text
         
-        filteredItems.removeAll()
+        filteredItems = items
         
-        for item in items {
-            
-            // category filter
-            if categoryText != nil {
-                if categoryText == categories[0] {
-                    filteredItems = items
-                } else if item.category == categoryText {
-                    filteredItems.append(item)
-                }
-                
-                currentFilters["Category"] = categoryText
+        // category filter
+        if !categoryText!.isEmpty {
+            if categoryText == categories[0] {
+                filteredItems = items
+            } else {
+                filteredItems = filteredItems.filter {$0.category == categoryText}
             }
-            
-            // location filter
-            if locationText != nil {
-                if item.location == locationText {
-                    filteredItems.append(item)
-                }
-                
-                currentFilters["Location"] = locationText
-            }
-            
-            // price filter
-            if priceFrom != nil && priceTo != nil {
-                if item.price >= priceFrom! && item.price <= priceTo! {
-                    filteredItems.append(item)
-                }
-            } else if priceFrom != nil {
-                if item.price >= priceFrom! {
-                    filteredItems.append(item)
-                }
-            } else if priceTo != nil {
-                if item.price <= priceTo! {
-                    filteredItems.append(item)
-                }
-            }
-            
+
+            currentFilters["Category"] = categoryText
+        } else {
+            currentFilters["Category"] = ""
+        }
+        
+        // location filter
+        if !locationText!.isEmpty {
+            filteredItems = filteredItems.filter {$0.location == locationText}
+            currentFilters["Location"] = locationText
+        } else {
+            currentFilters["Location"] = ""
+        }
+        
+        // price filter
+        if priceFrom != nil && priceTo != nil {
+            filteredItems = filteredItems.filter {$0.price >= priceFrom! && $0.price <= priceTo!}
             currentFilters["PriceFrom"] = String(priceFrom!)
             currentFilters["PriceTo"] = String(priceTo!)
+        } else if priceFrom != nil {
+            filteredItems = filteredItems.filter {$0.price >= priceFrom!}
+            currentFilters["PriceFrom"] = String(priceFrom!)
+        } else if priceTo != nil {
+            filteredItems = filteredItems.filter {$0.price <= priceTo!}
+            currentFilters["PriceTo"] = String(priceTo!)
+        } else {
+            currentFilters["PriceFrom"] = nil
+            currentFilters["PriceTo"] = nil
         }
         
         // sort filter
