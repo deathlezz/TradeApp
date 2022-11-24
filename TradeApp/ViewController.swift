@@ -117,7 +117,7 @@ class ViewController: UICollectionViewController {
     
     // show or hide filter and sort buttons
     func hideButtons() {
-        if isFilterApplied {
+        if isCategoryApplied || isSearchApplied {
             filterButton.isHidden = false
             sortButton.isHidden = false
         } else {

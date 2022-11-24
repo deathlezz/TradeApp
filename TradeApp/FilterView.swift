@@ -117,53 +117,73 @@ class FilterView: UITableViewController {
     
     // set action for apply button
     @objc func applyTapped() {
-        let categoryText = filterCells[1].filterTextField.text
-        let locationText = filterCells[2].filterTextField.text
-        let priceFrom = Int(priceCell.firstTextField.text ?? "")
-        let priceTo = Int(priceCell.secondTextField.text ?? "")
-        let sortText = filterCells[0].filterTextField.text
+        let categoryText = filterCells[1].filterTextField.text ?? ""
+        let locationText = filterCells[2].filterTextField.text ?? ""
+        var priceFrom = Int(priceCell.firstTextField.text ?? "")
+        var priceTo = Int(priceCell.secondTextField.text ?? "")
+        let sortText = filterCells[0].filterTextField.text ?? ""
         
-        filteredItems = items
+        if isSearchApplied && isCategoryApplied {
+            filteredItems = items.filter {$0.category == currentFilters["Category"]}
+            filteredItems = filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+        } else if isSearchApplied {
+            filteredItems = items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+        } else if isCategoryApplied {
+            filteredItems = items.filter {$0.category == currentFilters["Category"]}
+        }
         
         // category filter
-        if !categoryText!.isEmpty {
+        if !categoryText.isEmpty {
             if categoryText == categories[0] {
                 filteredItems = items
+                isCategoryApplied = true
             } else {
                 filteredItems = filteredItems.filter {$0.category == categoryText}
+                isCategoryApplied = true
             }
 
             currentFilters["Category"] = categoryText
         } else {
             currentFilters["Category"] = ""
+            isCategoryApplied = false
         }
         
         // location filter
-        if !locationText!.isEmpty {
-            filteredItems = filteredItems.filter {$0.location == locationText}
+        if !locationText.isEmpty {
+            filteredItems = filteredItems.filter {$0.location.lowercased() == locationText.lowercased()}
             currentFilters["Location"] = locationText
+            isFilterApplied = true
         } else {
             currentFilters["Location"] = ""
+            isFilterApplied = false
         }
         
         // price filter
         if priceFrom != nil && priceTo != nil {
+            if priceFrom! > priceTo! {
+                (priceFrom, priceTo) = (priceTo, priceFrom)
+            }
+            
             filteredItems = filteredItems.filter {$0.price >= priceFrom! && $0.price <= priceTo!}
             currentFilters["PriceFrom"] = String(priceFrom!)
             currentFilters["PriceTo"] = String(priceTo!)
+            isFilterApplied = true
         } else if priceFrom != nil {
             filteredItems = filteredItems.filter {$0.price >= priceFrom!}
             currentFilters["PriceFrom"] = String(priceFrom!)
+            isFilterApplied = true
         } else if priceTo != nil {
             filteredItems = filteredItems.filter {$0.price <= priceTo!}
             currentFilters["PriceTo"] = String(priceTo!)
+            isFilterApplied = true
         } else {
             currentFilters["PriceFrom"] = nil
             currentFilters["PriceTo"] = nil
+            isFilterApplied = false
         }
         
         // sort filter
-        if sortText != nil {
+        if !sortText.isEmpty {
             if sortText == "Lowest price" {
                 filteredItems.sort(by: {$0.price < $1.price})
             } else if sortText == "Highest price" {
@@ -173,6 +193,8 @@ class FilterView: UITableViewController {
             }
             
             currentFilters["Sort"] = sortText
+        } else {
+            currentFilters["Sort"] = ""
         }
         
         navigationController?.popToRootViewController(animated: true)
@@ -181,7 +203,7 @@ class FilterView: UITableViewController {
     // set action for clear button
     @objc func clearTapped() {
         for cell in filterCells {
-            cell.filterTextField.text = nil
+            cell.filterTextField.text = ""
         }
         
         priceCell.firstTextField.text = nil

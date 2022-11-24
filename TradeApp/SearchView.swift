@@ -58,29 +58,30 @@ class SearchView: UITableViewController {
     
     // set action for "return" keyboard button
     @objc func returnTapped() {
-        if !textField.text!.isEmpty {
-            filteredItems.removeAll()
-
-            for item in items {
-                if item.title.lowercased().contains(textField.text!.lowercased()) {
-                    filteredItems.append(item)
-                }
-            }
-
-            if !recentlySearched.contains(textField.text!) {
-                let indexPath = IndexPath(row: 0, section: 0)
-                recentlySearched.insert(textField.text!, at: 0)
-                tableView.insertRows(at: [indexPath], with: .automatic)
-            }
-            isFilterApplied = true
-
-        } else {
+        let word = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        
+        if !word.isEmpty && isCategoryApplied {
+            filter(word)
+            isSearchApplied = true
+            currentFilters["Search"] = word
+            
+        } else if !word.isEmpty && !isCategoryApplied {
+            filteredItems = items
+            filter(word)
+            isSearchApplied = true
+            currentFilters["Search"] = word
+            
+        } else if word.isEmpty && isCategoryApplied {
+            filter(word)
+            isSearchApplied = false
+            currentFilters["Search"] = ""
+            
+        } else if word.isEmpty && !isCategoryApplied {
             filteredItems = recentlyAdded
-            isFilterApplied = false
-            currentFilters.removeAll()
+            isSearchApplied = false
+            currentFilters["Search"] = ""
         }
         
-        currentFilters["Search"] = textField.text
         textField.resignFirstResponder()
         navigationController?.popToRootViewController(animated: true)
     }
@@ -105,4 +106,14 @@ class SearchView: UITableViewController {
         textField.resignFirstResponder()
     }
 
+    func filter(_ word: String) {
+        filteredItems = filteredItems.filter {$0.title.lowercased().contains(word.lowercased())}
+        
+        if !recentlySearched.contains(word) {
+            let indexPath = IndexPath(row: 0, section: 0)
+            recentlySearched.insert(word, at: 0)
+            tableView.insertRows(at: [indexPath], with: .automatic)
+        }
+    }
+    
 }

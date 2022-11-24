@@ -53,7 +53,7 @@ class CategoryView: UITableViewController {
             }
         }
         
-        isFilterApplied = true
+        isCategoryApplied = true
         currentFilters["Category"] = word
         navigationController?.popToRootViewController(animated: true)
     }
