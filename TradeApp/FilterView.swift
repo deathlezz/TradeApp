@@ -66,6 +66,7 @@ class FilterView: UITableViewController {
             case "Location":
                 cell.filterTextField.placeholder = "None"
                 cell.filterTextField.text = currentFilters["Location"]
+                cell.filterTextField.clearButtonMode = .whileEditing
                 cell.selectionStyle = .none
                 cell.filterTextField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 filterCells.append(cell)
@@ -78,8 +79,10 @@ class FilterView: UITableViewController {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "priceCell", for: indexPath) as? PriceCell {
             cell.firstTextField.placeholder = "From"
             cell.firstTextField.text = currentFilters["PriceFrom"]
+            cell.firstTextField.clearButtonMode = .whileEditing
             cell.secondTextField.placeholder = "To"
             cell.secondTextField.text = currentFilters["PriceTo"]
+            cell.secondTextField.clearButtonMode = .whileEditing
             cell.selectionStyle = .none
             priceCell = cell
             return cell
@@ -119,8 +122,8 @@ class FilterView: UITableViewController {
     @objc func applyTapped() {
         let categoryText = filterCells[1].filterTextField.text ?? ""
         let locationText = filterCells[2].filterTextField.text ?? ""
-        var priceFrom = Int(priceCell.firstTextField.text ?? "")
-        var priceTo = Int(priceCell.secondTextField.text ?? "")
+        var priceFrom = priceCell.firstTextField.text ?? ""
+        var priceTo = priceCell.secondTextField.text ?? ""
         let sortText = filterCells[0].filterTextField.text ?? ""
         
         if isSearchApplied && isCategoryApplied {
@@ -134,17 +137,21 @@ class FilterView: UITableViewController {
         
         // category filter
         if !categoryText.isEmpty {
-            if categoryText == categories[0] {
+            if categoryText == categories[0] && isSearchApplied {
+                filteredItems = items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+            } else if categoryText == categories[0] && !isSearchApplied {
                 filteredItems = items
-                isCategoryApplied = true
-            } else {
+            } else if categoryText != categories[0] && isSearchApplied {
+                filteredItems = items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
                 filteredItems = filteredItems.filter {$0.category == categoryText}
-                isCategoryApplied = true
+            } else if categoryText != categories[0] && !isSearchApplied {
+                filteredItems = items.filter {$0.category == categoryText}
             }
 
+            isCategoryApplied = true
             currentFilters["Category"] = categoryText
         } else {
-            currentFilters["Category"] = ""
+            currentFilters["Category"] = nil
             isCategoryApplied = false
         }
         
@@ -154,32 +161,32 @@ class FilterView: UITableViewController {
             currentFilters["Location"] = locationText
             isFilterApplied = true
         } else {
-            currentFilters["Location"] = ""
-            isFilterApplied = false
+            currentFilters["Location"] = nil
         }
         
         // price filter
-        if priceFrom != nil && priceTo != nil {
-            if priceFrom! > priceTo! {
+        if !priceFrom.isEmpty && !priceTo.isEmpty {
+            if Int(priceFrom)! > Int(priceTo)! {
                 (priceFrom, priceTo) = (priceTo, priceFrom)
             }
             
-            filteredItems = filteredItems.filter {$0.price >= priceFrom! && $0.price <= priceTo!}
-            currentFilters["PriceFrom"] = String(priceFrom!)
-            currentFilters["PriceTo"] = String(priceTo!)
+            filteredItems = filteredItems.filter {$0.price >= Int(priceFrom)! && $0.price <= Int(priceTo)!}
+            currentFilters["PriceFrom"] = priceFrom
+            currentFilters["PriceTo"] = priceTo
             isFilterApplied = true
-        } else if priceFrom != nil {
-            filteredItems = filteredItems.filter {$0.price >= priceFrom!}
-            currentFilters["PriceFrom"] = String(priceFrom!)
+        } else if !priceFrom.isEmpty {
+            filteredItems = filteredItems.filter {$0.price >= Int(priceFrom)!}
+            currentFilters["PriceFrom"] = priceFrom
+            currentFilters["PriceTo"] = nil
             isFilterApplied = true
-        } else if priceTo != nil {
-            filteredItems = filteredItems.filter {$0.price <= priceTo!}
-            currentFilters["PriceTo"] = String(priceTo!)
+        } else if !priceTo.isEmpty {
+            filteredItems = filteredItems.filter {$0.price <= Int(priceTo)!}
+            currentFilters["PriceTo"] = priceTo
+            currentFilters["PriceFrom"] = nil
             isFilterApplied = true
         } else {
             currentFilters["PriceFrom"] = nil
             currentFilters["PriceTo"] = nil
-            isFilterApplied = false
         }
         
         // sort filter
@@ -193,8 +200,19 @@ class FilterView: UITableViewController {
             }
             
             currentFilters["Sort"] = sortText
+            isFilterApplied = true
         } else {
-            currentFilters["Sort"] = ""
+            currentFilters["Sort"] = nil
+        }
+        
+        if !isCategoryApplied && !isSearchApplied {
+            filteredItems = recentlyAdded
+            isCategoryApplied = false
+            isSearchApplied = false
+        }
+        
+        if locationText.isEmpty && priceFrom.isEmpty && priceTo.isEmpty && sortText.isEmpty {
+            isFilterApplied = false
         }
         
         navigationController?.popToRootViewController(animated: true)
@@ -203,7 +221,7 @@ class FilterView: UITableViewController {
     // set action for clear button
     @objc func clearTapped() {
         for cell in filterCells {
-            cell.filterTextField.text = ""
+            cell.filterTextField.text = nil
         }
         
         priceCell.firstTextField.text = nil

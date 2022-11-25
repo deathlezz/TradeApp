@@ -58,28 +58,42 @@ class SearchView: UITableViewController {
     
     // set action for "return" keyboard button
     @objc func returnTapped() {
+        let currentCategory = currentFilters["Category"]
+        
         let word = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         
+        // category filter
+        if currentCategory != nil {
+            if currentCategory == categories[0] {
+                filteredItems = items
+            } else if currentCategory != categories[0] {
+                filteredItems = items.filter {$0.category == currentCategory}
+            }
+        }
+        
         if !word.isEmpty && isCategoryApplied {
-            filter(word)
+            filteredItems = filteredItems.filter {$0.title.lowercased().contains(word.lowercased())}
+            manageFilters()
+            isUnique(word)
             isSearchApplied = true
             currentFilters["Search"] = word
-            
+
         } else if !word.isEmpty && !isCategoryApplied {
-            filteredItems = items
-            filter(word)
+            filteredItems = items.filter {$0.title.lowercased().contains(word.lowercased())}
+            manageFilters()
+            isUnique(word)
             isSearchApplied = true
             currentFilters["Search"] = word
-            
+
         } else if word.isEmpty && isCategoryApplied {
-            filter(word)
+            manageFilters()
             isSearchApplied = false
-            currentFilters["Search"] = ""
-            
+            currentFilters["Search"] = nil
+
         } else if word.isEmpty && !isCategoryApplied {
             filteredItems = recentlyAdded
             isSearchApplied = false
-            currentFilters["Search"] = ""
+            currentFilters.removeAll()
         }
         
         textField.resignFirstResponder()
@@ -106,13 +120,16 @@ class SearchView: UITableViewController {
         textField.resignFirstResponder()
     }
 
-    func filter(_ word: String) {
-        filteredItems = filteredItems.filter {$0.title.lowercased().contains(word.lowercased())}
-        
+    // add unique word to recently searched array
+    func isUnique(_ word: String) {
         if !recentlySearched.contains(word) {
             let indexPath = IndexPath(row: 0, section: 0)
             recentlySearched.insert(word, at: 0)
             tableView.insertRows(at: [indexPath], with: .automatic)
+            
+            if recentlySearched.count > 10 {
+                recentlySearched.removeLast()
+            }
         }
     }
     

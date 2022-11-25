@@ -15,7 +15,7 @@ class CategoryView: UITableViewController {
         title = "Categories"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "itemCell")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "categoryCell")
     }
 
     // number of sections

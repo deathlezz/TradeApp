@@ -110,7 +110,6 @@ class ViewController: UICollectionViewController {
     
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
-        filteredItems.shuffle()
         collectionView.reloadData()
         refreshControl.endRefreshing()
     }
@@ -147,16 +146,19 @@ class ViewController: UICollectionViewController {
         ac.addAction(UIAlertAction(title: "Lowest price", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.price < $1.price})
             currentFilters["Sort"] = "Lowest price"
+            isFilterApplied = true
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Highest price", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.price > $1.price})
             currentFilters["Sort"] = "Highest price"
+            isFilterApplied = true
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Date added", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.date < $1.date})
             currentFilters["Sort"] = "Date added"
+            isFilterApplied = true
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
