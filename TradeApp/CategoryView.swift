@@ -41,16 +41,18 @@ class CategoryView: UITableViewController {
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let word = categories[indexPath.row]
-        filteredItems.removeAll()
         
         if word == categories[0] {
             filteredItems = items
-        } else {
-            for item in items {
-                if item.category.contains(word) {
-                    filteredItems.append(item)
-                }
-            }
+        } else if word != categories[0] {
+            filteredItems = items.filter {$0.category == word}
+        }
+        
+        if isSearchApplied {
+            filteredItems = filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+            manageFilters()
+        } else if !isSearchApplied {
+            manageFilters()
         }
         
         isCategoryApplied = true

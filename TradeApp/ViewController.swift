@@ -55,7 +55,7 @@ class ViewController: UICollectionViewController {
         return 1
     }
     
-    // number of rows in section
+    // number of items in section
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return filteredItems.count
     }
@@ -87,7 +87,7 @@ class ViewController: UICollectionViewController {
     
     // set action for categories button
     @objc func categoriesTapped() {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "categoryView") {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "CategoryView") {
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -103,7 +103,7 @@ class ViewController: UICollectionViewController {
     
     // refresh collection view before view appeared
     override func viewWillAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        super.viewWillAppear(animated)
         hideButtons()
         collectionView.reloadData()
     }

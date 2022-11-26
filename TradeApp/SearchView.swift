@@ -82,6 +82,8 @@ class SearchView: UITableViewController {
             filteredItems = items.filter {$0.title.lowercased().contains(word.lowercased())}
             manageFilters()
             isUnique(word)
+            isCategoryApplied = true
+            currentFilters["Category"] = categories[0]
             isSearchApplied = true
             currentFilters["Search"] = word
 

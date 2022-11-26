@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+class SceneDelegate: UIResponder, UIWindowSceneDelegate, UINavigationControllerDelegate {
 
     var window: UIWindow?
 
@@ -17,11 +17,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         
+        guard let _ = (scene as? UIWindowScene) else { return }
         
         // create "Saved" tab bar item
         if let tabBarController = window?.rootViewController as? UITabBarController {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "NavController")
+            let vc = storyboard.instantiateViewController(withIdentifier: "SavedView")
             vc.tabBarItem = UITabBarItem(title: "Saved", image: .init(systemName: "heart"), tag: 1)
             tabBarController.viewControllers?.append(vc)
         }
@@ -29,7 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // create "Add" tab bar item
         if let tabBarController = window?.rootViewController as? UITabBarController {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "NavController")
+            let vc = storyboard.instantiateViewController(withIdentifier: "CategoryView")
             vc.tabBarItem = UITabBarItem(title: "Add", image: .init(systemName: "plus"), tag: 2)
             tabBarController.viewControllers?.append(vc)
         }
@@ -49,8 +50,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             vc.tabBarItem = UITabBarItem(title: "Account", image: .init(systemName: "person"), tag: 4)
             tabBarController.viewControllers?.append(vc)
         }
-        
-        guard let _ = (scene as? UIWindowScene) else { return }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

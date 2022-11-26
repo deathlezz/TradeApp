@@ -151,13 +151,15 @@ class FilterView: UITableViewController {
             isCategoryApplied = true
             currentFilters["Category"] = categoryText
         } else {
+            currentFilters["Search"] = nil
             currentFilters["Category"] = nil
             isCategoryApplied = false
+            isSearchApplied = false
         }
         
         // location filter
         if !locationText.isEmpty {
-            filteredItems = filteredItems.filter {$0.location.lowercased() == locationText.lowercased()}
+            filteredItems = filteredItems.filter {$0.location == locationText}
             currentFilters["Location"] = locationText
             isFilterApplied = true
         } else {
@@ -251,6 +253,7 @@ class FilterView: UITableViewController {
     
     // add "done" button after view appeard
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         addDoneButtonToKeyboard()
     }
     

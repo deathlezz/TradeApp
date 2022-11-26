@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 // date formatter extension
 extension Date {
@@ -13,6 +14,12 @@ extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMM, HH:mm"
         return dateFormatter.string(from: self)
+    }
+}
+
+extension UIViewController {
+    func embedInNavController() -> UINavigationController {
+        return UINavigationController(rootViewController: self)
     }
 }
 

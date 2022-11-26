@@ -118,6 +118,8 @@ class DetailView: UITableViewController {
     
     // set save/remove button icon
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         if savedItems.contains(where: {$0.title == item.title}) {
             navigationItem.rightBarButtonItems = [removeButton, actionButton]
         } else {
