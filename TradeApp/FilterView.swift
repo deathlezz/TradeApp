@@ -23,6 +23,8 @@ class FilterView: UITableViewController {
         title = "Filter"
         navigationController?.navigationBar.prefersLargeTitles = true
         
+        navigationController?.hidesBarsOnSwipe = false
+        
         applyButton = UIBarButtonItem(title: "Apply", style: .plain, target: self, action: #selector(applyTapped))
         
         clearButton = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearTapped))

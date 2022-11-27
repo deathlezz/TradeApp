@@ -19,6 +19,9 @@ class ViewController: UICollectionViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        title = "Recently added"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        
         categoriesButton = UIBarButtonItem(image: .init(systemName: "line.horizontal.3"), style: .plain, target: self, action: #selector(categoriesTapped))
         
         searchButton = UIBarButtonItem(image: .init(systemName: "magnifyingglass"), style: .plain, target: self, action: #selector(searchTapped))
@@ -32,8 +35,6 @@ class ViewController: UICollectionViewController {
         
         sortButton.isHidden = true
         filterButton.isHidden = true
-        
-        navigationController?.hidesBarsOnSwipe = true
         
         // pull to refresh
         let refreshControl = UIRefreshControl()
@@ -104,6 +105,8 @@ class ViewController: UICollectionViewController {
     // refresh collection view before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.hidesBarsOnSwipe = true
+        changeTitle()
         hideButtons()
         collectionView.reloadData()
     }
@@ -170,6 +173,16 @@ class ViewController: UICollectionViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "filterView") as? FilterView {
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    func changeTitle() {
+        if isCategoryApplied {
+            title = currentFilters["Category"]
+            navigationController?.tabBarItem.title = "Search"
+        } else {
+            title = "Recently added"
+            navigationController?.tabBarItem.title = "Search"
         }
     }
 }

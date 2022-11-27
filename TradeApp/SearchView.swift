@@ -15,6 +15,7 @@ class SearchView: UITableViewController {
         super.viewDidLoad()
         
         navigationItem.largeTitleDisplayMode = .never
+        navigationController?.hidesBarsOnSwipe = false
         
         textField = UITextField(frame: CGRect(x: 0, y: 0, width: (navigationController?.navigationBar.frame.width)!, height: 30))
         textField.borderStyle = .roundedRect
