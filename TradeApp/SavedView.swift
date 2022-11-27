@@ -20,7 +20,6 @@ class SavedView: UICollectionViewController {
         refreshControl.tintColor = .red
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
-        collectionView.delegate = self
     }
     
     // number of sections

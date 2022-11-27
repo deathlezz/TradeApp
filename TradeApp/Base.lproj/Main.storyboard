@@ -10,7 +10,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!-- -->
         <scene sceneID="ne1-Gl-eXw">
             <objects>
                 <collectionViewController storyboardIdentifier="viewController" automaticallyAdjustsScrollViewInsets="NO" id="QXd-Yp-lgq" customClass="ViewController" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
@@ -83,13 +83,13 @@
                             <outlet property="delegate" destination="QXd-Yp-lgq" id="6y7-3u-gXq"/>
                         </connections>
                     </collectionView>
-                    <navigationItem key="navigationItem" id="iOP-Wk-sYJ">
-                        <nil key="title"/>
+                    <navigationItem key="navigationItem" title=" " id="iOP-Wk-sYJ">
+                        <barButtonItem key="backBarButtonItem" title=" " id="FXA-JH-z4u"/>
                     </navigationItem>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rsd-KG-NQt" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3575" y="6"/>
+            <point key="canvasLocation" x="2631" y="6"/>
         </scene>
         <!--Saved View-->
         <scene sceneID="aI2-zJ-tbe">
@@ -164,11 +164,11 @@
                             <outlet property="delegate" destination="LDV-4E-Hc6" id="M4r-lc-Ody"/>
                         </connections>
                     </collectionView>
-                    <navigationItem key="navigationItem" id="5ca-2D-QeW"/>
+                    <navigationItem key="navigationItem" id="EOr-dz-jMF"/>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GbY-GD-Vge" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4474" y="6"/>
+            <point key="canvasLocation" x="2631" y="687"/>
         </scene>
         <!--Item View-->
         <scene sceneID="0Sv-0N-Us1">
@@ -194,7 +194,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Abn-eK-zj1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3574.8091603053435" y="686.61971830985919"/>
+            <point key="canvasLocation" x="3534" y="6"/>
         </scene>
         <!--Detail View-->
         <scene sceneID="v3i-0l-WED">
@@ -203,7 +203,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" contentInsetAdjustmentBehavior="never" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="2RO-hq-tql">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" systemColor="systemGray6Color"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="Image" rowHeight="310" id="aGs-hp-K6R" customClass="GalleryCell" customModule="TradeApp" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="50" width="393" height="310"/>
@@ -282,7 +282,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1uf-Wc-mgS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3574.8091603053435" y="-675.35211267605632"/>
+            <point key="canvasLocation" x="3534" y="687"/>
         </scene>
         <!--Search View-->
         <scene sceneID="Ksc-iU-NkS">
@@ -291,6 +291,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" contentViewInsetsToSafeArea="NO" id="Vc4-zd-ZQi">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemGray6Color"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="historyCell" textLabel="D4L-DE-xGa" style="IBUITableViewCellStyleDefault" id="ffm-J3-E5t">
                                 <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
@@ -319,7 +320,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Cub-Zg-kuq" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2644" y="687"/>
+            <point key="canvasLocation" x="2631" y="-675"/>
         </scene>
         <!--Category View-->
         <scene sceneID="ChW-Or-xg0">
@@ -356,7 +357,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sec-WA-96w" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2645" y="-675"/>
+            <point key="canvasLocation" x="3534" y="-675"/>
         </scene>
         <!--Filter View-->
         <scene sceneID="Dbl-8d-Pq0">
@@ -365,7 +366,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="m5b-wW-PeD">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" systemColor="systemGray6Color"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="filterCell" id="Zwj-RS-Nvv" customClass="FilterCell" customModule="TradeApp" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
@@ -424,7 +425,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yiV-uN-60d" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1716.7938931297708" y="686.61971830985919"/>
+            <point key="canvasLocation" x="1717" y="-675"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="kKH-oV-Ueq">
@@ -438,11 +439,12 @@
                     </tabBar>
                     <connections>
                         <segue destination="PGc-Wf-AUr" kind="relationship" relationship="viewControllers" id="kSz-IR-LYE"/>
+                        <segue destination="cUf-l7-uP0" kind="relationship" relationship="viewControllers" id="hjb-7P-tP8"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5hq-Wy-t4h" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1716.9230769230769" y="5.6872037914691944"/>
+            <point key="canvasLocation" x="706" y="330"/>
         </scene>
         <!--Search-->
         <scene sceneID="Dd3-Ss-MbM">
@@ -463,11 +465,31 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="blx-VP-dDe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2646.1538461538462" y="5.6872037914691944"/>
+            <point key="canvasLocation" x="1717" y="6"/>
+        </scene>
+        <!--Saved-->
+        <scene sceneID="MZc-DY-epq">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="cUf-l7-uP0" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Saved" image="heart" catalog="system" id="dOW-HG-H70"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="0LN-c1-xde">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="LDV-4E-Hc6" kind="relationship" relationship="rootViewController" id="X7m-Bb-8JS"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dyS-22-ylR" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1717" y="687"/>
         </scene>
     </scenes>
     <resources>
         <image name="car" catalog="system" width="128" height="95"/>
+        <image name="heart" catalog="system" width="128" height="107"/>
         <image name="magnifyingglass" catalog="system" width="128" height="117"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

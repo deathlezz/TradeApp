@@ -17,12 +17,6 @@ extension Date {
     }
 }
 
-extension UIViewController {
-    func embedInNavController() -> UINavigationController {
-        return UINavigationController(rootViewController: self)
-    }
-}
-
 // categories array
 let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
 
