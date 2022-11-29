@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import UIKit
 
 // date formatter extension
 extension Date {
@@ -17,38 +16,68 @@ extension Date {
     }
 }
 
-// categories array
-let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
-
-// manage filters function
-func manageFilters() {
-    let currentLocation = currentFilters["Location"]
-    let currentPriceFrom = currentFilters["PriceFrom"]
-    let currentPriceTo = currentFilters["PriceTo"]
-    let currentSort = currentFilters["Sort"]
+class Utilities {
     
-    // location filter
-    if currentLocation != nil {
-        filteredItems = filteredItems.filter {$0.location == currentLocation}
+    // save saved items
+    static func saveItems(_ items: [Item]) {
+        let defaults = UserDefaults.standard
+        defaults.set(items, forKey: "savedItems")
     }
     
-    // price filter
-    if currentPriceFrom != nil && currentPriceTo != nil {
-        filteredItems = filteredItems.filter {$0.price >= Int(currentPriceFrom!)! && $0.price <= Int(currentPriceTo!)!}
-    } else if currentPriceFrom != nil {
-        filteredItems = filteredItems.filter {$0.price >= Int(currentPriceFrom!)!}
-    } else if currentPriceTo != nil {
-        filteredItems = filteredItems.filter {$0.price <= Int(currentPriceTo!)!}
+    // load saved items
+    static func loadItems() -> [Item] {
+        let defaults = UserDefaults.standard
+        if let savedItems = defaults.object(forKey: "savedItems") as? [Item] {
+            return savedItems
+        }
+        return [Item]()
     }
     
-    // sort filter
-    if currentSort != nil {
-        if currentSort == "Lowest price" {
-            filteredItems.sort(by: {$0.price < $1.price})
-        } else if currentSort == "Highest price" {
-            filteredItems.sort(by: {$0.price > $1.price})
-        } else if currentSort == "Date added" {
-            filteredItems.sort(by: {$0.date < $1.date})
+    // save applied filters
+    static func saveFilters(_ filters: [String: String]) {
+        let defaults = UserDefaults.standard
+        defaults.set(filters, forKey: "currentFilters")
+    }
+    
+    // load applied filters
+    static func loadFilters() -> [String: String] {
+        let defaults = UserDefaults.standard
+        if let filters = defaults.object(forKey: "currentFilters") as? [String: String] {
+            return filters
+        }
+        return [String: String]()
+    }
+    
+    // manage filters function
+    static func manageFilters(_ currentFilters: [String: String]) {
+        let currentLocation = currentFilters["Location"]
+        let currentPriceFrom = currentFilters["PriceFrom"]
+        let currentPriceTo = currentFilters["PriceTo"]
+        let currentSort = currentFilters["Sort"]
+        
+        // location filter
+        if currentLocation != nil {
+            filteredItems = filteredItems.filter {$0.location == currentLocation}
+        }
+        
+        // price filter
+        if currentPriceFrom != nil && currentPriceTo != nil {
+            filteredItems = filteredItems.filter {$0.price >= Int(currentPriceFrom!)! && $0.price <= Int(currentPriceTo!)!}
+        } else if currentPriceFrom != nil {
+            filteredItems = filteredItems.filter {$0.price >= Int(currentPriceFrom!)!}
+        } else if currentPriceTo != nil {
+            filteredItems = filteredItems.filter {$0.price <= Int(currentPriceTo!)!}
+        }
+        
+        // sort filter
+        if currentSort != nil {
+            if currentSort == "Lowest price" {
+                filteredItems.sort(by: {$0.price < $1.price})
+            } else if currentSort == "Highest price" {
+                filteredItems.sort(by: {$0.price > $1.price})
+            } else if currentSort == "Date added" {
+                filteredItems.sort(by: {$0.date < $1.date})
+            }
         }
     }
 }

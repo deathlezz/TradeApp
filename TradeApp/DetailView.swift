@@ -9,6 +9,8 @@ import UIKit
 
 class DetailView: UITableViewController {
     
+    var savedItems = [Item]()
+    
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
@@ -19,6 +21,8 @@ class DetailView: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.backButtonTitle = " "
+        
         actionButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareTapped))
         
         saveButton = UIBarButtonItem(image: .init(systemName: "heart"), style: .plain, target: self, action: #selector(saveTapped))
@@ -26,6 +30,14 @@ class DetailView: UITableViewController {
         removeButton = UIBarButtonItem(image: .init(systemName: "heart.fill"), style: .plain, target: self, action: #selector(removeTapped))
         
         navigationItem.rightBarButtonItems = [saveButton, actionButton]
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.savedItems = Utilities.loadItems()
+            
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
+            }
+        }
     }
 
     // set number of sections
@@ -97,6 +109,7 @@ class DetailView: UITableViewController {
     // set action for save item button
     @objc func saveTapped() {
         savedItems.insert(item, at: 0)
+        Utilities.saveItems(savedItems)
         navigationItem.rightBarButtonItems = [removeButton, actionButton]
     }
     
@@ -104,6 +117,7 @@ class DetailView: UITableViewController {
     @objc func removeTapped() {
         guard let index = savedItems.firstIndex(where: {$0.title == item.title}) else { return }
         savedItems.remove(at: index)
+        Utilities.saveItems(savedItems)
         navigationItem.rightBarButtonItems = [saveButton, actionButton]
     }
     

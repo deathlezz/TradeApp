@@ -164,7 +164,9 @@
                             <outlet property="delegate" destination="LDV-4E-Hc6" id="M4r-lc-Ody"/>
                         </connections>
                     </collectionView>
-                    <navigationItem key="navigationItem" id="EOr-dz-jMF"/>
+                    <navigationItem key="navigationItem" id="EOr-dz-jMF">
+                        <barButtonItem key="backBarButtonItem" title=" " id="Wsx-Pt-81M"/>
+                    </navigationItem>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GbY-GD-Vge" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

@@ -9,17 +9,29 @@ import UIKit
 
 class SavedView: UICollectionViewController {
     
+    var savedItems = [Item]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         title = "Saved"
         navigationController?.navigationBar.prefersLargeTitles = true
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Remove all", style: .plain, target: self, action: #selector(removeAllTapped))
 
         // pull to refresh
         let refreshControl = UIRefreshControl()
         refreshControl.tintColor = .red
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.savedItems = Utilities.loadItems()
+            
+            DispatchQueue.main.async {
+                self?.collectionView.reloadData()
+            }
+        }
     }
     
     // number of sections
@@ -69,4 +81,10 @@ class SavedView: UICollectionViewController {
         collectionView.reloadData()
     }
 
+    @objc func removeAllTapped() {
+        guard !savedItems.isEmpty else { return }
+        savedItems.removeAll()
+        collectionView.reloadData()
+        Utilities.saveItems(savedItems)
+    }
 }

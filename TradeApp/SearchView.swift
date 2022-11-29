@@ -9,6 +9,11 @@ import UIKit
 
 class SearchView: UITableViewController {
     
+    var categories = [String]()
+    
+    var recentlySearched = [String]()
+    var currentFilters = [String: String]()
+        
     var textField: UITextField!
 
     override func viewDidLoad() {
@@ -21,12 +26,20 @@ class SearchView: UITableViewController {
         textField.borderStyle = .roundedRect
         textField.clearButtonMode = .whileEditing
         textField.placeholder = "Find something for yourself"
-        textField.text = currentFilters["Search"]
         textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
         textField.returnKeyType = .search
         navigationItem.titleView = textField
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.currentFilters = Utilities.loadFilters()
+            self?.loadHistory()
+            
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
+            }
+        }
     }
 
     // set number of sections
@@ -74,14 +87,14 @@ class SearchView: UITableViewController {
         
         if !word.isEmpty && isCategoryApplied {
             filteredItems = filteredItems.filter {$0.title.lowercased().contains(word.lowercased())}
-            manageFilters()
+            Utilities.manageFilters(currentFilters)
             isUnique(word)
             isSearchApplied = true
             currentFilters["Search"] = word
 
         } else if !word.isEmpty && !isCategoryApplied {
             filteredItems = items.filter {$0.title.lowercased().contains(word.lowercased())}
-            manageFilters()
+            Utilities.manageFilters(currentFilters)
             isUnique(word)
             isCategoryApplied = true
             currentFilters["Category"] = categories[0]
@@ -89,7 +102,7 @@ class SearchView: UITableViewController {
             currentFilters["Search"] = word
 
         } else if word.isEmpty && isCategoryApplied {
-            manageFilters()
+            Utilities.manageFilters(currentFilters)
             isSearchApplied = false
             currentFilters["Search"] = nil
 
@@ -99,6 +112,7 @@ class SearchView: UITableViewController {
             currentFilters.removeAll()
         }
         
+        Utilities.saveFilters(currentFilters)
         textField.resignFirstResponder()
         navigationController?.popToRootViewController(animated: true)
     }
@@ -108,6 +122,7 @@ class SearchView: UITableViewController {
         if editingStyle == .delete {
             recentlySearched.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
+            saveHistory()
         }
     }
     
@@ -115,6 +130,12 @@ class SearchView: UITableViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         textField.becomeFirstResponder()
+    }
+    
+    // set textfield.text before view appeared
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        textField.text = currentFilters["Search"]
     }
     
     // finish editing texfield before view disappeared
@@ -133,7 +154,21 @@ class SearchView: UITableViewController {
             if recentlySearched.count > 10 {
                 recentlySearched.removeLast()
             }
+            
+            saveHistory()
         }
+    }
+    
+    // save search history
+    func saveHistory() {
+        let defaults = UserDefaults.standard
+        defaults.set(recentlySearched, forKey: "recentlySearched")
+    }
+    
+    // load search history
+    func loadHistory() {
+        let defaults = UserDefaults.standard
+        recentlySearched = defaults.object(forKey: "recentlySearched") as? [String] ?? [String]()
     }
     
 }

@@ -9,6 +9,9 @@ import UIKit
 
 class FilterView: UITableViewController {
     
+    var categories = [String]()
+    var currentFilters = [String: String]()
+    
     var filterCells = [FilterCell]()
     var priceCell: PriceCell!
     
@@ -19,10 +22,9 @@ class FilterView: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         title = "Filter"
         navigationController?.navigationBar.prefersLargeTitles = true
-        
         navigationController?.hidesBarsOnSwipe = false
         
         applyButton = UIBarButtonItem(title: "Apply", style: .plain, target: self, action: #selector(applyTapped))
@@ -30,6 +32,10 @@ class FilterView: UITableViewController {
         clearButton = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearTapped))
         
         navigationItem.rightBarButtonItems = [clearButton, applyButton]
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.currentFilters = Utilities.loadFilters()
+        }
     }
 
     // set number of sections
@@ -219,6 +225,7 @@ class FilterView: UITableViewController {
             isFilterApplied = false
         }
         
+        Utilities.saveFilters(currentFilters)
         navigationController?.popToRootViewController(animated: true)
     }
     

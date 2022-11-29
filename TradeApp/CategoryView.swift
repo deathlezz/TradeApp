@@ -8,6 +8,9 @@
 import UIKit
 
 class CategoryView: UITableViewController {
+    
+    var categories = [String]()
+    var currentFilters = [String: String]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,6 +20,10 @@ class CategoryView: UITableViewController {
         navigationController?.hidesBarsOnSwipe = false
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "categoryCell")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.currentFilters = Utilities.loadFilters()
+        }
     }
 
     // number of sections
@@ -51,13 +58,14 @@ class CategoryView: UITableViewController {
         
         if isSearchApplied {
             filteredItems = filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-            manageFilters()
+            Utilities.manageFilters(currentFilters)
         } else if !isSearchApplied {
-            manageFilters()
+            Utilities.manageFilters(currentFilters)
         }
         
         isCategoryApplied = true
         currentFilters["Category"] = word
+        Utilities.saveFilters(currentFilters)
         navigationController?.popToRootViewController(animated: true)
     }
 

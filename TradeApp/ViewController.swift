@@ -9,6 +9,10 @@ import UIKit
 
 class ViewController: UICollectionViewController {
     
+    let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
+    
+    var currentFilters = [String: String]()
+    
     var categoriesButton: UIBarButtonItem!
     var searchButton: UIBarButtonItem!
     
@@ -18,6 +22,9 @@ class ViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        let nc = NotificationCenter.default
+        nc.addObserver(self, selector: #selector(resetFilters), name: UIApplication.didEnterBackgroundNotification, object: nil)
         
         title = "Recently added"
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -88,8 +95,9 @@ class ViewController: UICollectionViewController {
     
     // set action for categories button
     @objc func categoriesTapped() {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "CategoryView") {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "CategoryView") as? CategoryView {
             vc.hidesBottomBarWhenPushed = true
+            vc.categories = categories
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -98,6 +106,7 @@ class ViewController: UICollectionViewController {
     @objc func searchTapped() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "searchView") as? SearchView {
             vc.hidesBottomBarWhenPushed = true
+            vc.categories = categories
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -106,6 +115,7 @@ class ViewController: UICollectionViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.hidesBarsOnSwipe = true
+        currentFilters = Utilities.loadFilters()
         changeTitle()
         hideButtons()
         collectionView.reloadData()
@@ -148,19 +158,22 @@ class ViewController: UICollectionViewController {
         let ac = UIAlertController(title: "Sort items by", message: nil, preferredStyle: .actionSheet)
         ac.addAction(UIAlertAction(title: "Lowest price", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.price < $1.price})
-            currentFilters["Sort"] = "Lowest price"
+            self?.currentFilters["Sort"] = "Lowest price"
+            Utilities.saveFilters(self!.currentFilters)
             isFilterApplied = true
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Highest price", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.price > $1.price})
-            currentFilters["Sort"] = "Highest price"
+            self?.currentFilters["Sort"] = "Highest price"
+            Utilities.saveFilters(self!.currentFilters)
             isFilterApplied = true
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Date added", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.date < $1.date})
-            currentFilters["Sort"] = "Date added"
+            self?.currentFilters["Sort"] = "Date added"
+            Utilities.saveFilters(self!.currentFilters)
             isFilterApplied = true
             self?.collectionView.reloadData()
         })
@@ -172,10 +185,12 @@ class ViewController: UICollectionViewController {
     @objc func filterTapped() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "filterView") as? FilterView {
             vc.hidesBottomBarWhenPushed = true
+            vc.categories = categories
             navigationController?.pushViewController(vc, animated: true)
         }
     }
     
+    // set view title
     func changeTitle() {
         if isCategoryApplied {
             title = currentFilters["Category"]
@@ -185,5 +200,11 @@ class ViewController: UICollectionViewController {
             navigationController?.tabBarItem.title = "Search"
         }
     }
+    
+    @objc func resetFilters() {
+        currentFilters.removeAll()
+        Utilities.saveFilters(currentFilters)
+    }
+    
 }
 
