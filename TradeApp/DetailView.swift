@@ -20,8 +20,28 @@ class DetailView: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+    
+        let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+        let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+        callFrame.setImage(image, for: .normal)
+        callFrame.addTarget(self, action: #selector(callTapped), for: .touchUpInside)
+        callFrame.backgroundColor = .white
+        callFrame.layer.cornerRadius = 7
+        let callButton = UIBarButtonItem(customView: callFrame)
+        
+        let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+        let message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+        messageFrame.setImage(message, for: .normal)
+        messageFrame.addTarget(self, action: #selector(messageTapped), for: .touchUpInside)
+        messageFrame.backgroundColor = .white
+        messageFrame.layer.cornerRadius = 7
+        let messageButton = UIBarButtonItem(customView: messageFrame)
+        
+        toolbarItems = [callButton, messageButton]
+        navigationController?.isToolbarHidden = false
         
         navigationItem.backButtonTitle = " "
+        navigationController?.hidesBarsOnSwipe = false
         
         actionButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareTapped))
         
@@ -109,8 +129,15 @@ class DetailView: UITableViewController {
     // set action for save item button
     @objc func saveTapped() {
         savedItems.insert(item, at: 0)
+        
+        if savedItems.count > 50 {
+            showAlert()
+            savedItems.remove(at: 0)
+        } else {
+            navigationItem.rightBarButtonItems = [removeButton, actionButton]
+        }
+        
         Utilities.saveItems(savedItems)
-        navigationItem.rightBarButtonItems = [removeButton, actionButton]
     }
     
     // set action for remove item button
@@ -133,12 +160,35 @@ class DetailView: UITableViewController {
     // set save/remove button icon
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        savedItems = Utilities.loadItems()
         
         if savedItems.contains(where: {$0.title == item.title}) {
             navigationItem.rightBarButtonItems = [removeButton, actionButton]
         } else {
             navigationItem.rightBarButtonItems = [saveButton, actionButton]
         }
+    }
+    
+    // show save alert
+    func showAlert() {
+        let ac = UIAlertController(title: "You can't save more items.", message: "You've already saved 50 items.", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .cancel))
+        present(ac, animated: true)
+    }
+    
+    // set action for call button
+    @objc func callTapped() {
+        let phoneNumber = 123456789
+        guard let url = URL(string: "telprompt://\(phoneNumber)"), UIApplication.shared.canOpenURL(url) else {
+            return
+        }
+        
+        UIApplication.shared.open(url)
+    }
+    
+    // set action for message button
+    @objc func messageTapped() {
+        
     }
 
 }

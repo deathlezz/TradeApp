@@ -10,6 +10,3 @@ import Foundation
 var items = [Item]()
 var filteredItems = [Item]()
 var recentlyAdded = [Item]()
-var isCategoryApplied = false
-var isSearchApplied = false
-var isFilterApplied = false

@@ -85,30 +85,25 @@ class SearchView: UITableViewController {
             }
         }
         
-        if !word.isEmpty && isCategoryApplied {
+        if !word.isEmpty && currentFilters["Category"] != nil {
             filteredItems = filteredItems.filter {$0.title.lowercased().contains(word.lowercased())}
             Utilities.manageFilters(currentFilters)
             isUnique(word)
-            isSearchApplied = true
             currentFilters["Search"] = word
 
-        } else if !word.isEmpty && !isCategoryApplied {
+        } else if !word.isEmpty && currentFilters["Category"] == nil {
             filteredItems = items.filter {$0.title.lowercased().contains(word.lowercased())}
             Utilities.manageFilters(currentFilters)
             isUnique(word)
-            isCategoryApplied = true
             currentFilters["Category"] = categories[0]
-            isSearchApplied = true
             currentFilters["Search"] = word
 
-        } else if word.isEmpty && isCategoryApplied {
+        } else if word.isEmpty && currentFilters["Category"] != nil {
             Utilities.manageFilters(currentFilters)
-            isSearchApplied = false
             currentFilters["Search"] = nil
 
-        } else if word.isEmpty && !isCategoryApplied {
+        } else if word.isEmpty && currentFilters["Category"] == nil {
             filteredItems = recentlyAdded
-            isSearchApplied = false
             currentFilters.removeAll()
         }
         

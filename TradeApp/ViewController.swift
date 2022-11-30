@@ -23,9 +23,6 @@ class ViewController: UICollectionViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        let nc = NotificationCenter.default
-        nc.addObserver(self, selector: #selector(resetFilters), name: UIApplication.didEnterBackgroundNotification, object: nil)
-        
         title = "Recently added"
         navigationController?.navigationBar.prefersLargeTitles = true
         
@@ -51,6 +48,7 @@ class ViewController: UICollectionViewController {
         
         DispatchQueue.global().async { [weak self] in
             self?.loadData()
+            self?.resetFilters()
             
             DispatchQueue.main.async {
                 self?.collectionView.reloadData()
@@ -74,10 +72,10 @@ class ViewController: UICollectionViewController {
             fatalError("Unable to dequeue itemCell")
         }
         
-        cell.title.text = filteredItems[indexPath.row].title
-        cell.price.text = "£\(filteredItems[indexPath.row].price)"
-        cell.location.text = filteredItems[indexPath.row].location
-        cell.date.text = filteredItems[indexPath.row].date.formatDate()
+        cell.title.text = filteredItems[indexPath.item].title
+        cell.price.text = "£\(filteredItems[indexPath.item].price)"
+        cell.location.text = filteredItems[indexPath.item].location
+        cell.date.text = filteredItems[indexPath.item].date.formatDate()
         cell.layer.cornerRadius = 10
         cell.backgroundColor = .white
         
@@ -87,7 +85,7 @@ class ViewController: UICollectionViewController {
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-            vc.item = filteredItems[indexPath.row]
+            vc.item = filteredItems[indexPath.item]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -115,6 +113,7 @@ class ViewController: UICollectionViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.hidesBarsOnSwipe = true
+        navigationController?.isToolbarHidden = true
         currentFilters = Utilities.loadFilters()
         changeTitle()
         hideButtons()
@@ -129,7 +128,7 @@ class ViewController: UICollectionViewController {
     
     // show or hide filter and sort buttons
     func hideButtons() {
-        if isCategoryApplied || isSearchApplied {
+        if currentFilters["Category"] != nil || currentFilters["Search"] != nil {
             filterButton.isHidden = false
             sortButton.isHidden = false
         } else {
@@ -160,21 +159,18 @@ class ViewController: UICollectionViewController {
             filteredItems.sort(by: {$0.price < $1.price})
             self?.currentFilters["Sort"] = "Lowest price"
             Utilities.saveFilters(self!.currentFilters)
-            isFilterApplied = true
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Highest price", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.price > $1.price})
             self?.currentFilters["Sort"] = "Highest price"
             Utilities.saveFilters(self!.currentFilters)
-            isFilterApplied = true
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Date added", style: .default) { [weak self] _ in
             filteredItems.sort(by: {$0.date < $1.date})
             self?.currentFilters["Sort"] = "Date added"
             Utilities.saveFilters(self!.currentFilters)
-            isFilterApplied = true
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
@@ -192,7 +188,7 @@ class ViewController: UICollectionViewController {
     
     // set view title
     func changeTitle() {
-        if isCategoryApplied {
+        if currentFilters["Category"] != nil {
             title = currentFilters["Category"]
             navigationController?.tabBarItem.title = "Search"
         } else {
@@ -201,7 +197,8 @@ class ViewController: UICollectionViewController {
         }
     }
     
-    @objc func resetFilters() {
+    // reset filters on start
+    func resetFilters() {
         currentFilters.removeAll()
         Utilities.saveFilters(currentFilters)
     }

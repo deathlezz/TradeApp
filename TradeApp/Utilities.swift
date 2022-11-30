@@ -20,15 +20,27 @@ class Utilities {
     
     // save saved items
     static func saveItems(_ items: [Item]) {
-        let defaults = UserDefaults.standard
-        defaults.set(items, forKey: "savedItems")
+        let jsonEncoder = JSONEncoder()
+        
+        if let savedItems = try? jsonEncoder.encode(items) {
+            let defaults = UserDefaults.standard
+            defaults.set(savedItems, forKey: "savedItems")
+        } else {
+            print("Failed to save items.")
+        }
     }
     
     // load saved items
     static func loadItems() -> [Item] {
         let defaults = UserDefaults.standard
-        if let savedItems = defaults.object(forKey: "savedItems") as? [Item] {
-            return savedItems
+        if let savedItems = defaults.object(forKey: "savedItems") as? Data {
+            let jsonDecoder = JSONDecoder()
+            
+            if let decodedItems = try? jsonDecoder.decode([Item].self, from: savedItems) {
+                return decodedItems
+            } else {
+                print("Failed to load items.")
+            }
         }
         return [Item]()
     }

@@ -50,10 +50,10 @@ class SavedView: UICollectionViewController {
             fatalError("Unable to dequeue itemCell")
         }
         
-        cell.title.text = filteredItems[indexPath.row].title
-        cell.price.text = "£\(filteredItems[indexPath.row].price)"
-        cell.location.text = filteredItems[indexPath.row].location
-        cell.date.text = filteredItems[indexPath.row].date.formatDate()
+        cell.title.text = savedItems[indexPath.item].title
+        cell.price.text = "£\(savedItems[indexPath.item].price)"
+        cell.location.text = savedItems[indexPath.item].location
+        cell.date.text = savedItems[indexPath.item].date.formatDate()
         cell.layer.cornerRadius = 10
         cell.backgroundColor = .white
         
@@ -63,7 +63,7 @@ class SavedView: UICollectionViewController {
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-            vc.item = savedItems[indexPath.row]
+            vc.item = savedItems[indexPath.item]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -78,13 +78,15 @@ class SavedView: UICollectionViewController {
     // refresh collection view before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.isToolbarHidden = true
+        savedItems = Utilities.loadItems()
         collectionView.reloadData()
     }
 
     @objc func removeAllTapped() {
         guard !savedItems.isEmpty else { return }
         savedItems.removeAll()
-        collectionView.reloadData()
         Utilities.saveItems(savedItems)
+        collectionView.reloadData()
     }
 }

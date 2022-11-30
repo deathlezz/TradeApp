@@ -134,42 +134,38 @@ class FilterView: UITableViewController {
         var priceTo = priceCell.secondTextField.text ?? ""
         let sortText = filterCells[0].filterTextField.text ?? ""
         
-        if isSearchApplied && isCategoryApplied {
+        if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
             filteredItems = items.filter {$0.category == currentFilters["Category"]}
             filteredItems = filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-        } else if isSearchApplied {
+        } else if currentFilters["Search"] != nil {
             filteredItems = items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-        } else if isCategoryApplied {
+        } else if currentFilters["Category"] != nil {
             filteredItems = items.filter {$0.category == currentFilters["Category"]}
         }
         
         // category filter
         if !categoryText.isEmpty {
-            if categoryText == categories[0] && isSearchApplied {
+            if categoryText == categories[0] && currentFilters["Search"] != nil {
                 filteredItems = items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-            } else if categoryText == categories[0] && !isSearchApplied {
+            } else if categoryText == categories[0] && currentFilters["Search"] == nil {
                 filteredItems = items
-            } else if categoryText != categories[0] && isSearchApplied {
+            } else if categoryText != categories[0] && currentFilters["Search"] != nil {
                 filteredItems = items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
                 filteredItems = filteredItems.filter {$0.category == categoryText}
-            } else if categoryText != categories[0] && !isSearchApplied {
+            } else if categoryText != categories[0] && currentFilters["Search"] == nil {
                 filteredItems = items.filter {$0.category == categoryText}
             }
 
-            isCategoryApplied = true
             currentFilters["Category"] = categoryText
         } else {
             currentFilters["Search"] = nil
             currentFilters["Category"] = nil
-            isCategoryApplied = false
-            isSearchApplied = false
         }
         
         // location filter
         if !locationText.isEmpty {
             filteredItems = filteredItems.filter {$0.location == locationText}
             currentFilters["Location"] = locationText
-            isFilterApplied = true
         } else {
             currentFilters["Location"] = nil
         }
@@ -183,17 +179,14 @@ class FilterView: UITableViewController {
             filteredItems = filteredItems.filter {$0.price >= Int(priceFrom)! && $0.price <= Int(priceTo)!}
             currentFilters["PriceFrom"] = priceFrom
             currentFilters["PriceTo"] = priceTo
-            isFilterApplied = true
         } else if !priceFrom.isEmpty {
             filteredItems = filteredItems.filter {$0.price >= Int(priceFrom)!}
             currentFilters["PriceFrom"] = priceFrom
             currentFilters["PriceTo"] = nil
-            isFilterApplied = true
         } else if !priceTo.isEmpty {
             filteredItems = filteredItems.filter {$0.price <= Int(priceTo)!}
             currentFilters["PriceTo"] = priceTo
             currentFilters["PriceFrom"] = nil
-            isFilterApplied = true
         } else {
             currentFilters["PriceFrom"] = nil
             currentFilters["PriceTo"] = nil
@@ -210,19 +203,14 @@ class FilterView: UITableViewController {
             }
             
             currentFilters["Sort"] = sortText
-            isFilterApplied = true
         } else {
             currentFilters["Sort"] = nil
         }
         
-        if !isCategoryApplied && !isSearchApplied {
+        if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
             filteredItems = recentlyAdded
-            isCategoryApplied = false
-            isSearchApplied = false
-        }
-        
-        if locationText.isEmpty && priceFrom.isEmpty && priceTo.isEmpty && sortText.isEmpty {
-            isFilterApplied = false
+            currentFilters.removeAll()
+            Utilities.saveFilters(currentFilters)
         }
         
         Utilities.saveFilters(currentFilters)

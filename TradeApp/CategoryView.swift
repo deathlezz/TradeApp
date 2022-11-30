@@ -56,14 +56,13 @@ class CategoryView: UITableViewController {
             filteredItems = items.filter {$0.category == word}
         }
         
-        if isSearchApplied {
+        if currentFilters["Search"] != nil {
             filteredItems = filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
             Utilities.manageFilters(currentFilters)
-        } else if !isSearchApplied {
+        } else if currentFilters["Search"] == nil {
             Utilities.manageFilters(currentFilters)
         }
         
-        isCategoryApplied = true
         currentFilters["Category"] = word
         Utilities.saveFilters(currentFilters)
         navigationController?.popToRootViewController(animated: true)
