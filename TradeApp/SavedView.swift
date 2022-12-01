@@ -17,7 +17,7 @@ class SavedView: UICollectionViewController {
         title = "Saved"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Remove all", style: .plain, target: self, action: #selector(removeAllTapped))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(trashTapped))
 
         // pull to refresh
         let refreshControl = UIRefreshControl()
@@ -83,7 +83,8 @@ class SavedView: UICollectionViewController {
         collectionView.reloadData()
     }
 
-    @objc func removeAllTapped() {
+    // set action for trash button
+    @objc func trashTapped() {
         guard !savedItems.isEmpty else { return }
         savedItems.removeAll()
         Utilities.saveItems(savedItems)
