@@ -23,6 +23,8 @@ class FilterView: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.separatorStyle = .none
+        
         title = "Filter"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.hidesBarsOnSwipe = false
