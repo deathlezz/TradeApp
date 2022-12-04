@@ -15,7 +15,7 @@ class FilterView: UITableViewController {
     var filterCells = [FilterCell]()
     var priceCell: PriceCell!
     
-    let sectionTitles = ["Sort", "Category", "Location", "Price"]
+    let sectionTitles = ["Sort", "Category", "Location", "Price", "Button"]
     
     var applyButton: UIBarButtonItem!
     var clearButton: UIBarButtonItem!
@@ -29,11 +29,7 @@ class FilterView: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.hidesBarsOnSwipe = false
         
-        applyButton = UIBarButtonItem(title: "Apply", style: .plain, target: self, action: #selector(applyTapped))
-        
-        clearButton = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearTapped))
-        
-        navigationItem.rightBarButtonItems = [clearButton, applyButton]
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearTapped))
         
         DispatchQueue.global().async { [weak self] in
             self?.currentFilters = Utilities.loadFilters()
@@ -47,7 +43,7 @@ class FilterView: UITableViewController {
     
     // set title for every section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sectionTitles[section]
+        section == 4 ? " " : sectionTitles[section]
     }
 
     // set number of rows in section
@@ -87,16 +83,28 @@ class FilterView: UITableViewController {
         }
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "priceCell", for: indexPath) as? PriceCell {
-            cell.firstTextField.placeholder = "From"
-            cell.firstTextField.text = currentFilters["PriceFrom"]
-            cell.firstTextField.clearButtonMode = .whileEditing
-            cell.secondTextField.placeholder = "To"
-            cell.secondTextField.text = currentFilters["PriceTo"]
-            cell.secondTextField.clearButtonMode = .whileEditing
-            cell.selectionStyle = .none
-            priceCell = cell
-            return cell
+            if sectionTitles[indexPath.section] == "Price"{
+                cell.firstTextField.placeholder = "From"
+                cell.firstTextField.text = currentFilters["PriceFrom"]
+                cell.firstTextField.clearButtonMode = .whileEditing
+                cell.secondTextField.placeholder = "To"
+                cell.secondTextField.text = currentFilters["PriceTo"]
+                cell.secondTextField.clearButtonMode = .whileEditing
+                cell.selectionStyle = .none
+                priceCell = cell
+                return cell
+            }
         }
+        
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "buttonCell", for: indexPath) as? ButtonCell {
+            if sectionTitles[indexPath.section] == "Button" {
+                cell.selectionStyle = .none
+                cell.submitButton.setTitle("Apply", for: .normal)
+                cell.submitButton.addTarget(self, action: #selector(applyTapped), for: .touchUpInside)
+                return cell
+            }
+        }
+        
         return UITableViewCell()
     }
     

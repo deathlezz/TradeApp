@@ -9,12 +9,12 @@ import Foundation
 
 struct Item: Codable {
 //    let photos: [Data]
-    let category: String
     let title: String
     let price: Int
+    let category: String
     let location: String
+    let description: String
     let date: Date
-//    let description: String
 //    let phoneNumber: Int
 //    let itemID: Int
 }

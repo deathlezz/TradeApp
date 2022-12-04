@@ -113,11 +113,17 @@ class ViewController: UICollectionViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.hidesBarsOnSwipe = true
-        navigationController?.isToolbarHidden = true
         currentFilters = Utilities.loadFilters()
         changeTitle()
         hideButtons()
         collectionView.reloadData()
+    }
+    
+    // hide toolbar after view appeared
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.isToolbarHidden = true
+        navigationController?.isNavigationBarHidden = false
     }
     
     // set action for "pull to refresh"
@@ -140,9 +146,9 @@ class ViewController: UICollectionViewController {
     // load data in the background
     func loadData() {
         for _ in 0...3 {
-            let tesla = Item(category: "Vehicles", title: "Tesla Model X", price: 6000, location: "London", date: Date())
-            let bmw = Item(category: "Vehicles", title: "BMW E36 2.0 LPG", price: 500, location: "Stirling", date: Date())
-            let fiat = Item(category: "Vehicles", title: "Fiat Punto 1.9 TDI", price: 1200, location: "Glasgow", date: Date())
+            let tesla = Item(title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date())
+            let bmw = Item(title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date())
+            let fiat = Item(title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date())
             items.append(tesla)
             items.append(bmw)
             items.append(fiat)

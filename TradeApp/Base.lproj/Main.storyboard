@@ -215,7 +215,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="car" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="ksl-FN-pGF">
-                                            <rect key="frame" x="0.0" y="1.3333333333333428" width="393" height="307.33333333333331"/>
+                                            <rect key="frame" x="0.0" y="1.0000000000000107" width="393" height="307.5"/>
                                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <color key="tintColor" systemColor="systemYellowColor"/>
                                             <constraints>
@@ -365,7 +365,7 @@
         <scene sceneID="Dbl-8d-Pq0">
             <objects>
                 <tableViewController storyboardIdentifier="filterView" id="wNW-GY-j5A" customClass="FilterView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="m5b-wW-PeD">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleAspectFit" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="m5b-wW-PeD">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -418,6 +418,32 @@
                                     <outlet property="secondTextField" destination="lBM-ew-5fc" id="RPR-pb-0EA"/>
                                 </connections>
                             </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="buttonCell" rowHeight="70" id="jBI-hd-uv7" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="137.33333587646484" width="393" height="70"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jBI-hd-uv7" id="6W5-KC-dED">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="70"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YdE-yt-D0f">
+                                            <rect key="frame" x="20" y="4" width="353" height="62"/>
+                                            <state key="normal" title="Button"/>
+                                            <buttonConfiguration key="configuration" style="filled" title="Apply"/>
+                                        </button>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="top" secondItem="6W5-KC-dED" secondAttribute="top" constant="4" id="2bU-Ww-kQc"/>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="leading" secondItem="6W5-KC-dED" secondAttribute="leading" constant="20" symbolic="YES" id="9ZE-6H-xbn"/>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="width" secondItem="6W5-KC-dED" secondAttribute="height" multiplier="353:70" id="QA7-PU-Yqd"/>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="centerX" secondItem="6W5-KC-dED" secondAttribute="centerX" id="YmU-cP-aXy"/>
+                                        <constraint firstAttribute="trailing" secondItem="YdE-yt-D0f" secondAttribute="trailing" constant="20" symbolic="YES" id="voI-fF-PeI"/>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="centerY" secondItem="6W5-KC-dED" secondAttribute="centerY" id="zaZ-ps-SPN"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="submitButton" destination="YdE-yt-D0f" id="JbZ-jI-nBu"/>
+                                </connections>
+                            </tableViewCell>
                         </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="wNW-GY-j5A" id="30T-jE-9k1"/>
@@ -427,7 +453,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yiV-uN-60d" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1717" y="-675"/>
+            <point key="canvasLocation" x="1716.7938931297708" y="-675.35211267605632"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="kKH-oV-Ueq">
@@ -589,25 +615,26 @@
                                     <outlet property="textView" destination="Wcj-B1-2VN" id="yBi-vz-oyl"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ButtonCell" rowHeight="90" id="ku5-vh-zcl" userLabel="TextCell" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="383.66666793823242" width="393" height="90"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ButtonCell" rowHeight="70" id="ku5-vh-zcl" userLabel="TextCell" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="383.66666793823242" width="393" height="70"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ku5-vh-zcl" id="Fur-av-X3a">
-                                    <rect key="frame" x="0.0" y="0.0" width="393" height="90"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="70"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mlg-wN-hvK">
-                                            <rect key="frame" x="20" y="4" width="353" height="81"/>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mlg-wN-hvK">
+                                            <rect key="frame" x="20" y="4" width="353" height="62"/>
                                             <state key="normal" title="Button"/>
                                             <buttonConfiguration key="configuration" style="filled" title="Submit"/>
                                         </button>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="mlg-wN-hvK" firstAttribute="leading" secondItem="Fur-av-X3a" secondAttribute="leading" constant="20" symbolic="YES" id="0Ft-zW-nor"/>
-                                        <constraint firstItem="mlg-wN-hvK" firstAttribute="width" secondItem="Fur-av-X3a" secondAttribute="height" multiplier="353:90" id="5UF-tu-Q0c"/>
                                         <constraint firstItem="mlg-wN-hvK" firstAttribute="centerX" secondItem="Fur-av-X3a" secondAttribute="centerX" id="J4B-V8-tvQ"/>
                                         <constraint firstItem="mlg-wN-hvK" firstAttribute="top" secondItem="Fur-av-X3a" secondAttribute="top" constant="4" id="hJf-7X-k68"/>
                                         <constraint firstItem="mlg-wN-hvK" firstAttribute="centerY" secondItem="Fur-av-X3a" secondAttribute="centerY" id="hWr-p9-9F8"/>
+                                        <constraint firstAttribute="trailing" secondItem="mlg-wN-hvK" secondAttribute="trailing" constant="20" symbolic="YES" id="iEp-xO-V1h"/>
+                                        <constraint firstItem="mlg-wN-hvK" firstAttribute="width" secondItem="Fur-av-X3a" secondAttribute="height" multiplier="353:70" id="tG5-Vf-VdC"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>

@@ -71,12 +71,14 @@ class AddItemView: UITableViewController {
             switch sectionTitles[indexPath.section] {
             case "Title":
                 cell.textField.placeholder = "None"
+                cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 textFieldCells.append(cell)
                 return cell
             case "Price":
                 cell.textField.placeholder = "None"
+                cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.keyboardType = .numberPad
                 textFieldCells.append(cell)
@@ -89,6 +91,7 @@ class AddItemView: UITableViewController {
                 return cell
             case "Location":
                 cell.textField.placeholder = "None"
+                cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 textFieldCells.append(cell)
@@ -100,6 +103,7 @@ class AddItemView: UITableViewController {
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "TextViewCell", for: indexPath) as? TextViewCell {
             if sectionTitles[indexPath.section] == "Description" {
+                cell.selectionStyle = .none
                 cell.textView.layer.cornerRadius = 5
                 cell.textView.layer.borderWidth = 0.1
                 cell.textView.layer.borderColor = UIColor.darkGray.cgColor
@@ -110,7 +114,9 @@ class AddItemView: UITableViewController {
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "ButtonCell", for: indexPath) as? ButtonCell {
             if sectionTitles[indexPath.section] == "Button" {
+                cell.selectionStyle = .none
                 cell.submitButton.setTitle("Submit", for: .normal)
+                cell.submitButton.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
                 return cell
             }
         }
@@ -168,5 +174,28 @@ class AddItemView: UITableViewController {
         super.viewDidAppear(animated)
         addDoneButtonToKeyboard()
     }
-
+    
+    // set action for submit button
+    @objc func submitTapped() {
+        let title = textFieldCells[0].textField.text
+        let price = textFieldCells[1].textField.text
+        let category = textFieldCells[2].textField.text
+        let location = textFieldCells[3].textField.text
+        let description = textViewCell.textView.text
+        
+        if !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
+            let newItem = Item(title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
+            items.append(newItem)
+            recentlyAdded.append(newItem)
+        } else {
+            showAlert()
+        }
+    }
+    
+    // show alert if at least one field is empty
+    func showAlert() {
+        let ac = UIAlertController(title: "Field empty", message: "Fill all text fields to continue.", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .cancel))
+        present(ac, animated: true)
+    }
 }

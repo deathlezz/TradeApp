@@ -50,6 +50,7 @@ class DetailView: UITableViewController {
         removeButton = UIBarButtonItem(image: .init(systemName: "heart.fill"), style: .plain, target: self, action: #selector(removeTapped))
         
         navigationItem.rightBarButtonItems = [saveButton, actionButton]
+        tableView.separatorStyle = .none
         
         DispatchQueue.global().async { [weak self] in
             self?.savedItems = Utilities.loadItems()
@@ -107,7 +108,7 @@ class DetailView: UITableViewController {
             
         case "Description":
             let cell = tableView.dequeueReusableCell(withIdentifier: "Text", for: indexPath)
-            cell.textLabel?.text = "Description here"
+            cell.textLabel?.text = item.description
             cell.textLabel?.font = UIFont.systemFont(ofSize: 15)
             cell.isUserInteractionEnabled = false
             return cell
@@ -161,6 +162,7 @@ class DetailView: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         savedItems = Utilities.loadItems()
+        navigationController?.isNavigationBarHidden = false
         
         if savedItems.contains(where: {$0.title == item.title}) {
             navigationItem.rightBarButtonItems = [removeButton, actionButton]
