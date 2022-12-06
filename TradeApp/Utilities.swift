@@ -11,6 +11,7 @@ import Foundation
 extension Date {
     func formatDate() -> String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en")
         dateFormatter.dateFormat = "d MMM, HH:mm"
         return dateFormatter.string(from: self)
     }

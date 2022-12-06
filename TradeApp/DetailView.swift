@@ -109,6 +109,7 @@ class DetailView: UITableViewController {
         case "Description":
             let cell = tableView.dequeueReusableCell(withIdentifier: "Text", for: indexPath)
             cell.textLabel?.text = item.description
+            cell.textLabel?.numberOfLines = 0
             cell.textLabel?.font = UIFont.systemFont(ofSize: 15)
             cell.isUserInteractionEnabled = false
             return cell

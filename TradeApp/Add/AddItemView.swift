@@ -7,6 +7,11 @@
 
 import UIKit
 
+enum AlertType {
+    case error
+    case success
+}
+
 class PhotosView: UICollectionView {
 
     override func numberOfItems(inSection section: Int) -> Int {
@@ -29,6 +34,8 @@ class AddItemView: UITableViewController {
     
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell!
+    
+    let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
     let sectionTitles = ["Photos", "Title", "Price", "Category", "Location", "Description", "Button"]
 
@@ -130,6 +137,20 @@ class AddItemView: UITableViewController {
         return UITableViewCell()
     }
     
+    // set action for tapped cell
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if sectionTitles[indexPath.section] == "Category" {
+            let ac = UIAlertController(title: "Categories", message: nil, preferredStyle: .actionSheet)
+            for category in categories {
+                ac.addAction(UIAlertAction(title: category, style: .default) { [weak self] _ in
+                    self?.textFieldCells[2].textField.text = category
+                })
+            }
+            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            present(ac, animated: true)
+        }
+    }
+    
     // set action for clear button
     @objc func clearTapped() {
         for cell in textFieldCells {
@@ -187,15 +208,25 @@ class AddItemView: UITableViewController {
             let newItem = Item(title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
             items.append(newItem)
             recentlyAdded.append(newItem)
+            showAlert(.success)
         } else {
-            showAlert()
+            showAlert(.error)
         }
     }
     
     // show alert if at least one field is empty
-    func showAlert() {
-        let ac = UIAlertController(title: "Field empty", message: "Fill all text fields to continue.", preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .cancel))
-        present(ac, animated: true)
+    func showAlert(_ type: AlertType) {
+        if type == .error {
+            let ac = UIAlertController(title: "Field empty", message: "Fill all text fields to continue.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .cancel))
+            present(ac, animated: true)
+        } else {
+            let ac = UIAlertController(title: "Item added successfully", message: "Your item will be visible soon", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .cancel) { [weak self] _ in
+                self?.clearTapped()
+                self?.tabBarController?.selectedIndex = 0
+            })
+            present(ac, animated: true)
+        }
     }
 }
