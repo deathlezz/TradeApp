@@ -215,7 +215,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="car" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="ksl-FN-pGF">
-                                            <rect key="frame" x="0.0" y="1.0000000000000107" width="393" height="307.5"/>
+                                            <rect key="frame" x="0.0" y="1.3333333333333428" width="393" height="307.33333333333331"/>
                                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <color key="tintColor" systemColor="systemYellowColor"/>
                                             <constraints>
@@ -524,23 +524,22 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleAspectFit" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="PhotosCell" rowHeight="140" id="ehw-dE-PfW" userLabel="PhotosCell" customClass="GalleryCell" customModule="TradeApp" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleAspectFit" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="CollectionTableViewCell" rowHeight="140" id="ehw-dE-PfW" userLabel="PhotosCell" customClass="CollectionTableViewCell" customModule="TradeApp" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="50" width="393" height="140"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ehw-dE-PfW" id="8wQ-Rr-wEZ">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="140"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" fixedFrame="YES" dataMode="prototypes" springLoaded="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Nd-Qr-WkW" customClass="PhotosView" customModule="TradeApp" customModuleProvider="target">
+                                        <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" springLoaded="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Nd-Qr-WkW">
                                             <rect key="frame" x="20" y="6" width="353" height="128"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                            <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="atR-WX-FE0">
+                                            <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="20" minimumInteritemSpacing="10" id="HDv-lw-0mN">
                                                 <size key="itemSize" width="128" height="128"/>
                                                 <size key="estimatedItemSize" width="128" height="128"/>
                                                 <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                                 <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                                <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                <inset key="sectionInset" minX="0.0" minY="0.0" maxX="70" maxY="0.0"/>
                                             </collectionViewFlowLayout>
                                             <cells>
                                                 <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="photoCell" id="1sa-aZ-eAd" customClass="PhotosCell" customModule="TradeApp" customModuleProvider="target">
@@ -551,45 +550,60 @@
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <subviews>
                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QdQ-pt-y75">
-                                                                <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                                                <rect key="frame" x="0.0" y="2" width="128" height="124.00000000000001"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                                <color key="tintColor" systemColor="systemOrangeColor"/>
-                                                                <imageReference key="image" image="car" catalog="system" symbolScale="large"/>
+                                                                <color key="tintColor" systemColor="systemGrayColor"/>
+                                                                <imageReference key="image" image="plus" catalog="system" symbolScale="small" variableValue="0.0"/>
                                                             </imageView>
                                                         </subviews>
                                                     </view>
                                                     <color key="backgroundColor" systemColor="systemGray5Color"/>
                                                     <connections>
-                                                        <outlet property="imageView" destination="QdQ-pt-y75" id="hrR-dZ-yOT"/>
+                                                        <outlet property="imageView" destination="QdQ-pt-y75" id="ddv-c3-hsq"/>
                                                     </connections>
                                                 </collectionViewCell>
                                             </cells>
                                         </collectionView>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="9Nd-Qr-WkW" firstAttribute="centerY" secondItem="8wQ-Rr-wEZ" secondAttribute="centerY" id="0Rc-Rj-AcO"/>
+                                        <constraint firstItem="9Nd-Qr-WkW" firstAttribute="centerX" secondItem="8wQ-Rr-wEZ" secondAttribute="centerX" id="6mo-ky-eMB"/>
+                                        <constraint firstItem="9Nd-Qr-WkW" firstAttribute="leading" secondItem="8wQ-Rr-wEZ" secondAttribute="leading" constant="20" symbolic="YES" id="TOl-bx-YfW"/>
+                                        <constraint firstItem="9Nd-Qr-WkW" firstAttribute="width" secondItem="8wQ-Rr-wEZ" secondAttribute="height" multiplier="353:140" id="U4C-zf-wdi"/>
+                                        <constraint firstItem="9Nd-Qr-WkW" firstAttribute="top" secondItem="8wQ-Rr-wEZ" secondAttribute="top" constant="6" id="en7-N5-Hk4"/>
+                                    </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="collectionView" destination="9Nd-Qr-WkW" id="8uh-e4-slE"/>
+                                </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TextFieldCell" id="pQQ-Eg-aIz" userLabel="TextCell" customClass="TextFieldCell" customModule="TradeApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="190" width="393" height="43.666667938232422"/>
+                                <rect key="frame" x="0.0" y="190" width="393" height="42.333332061767578"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="pQQ-Eg-aIz" id="1gX-Gy-otq">
-                                    <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="42.333332061767578"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="weD-hC-iu5">
+                                        <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="weD-hC-iu5">
                                             <rect key="frame" x="20" y="4" width="353" height="34.333333333333336"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <color key="backgroundColor" systemColor="systemGray5Color"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <textInputTraits key="textInputTraits" returnKeyType="done"/>
                                         </textField>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="weD-hC-iu5" firstAttribute="centerY" secondItem="1gX-Gy-otq" secondAttribute="centerY" id="LvI-cl-OfA"/>
+                                        <constraint firstItem="weD-hC-iu5" firstAttribute="leading" secondItem="1gX-Gy-otq" secondAttribute="leadingMargin" id="VoO-rt-szx"/>
+                                        <constraint firstItem="weD-hC-iu5" firstAttribute="top" secondItem="1gX-Gy-otq" secondAttribute="topMargin" constant="-7" id="lfg-Ey-H9k"/>
+                                        <constraint firstItem="weD-hC-iu5" firstAttribute="trailing" secondItem="1gX-Gy-otq" secondAttribute="trailingMargin" id="t6y-Yf-bat"/>
+                                    </constraints>
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="textField" destination="weD-hC-iu5" id="g3y-I7-X2Q"/>
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TextViewCell" rowHeight="150" id="ICh-2r-Rb3" userLabel="TextCell" customClass="TextViewCell" customModule="TradeApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="233.66666793823242" width="393" height="150"/>
+                                <rect key="frame" x="0.0" y="232.33333206176758" width="393" height="150"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ICh-2r-Rb3" id="rY5-36-lfh">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="150"/>
@@ -616,7 +630,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ButtonCell" rowHeight="70" id="ku5-vh-zcl" userLabel="TextCell" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="383.66666793823242" width="393" height="70"/>
+                                <rect key="frame" x="0.0" y="382.33333206176758" width="393" height="70"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ku5-vh-zcl" id="Fur-av-X3a">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="70"/>
@@ -690,8 +704,8 @@
         <systemColor name="systemGray6Color">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
-        <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="systemGrayColor">
+            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

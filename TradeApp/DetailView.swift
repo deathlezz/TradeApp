@@ -86,6 +86,12 @@ class DetailView: UITableViewController {
         case "Image":
             if let cell = tableView.dequeueReusableCell(withIdentifier: "Image") as? GalleryCell {
                 // cell image here
+                let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
+                leftSwipe.direction = .left
+                let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
+                rightSwipe.direction = .right
+                cell.addGestureRecognizer(leftSwipe)
+                cell.addGestureRecognizer(rightSwipe)
                 return cell
             }
             
@@ -192,6 +198,15 @@ class DetailView: UITableViewController {
     // set action for message button
     @objc func messageTapped() {
         
+    }
+    
+    // set swipe recognizer
+    @objc func getSwipeAction(_ recognizer: UISwipeGestureRecognizer) {
+        if recognizer.direction == .left {
+            print("Left swipe")
+        } else if recognizer.direction == .right {
+            print("Right swipe")
+        }
     }
 
 }

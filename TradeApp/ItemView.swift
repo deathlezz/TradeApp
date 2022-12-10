@@ -15,7 +15,24 @@ class ItemView: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
+        leftSwipe.direction = .left
+        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
+        rightSwipe.direction = .right
+        
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(leftSwipe)
+        imageView.addGestureRecognizer(rightSwipe)
     }
     
+    // set swipe recognizer
+    @objc func getSwipeAction(_ recognizer: UISwipeGestureRecognizer) {
+        if recognizer.direction == .left {
+            print("Left swipe")
+        } else if recognizer.direction == .right {
+            print("Right swipe")
+        }
+    }
 
 }

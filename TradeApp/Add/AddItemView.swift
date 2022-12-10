@@ -12,24 +12,6 @@ enum AlertType {
     case success
 }
 
-class PhotosView: UICollectionView {
-
-    override func numberOfItems(inSection section: Int) -> Int {
-        return 8
-    }
-    
-    override func cellForItem(at indexPath: IndexPath) -> UICollectionViewCell? {
-        guard let cell = dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? PhotosCell else {
-            fatalError("Unable to dequeue photosCell")
-        }
-        
-        cell.layer.cornerRadius = 7
-        
-        return cell
-    }
-    
-}
-
 class AddItemView: UITableViewController {
     
     var textFieldCells = [TextFieldCell]()
@@ -72,6 +54,14 @@ class AddItemView: UITableViewController {
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "CollectionTableViewCell", for: indexPath) as? CollectionTableViewCell {
+            if sectionTitles[indexPath.section] == "Photos" {
+                cell.selectionStyle = .none
+                cell.isUserInteractionEnabled = false
+                return cell
+            }
+        }
 
         if let cell = tableView.dequeueReusableCell(withIdentifier: "TextFieldCell", for: indexPath) as? TextFieldCell {
             
@@ -128,12 +118,6 @@ class AddItemView: UITableViewController {
             }
         }
 
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "PhotosCell", for: indexPath) as? GalleryCell {
-            if sectionTitles[indexPath.section] == "Photos" {
-                return cell
-            }
-        }
-        
         return UITableViewCell()
     }
     
@@ -148,6 +132,7 @@ class AddItemView: UITableViewController {
             }
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(ac, animated: true)
+            
         }
     }
     
@@ -229,4 +214,5 @@ class AddItemView: UITableViewController {
             present(ac, animated: true)
         }
     }
+    
 }
