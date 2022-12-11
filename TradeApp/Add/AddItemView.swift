@@ -12,7 +12,9 @@ enum AlertType {
     case success
 }
 
-class AddItemView: UITableViewController {
+class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    var images = [UIImage]()
     
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell!
@@ -58,7 +60,7 @@ class AddItemView: UITableViewController {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "CollectionTableViewCell", for: indexPath) as? CollectionTableViewCell {
             if sectionTitles[indexPath.section] == "Photos" {
                 cell.selectionStyle = .none
-                cell.isUserInteractionEnabled = false
+                cell.delegate = self
                 return cell
             }
         }
@@ -132,7 +134,6 @@ class AddItemView: UITableViewController {
             }
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(ac, animated: true)
-            
         }
     }
     
@@ -213,6 +214,61 @@ class AddItemView: UITableViewController {
             })
             present(ac, animated: true)
         }
+    }
+    
+    // show source type alert
+    func addNewPhoto() {
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            let ac = UIAlertController(title: "Source", message: nil, preferredStyle: .actionSheet)
+            ac.addAction(UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
+                self?.showPicker(fromCamera: true)
+            })
+            
+            ac.addAction(UIAlertAction(title: "Photos", style: .default) { [weak self] _ in
+                self?.showPicker(fromCamera: false)
+            })
+            
+            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            present(ac, animated: true)
+            
+        } else {
+            showPicker(fromCamera: false)
+        }
+    }
+    
+    // show image picker
+    func showPicker(fromCamera: Bool) {
+        let picker = UIImagePickerController()
+        picker.allowsEditing = true
+        picker.delegate = self
+        
+        if fromCamera {
+            picker.sourceType = .camera
+        }
+        
+        present(picker, animated: true)
+    }
+    
+    // set chosen image
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = info[.editedImage] as? UIImage else { return }
+        
+        let imageName = UUID().uuidString
+        let imagePath = getDocumentsDirectory().appendingPathComponent(imageName)
+        
+        if let jpegData = image.jpegData(compressionQuality: 0.8) {
+            try? jpegData.write(to: imagePath)
+        }
+        
+        images.append(image)
+        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+        dismiss(animated: true)
+    }
+    
+    // get image directory
+    func getDocumentsDirectory() -> URL {
+        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return path[0]
     }
     
 }

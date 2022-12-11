@@ -11,14 +11,20 @@ class ItemView: UIViewController {
     
     @IBOutlet var imageView: UIImageView!
     
+    var selectedImageNumber: Int?
+    var totalPictures: Int?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
+        title = "\(selectedImageNumber!) of \(totalPictures!)"
+        navigationItem.largeTitleDisplayMode = .never
+        
         let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
-        leftSwipe.direction = .left
         let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
+        leftSwipe.direction = .left
         rightSwipe.direction = .right
         
         imageView.isUserInteractionEnabled = true
