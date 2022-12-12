@@ -252,23 +252,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // set chosen image
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         guard let image = info[.editedImage] as? UIImage else { return }
-        
-        let imageName = UUID().uuidString
-        let imagePath = getDocumentsDirectory().appendingPathComponent(imageName)
-        
-        if let jpegData = image.jpegData(compressionQuality: 0.8) {
-            try? jpegData.write(to: imagePath)
-        }
+        dismiss(animated: true)
         
         images.append(image)
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
-        dismiss(animated: true)
-    }
-    
-    // get image directory
-    func getDocumentsDirectory() -> URL {
-        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return path[0]
     }
     
 }

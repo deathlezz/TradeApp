@@ -27,15 +27,6 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         collectionView.dropDelegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadView), name: NSNotification.Name(rawValue: "reload"), object: nil)
-        
-//        let image1 = UIImage(named: "nssl0033")!
-//        images.append(image1)
-//        let image2 = UIImage(named: "nssl0043")!
-//        images.append(image2)
-//        let image3 = UIImage(named: "nssl0042")!
-//        images.append(image3)
-//        collectionView.reloadData()
-        
     }
     
     // set number of items in section
