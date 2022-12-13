@@ -14,7 +14,8 @@ enum AlertType {
 
 class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    var images = [UIImage]()
+//    var images = [UIImage]()
+    var index = -1
     
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell!
@@ -254,7 +255,9 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         guard let image = info[.editedImage] as? UIImage else { return }
         dismiss(animated: true)
         
-        images.append(image)
+        index += 1
+        images[index] = image
+        
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     

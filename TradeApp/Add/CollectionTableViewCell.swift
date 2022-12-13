@@ -17,7 +17,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     
     var delegate: ImagePicker?
     
-    var images = [UIImage]()
+//    var images = [UIImage]()
     
     override func awakeFromNib() {
         collectionView.delegate = self
@@ -27,6 +27,10 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         collectionView.dropDelegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadView), name: NSNotification.Name(rawValue: "reload"), object: nil)
+        
+        for _ in 0...7 {
+            images.append(UIImage(systemName: "plus")!)
+        }
     }
     
     // set number of items in section
@@ -38,11 +42,8 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? PhotosCell {
             cell.layer.cornerRadius = 10
-            
-            if !images.isEmpty {
-                cell.imageView.image = images[indexPath.item]
-            }
-            
+            cell.imageView.image = images[indexPath.item]
+                
             return cell
         }
         

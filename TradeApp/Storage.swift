@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import UIKit
 
 var items = [Item]()
 var filteredItems = [Item]()
 var recentlyAdded = [Item]()
+var images = [UIImage]()
