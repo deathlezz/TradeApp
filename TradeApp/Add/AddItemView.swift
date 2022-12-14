@@ -12,13 +12,19 @@ enum AlertType {
     case success
 }
 
+protocol PhotoEditor {
+    func deletePhoto()
+}
+
 class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
 //    var images = [UIImage]()
-    var index = -1
+    var index: IndexPath!
     
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell!
+    
+    var delegate: PhotoEditor?
     
     let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
@@ -218,7 +224,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // show source type alert
-    func addNewPhoto() {
+    func addNewPhoto(index: IndexPath) {
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
             let ac = UIAlertController(title: "Source", message: nil, preferredStyle: .actionSheet)
             ac.addAction(UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
@@ -255,10 +261,22 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         guard let image = info[.editedImage] as? UIImage else { return }
         dismiss(animated: true)
         
-        index += 1
-        images[index] = image
+        images[index.item] = image
         
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+    }
+    
+    // edit photo alert
+    func editPhoto(index: IndexPath) {
+        let ac = UIAlertController(title: "Edit", message: nil, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Change photo", style: .default) { [weak self] _ in
+            self?.addNewPhoto(index: index)
+        })
+        ac.addAction(UIAlertAction(title: "Delete photo", style: .destructive) { [weak self] _ in
+            self?.delegate?.deletePhoto()
+        })
+        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(ac, animated: true)
     }
     
 }

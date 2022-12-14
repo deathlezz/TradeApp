@@ -8,14 +8,16 @@
 import UIKit
 
 protocol ImagePicker {
-    func addNewPhoto()
+    func addNewPhoto(index: IndexPath)
+    func editPhoto(index: IndexPath)
 }
 
-class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDragDelegate, UICollectionViewDropDelegate, PhotoEditor {
     
     @IBOutlet var collectionView: UICollectionView!
     
     var delegate: ImagePicker?
+    var index: IndexPath!
     
 //    var images = [UIImage]()
     
@@ -53,7 +55,12 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     // set action for tapped cell
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // show picker
-        delegate?.addNewPhoto()
+        if images[indexPath.item] == UIImage(systemName: "plus") {
+            delegate?.addNewPhoto(index: indexPath)
+        } else {
+            delegate?.editPhoto(index: indexPath)
+            index = indexPath
+        }
     }
     
     // item has been dragged
@@ -112,6 +119,12 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     @objc func reloadView(_ notification: NSNotification) {
         print("it is working")
         self.collectionView.reloadData()
+    }
+    
+    // remove photo
+    func deletePhoto() {
+        images.remove(at: index.item)
+        collectionView.deleteItems(at: [index])
     }
     
 }
