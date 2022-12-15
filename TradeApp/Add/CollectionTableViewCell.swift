@@ -8,16 +8,16 @@
 import UIKit
 
 protocol ImagePicker {
-    func addNewPhoto(index: IndexPath)
-    func editPhoto(index: IndexPath)
+    func addNewPhoto()
+    func editPhoto()
+    func pushIndex(indexPath: Int)
 }
 
-class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDragDelegate, UICollectionViewDropDelegate, PhotoEditor {
+class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDragDelegate, UICollectionViewDropDelegate {
     
     @IBOutlet var collectionView: UICollectionView!
     
     var delegate: ImagePicker?
-    var index: IndexPath!
     
 //    var images = [UIImage]()
     
@@ -43,9 +43,9 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     // set table view cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? PhotosCell {
+            
             cell.layer.cornerRadius = 10
             cell.imageView.image = images[indexPath.item]
-                
             return cell
         }
         
@@ -54,19 +54,21 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     
     // set action for tapped cell
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // show picker
+        
+        delegate?.pushIndex(indexPath: indexPath.item)
+        
         if images[indexPath.item] == UIImage(systemName: "plus") {
-            delegate?.addNewPhoto(index: indexPath)
+            delegate?.addNewPhoto()
         } else {
-            delegate?.editPhoto(index: indexPath)
-            index = indexPath
+            delegate?.editPhoto()
         }
     }
     
     // item has been dragged
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        guard !images.isEmpty else { return [] }
+        guard images.filter({$0 != UIImage(systemName: "plus")}).count > 1 else { return [] }
         let item = images[indexPath.item]
+        guard item != UIImage(systemName: "plus") else { return [] }
         let itemProvider = NSItemProvider(object: item)
         let dragItem = UIDragItem(itemProvider: itemProvider)
         dragItem.localObject = item
@@ -85,16 +87,23 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     // item has been dropped
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
         var destinationIndexPath: IndexPath
+        let numberOfPhotos = images.filter {$0 != UIImage(systemName: "plus")}.count
         
         if let indexPath = coordinator.destinationIndexPath {
-            destinationIndexPath = indexPath
+            if indexPath.item < numberOfPhotos - 1 {
+                destinationIndexPath = indexPath
+            } else {
+                let row = numberOfPhotos
+                destinationIndexPath = IndexPath(item: row - 1, section: 0)
+            }
         } else {
-            let row = collectionView.numberOfItems(inSection: 0)
+            let row = numberOfPhotos
             destinationIndexPath = IndexPath(item: row - 1, section: 0)
         }
         
         if coordinator.proposal.operation == .move {
             reorderItems(coordinator: coordinator, destinationIndexPath: destinationIndexPath, collectionView: collectionView)
+            collectionView.reloadData()
         }
     }
     
@@ -117,14 +126,8 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     
     // reload collection view
     @objc func reloadView(_ notification: NSNotification) {
-        print("it is working")
-        self.collectionView.reloadData()
-    }
-    
-    // remove photo
-    func deletePhoto() {
-        images.remove(at: index.item)
-        collectionView.deleteItems(at: [index])
+        print("collection view reloaded")
+        collectionView.reloadData()
     }
     
 }

@@ -12,19 +12,18 @@ enum AlertType {
     case success
 }
 
-protocol PhotoEditor {
-    func deletePhoto()
+enum ActionType {
+    case edit
 }
 
 class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
 //    var images = [UIImage]()
-    var index: IndexPath!
+    var index: Int!
+    var action: ActionType!
     
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell!
-    
-    var delegate: PhotoEditor?
     
     let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
@@ -219,12 +218,13 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 self?.clearTapped()
                 self?.tabBarController?.selectedIndex = 0
             })
+            
             present(ac, animated: true)
         }
     }
     
     // show source type alert
-    func addNewPhoto(index: IndexPath) {
+    func addNewPhoto() {
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
             let ac = UIAlertController(title: "Source", message: nil, preferredStyle: .actionSheet)
             ac.addAction(UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
@@ -261,22 +261,52 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         guard let image = info[.editedImage] as? UIImage else { return }
         dismiss(animated: true)
         
-        images[index.item] = image
+        if action == .edit {
+            images[index] = image
+        } else {
+            for i in 0...images.count {
+                if images[i] == UIImage(systemName: "plus") {
+                    images[i] = image
+                    break
+                }
+            }
+        }
         
+        action = nil
+        index = nil
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // edit photo alert
-    func editPhoto(index: IndexPath) {
+    func editPhoto() {
         let ac = UIAlertController(title: "Edit", message: nil, preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Change photo", style: .default) { [weak self] _ in
-            self?.addNewPhoto(index: index)
+            self?.action = .edit
+            self?.addNewPhoto()
         })
         ac.addAction(UIAlertAction(title: "Delete photo", style: .destructive) { [weak self] _ in
-            self?.delegate?.deletePhoto()
+            self?.action = .edit
+            self?.deletePhoto()
         })
+        
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(ac, animated: true)
+    }
+    
+    // remove photo
+    func deletePhoto() {
+        images[index] = UIImage(systemName: "plus")!
+        let plusImages = images.filter {$0 == UIImage(systemName: "plus")}
+        images = images.filter {$0 != UIImage(systemName: "plus")}
+        images += plusImages
+        action = nil
+        index = nil
+        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+    }
+    
+    // change indexPath
+    func pushIndex(indexPath: Int) {
+        index = indexPath
     }
     
 }
