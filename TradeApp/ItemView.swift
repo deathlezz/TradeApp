@@ -11,6 +11,7 @@ class ItemView: UIViewController {
     
     @IBOutlet var imageView: UIImageView!
     
+    var selectedImage: UIImage!
     var selectedImageNumber: Int?
     var totalPictures: Int?
     
@@ -21,6 +22,8 @@ class ItemView: UIViewController {
         
         title = "\(selectedImageNumber!) of \(totalPictures!)"
         navigationItem.largeTitleDisplayMode = .never
+        
+        imageView.image = selectedImage
         
         let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
         let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))

@@ -86,6 +86,9 @@ class DetailView: UITableViewController {
         case "Image":
             if let cell = tableView.dequeueReusableCell(withIdentifier: "Image") as? GalleryCell {
                 // cell image here
+                let imgs = item.photos.map {UIImage(data: $0!)}
+                
+                cell.imageGallery.image = imgs[0]
                 let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
                 let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
                 leftSwipe.direction = .left
@@ -130,6 +133,8 @@ class DetailView: UITableViewController {
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "itemView") as? ItemView {
+            let imgs = item.photos.map {UIImage(data: $0!)}
+            vc.selectedImage = imgs[0]
             vc.selectedImageNumber = 1
             vc.totalPictures = 8
             navigationController?.pushViewController(vc, animated: true)

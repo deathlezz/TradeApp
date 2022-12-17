@@ -90,7 +90,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         let numberOfPhotos = images.filter {$0 != UIImage(systemName: "plus")}.count
         
         if let indexPath = coordinator.destinationIndexPath {
-            if indexPath.item < numberOfPhotos - 1 {
+            if indexPath.item < numberOfPhotos {
                 destinationIndexPath = indexPath
             } else {
                 let row = numberOfPhotos

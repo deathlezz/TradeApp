@@ -150,6 +150,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
         
         textViewCell.textView.text = nil
+        
+        for i in 0...7 {
+            images[i] = UIImage(systemName: "plus")!
+        }
+
+        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // set action for "return" keyboard button
@@ -190,14 +196,15 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for submit button
     @objc func submitTapped() {
+        let photos = images.map {$0.pngData()}
         let title = textFieldCells[0].textField.text
         let price = textFieldCells[1].textField.text
         let category = textFieldCells[2].textField.text
         let location = textFieldCells[3].textField.text
         let description = textViewCell.textView.text
         
-        if !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
-            let newItem = Item(title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
+        if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
+            let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
             items.append(newItem)
             recentlyAdded.append(newItem)
             showAlert(.success)

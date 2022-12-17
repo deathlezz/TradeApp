@@ -8,7 +8,7 @@
 import Foundation
 
 struct Item: Codable {
-//    let photos: [Data]
+    let photos: [Data?]
     let title: String
     let price: Int
     let category: String
