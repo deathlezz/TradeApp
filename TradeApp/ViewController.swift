@@ -147,15 +147,18 @@ class ViewController: UICollectionViewController {
     
     // load data in the background
     func loadData() {
-//        for _ in 0...3 {
-//            let tesla = Item(title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date())
-//            let bmw = Item(title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date())
-//            let fiat = Item(title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date())
-//            items.append(tesla)
-//            items.append(bmw)
-//            items.append(fiat)
-//            recentlyAdded.append(fiat)
-//        }
+        let car = UIImage(systemName: "car")?.pngData()
+        let plus = UIImage(systemName: "plus")?.jpegData(compressionQuality: 0.8)
+        
+        for _ in 0...3 {
+            let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date())
+            let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date())
+            let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date())
+            items.append(tesla)
+            items.append(bmw)
+            items.append(fiat)
+            recentlyAdded.append(fiat)
+        }
         
         filteredItems = recentlyAdded
     }

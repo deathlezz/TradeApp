@@ -50,6 +50,9 @@ class SavedView: UICollectionViewController {
             fatalError("Unable to dequeue itemCell")
         }
         
+        let img = UIImage(data: savedItems[indexPath.item].photos[0]!)
+        
+        cell.image.image = img
         cell.title.text = savedItems[indexPath.item].title
         cell.price.text = "£\(savedItems[indexPath.item].price)"
         cell.location.text = savedItems[indexPath.item].location

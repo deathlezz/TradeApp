@@ -10,6 +10,7 @@ import UIKit
 class DetailView: UITableViewController {
     
     var savedItems = [Item]()
+    var currentImage = 0
     
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
@@ -21,6 +22,7 @@ class DetailView: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
+        // set toolbar "call" buttoon
         let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
         let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
         callFrame.setImage(image, for: .normal)
@@ -29,6 +31,7 @@ class DetailView: UITableViewController {
         callFrame.layer.cornerRadius = 7
         let callButton = UIBarButtonItem(customView: callFrame)
         
+        // set toolbar "message" button
         let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
         let message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
         messageFrame.setImage(message, for: .normal)
@@ -87,10 +90,11 @@ class DetailView: UITableViewController {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "Image") as? GalleryCell {
                 // cell image here
                 let imgs = item.photos.map {UIImage(data: $0!)}
+                cell.imageGallery.image = imgs[currentImage]
                 
-                cell.imageGallery.image = imgs[0]
                 let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
                 let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
+                
                 leftSwipe.direction = .left
                 rightSwipe.direction = .right
                 cell.addGestureRecognizer(leftSwipe)
@@ -134,9 +138,11 @@ class DetailView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "itemView") as? ItemView {
             let imgs = item.photos.map {UIImage(data: $0!)}
-            vc.selectedImage = imgs[0]
-            vc.selectedImageNumber = 1
-            vc.totalPictures = 8
+            vc.item = item
+            vc.currentImage = currentImage
+//            vc.selectedImage = imgs[currentImage]
+            vc.selectedImageNumber = currentImage + 1
+            vc.totalPictures = imgs.count
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -204,16 +210,31 @@ class DetailView: UITableViewController {
     
     // set action for message button
     @objc func messageTapped() {
-        
+        print("message will be send here")
     }
     
     // set swipe recognizer
     @objc func getSwipeAction(_ recognizer: UISwipeGestureRecognizer) {
+        let imgs = item.photos.map {UIImage(data: $0!)}
+        
         if recognizer.direction == .left {
             print("Left swipe")
-        } else if recognizer.direction == .right {
+            currentImage += 1
+        } else {
             print("Right swipe")
+            currentImage -= 1
         }
+        
+        if currentImage > imgs.count - 1 {
+            currentImage = imgs.count - 1
+            return
+        } else if currentImage < 0 {
+            currentImage = 0
+            return
+        }
+        
+        tableView.reloadData()
+        print("table view reloaded")
     }
 
 }
