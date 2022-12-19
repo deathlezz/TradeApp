@@ -18,7 +18,6 @@ enum ActionType {
 
 class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-//    var images = [UIImage]()
     var index: Int!
     var action: ActionType!
     

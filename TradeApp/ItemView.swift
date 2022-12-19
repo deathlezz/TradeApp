@@ -11,22 +11,24 @@ class ItemView: UIViewController {
     
     @IBOutlet var imageView: UIImageView!
     
-    var currentImage: Int!
-//    var selectedImage: UIImage!
-    var selectedImageNumber: Int?
-    var totalPictures: Int?
-    
+    var imgs = [UIImage?]()
     var item: Item!
+    var transition = CATransition()
+    
+    var currentImage: Int! {
+        didSet {
+            title = "\(currentImage + 1) of \(imgs.count)"
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
-        title = "\(selectedImageNumber!) of \(totalPictures!)"
+        title = "\(currentImage + 1) of \(imgs.count)"
         navigationItem.largeTitleDisplayMode = .never
         
-        let imgs = item.photos.map {UIImage(data: $0!)}
         imageView.image = imgs[currentImage]
         
         let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
@@ -41,14 +43,16 @@ class ItemView: UIViewController {
     
     // set swipe recognizer
     @objc func getSwipeAction(_ recognizer: UISwipeGestureRecognizer) {
-        let imgs = item.photos.map {UIImage(data: $0!)}
+        var direction: CATransitionSubtype
         
         if recognizer.direction == .left {
             print("Left swipe")
             currentImage += 1
+            direction = .fromRight
         } else {
             print("Right swipe")
             currentImage -= 1
+            direction = .fromLeft
         }
         
         if currentImage > imgs.count - 1 {
@@ -58,7 +62,22 @@ class ItemView: UIViewController {
             currentImage = 0
             return
         }
+        
+        animateImageView(direction: direction)
+//        imageView.image = imgs[currentImage]
+    }
+    
+    // animate swipe gesture
+    func animateImageView(direction: CATransitionSubtype) {
+        CATransaction.begin()
+        CATransaction.setAnimationDuration(0.25)
+        
+        transition.type = CATransitionType.push
+        transition.subtype = direction
+        
+        imageView.layer.add(transition, forKey: kCATransition)
         imageView.image = imgs[currentImage]
+        CATransaction.commit()
     }
 
 }

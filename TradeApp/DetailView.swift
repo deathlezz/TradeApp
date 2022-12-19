@@ -12,6 +12,7 @@ class DetailView: UITableViewController {
     var savedItems = [Item]()
     var currentImage = 0
     
+    var imgs = [UIImage?]()
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
@@ -88,8 +89,6 @@ class DetailView: UITableViewController {
         switch sectionTitles[indexPath.section] {
         case "Image":
             if let cell = tableView.dequeueReusableCell(withIdentifier: "Image") as? GalleryCell {
-                // cell image here
-                let imgs = item.photos.map {UIImage(data: $0!)}
                 cell.imageGallery.image = imgs[currentImage]
                 
                 let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
@@ -137,12 +136,9 @@ class DetailView: UITableViewController {
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "itemView") as? ItemView {
-            let imgs = item.photos.map {UIImage(data: $0!)}
+            vc.imgs = imgs
             vc.item = item
             vc.currentImage = currentImage
-//            vc.selectedImage = imgs[currentImage]
-            vc.selectedImageNumber = currentImage + 1
-            vc.totalPictures = imgs.count
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -215,8 +211,6 @@ class DetailView: UITableViewController {
     
     // set swipe recognizer
     @objc func getSwipeAction(_ recognizer: UISwipeGestureRecognizer) {
-        let imgs = item.photos.map {UIImage(data: $0!)}
-        
         if recognizer.direction == .left {
             print("Left swipe")
             currentImage += 1

@@ -71,9 +71,9 @@ class ViewController: UICollectionViewController {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
             fatalError("Unable to dequeue itemCell")
         }
-        let img = UIImage(data: filteredItems[indexPath.item].photos[0]!)
+        let thumbnail = UIImage(data: filteredItems[indexPath.item].photos[0]!)
         
-        cell.image.image = img
+        cell.image.image = thumbnail
         cell.title.text = filteredItems[indexPath.item].title
         cell.price.text = "£\(filteredItems[indexPath.item].price)"
         cell.location.text = filteredItems[indexPath.item].location
@@ -87,6 +87,7 @@ class ViewController: UICollectionViewController {
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
+            vc.imgs = filteredItems[indexPath.item].photos.map {UIImage(data: $0!)}
             vc.item = filteredItems[indexPath.item]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
