@@ -9,11 +9,10 @@ import UIKit
 
 class ItemView: UIViewController {
     
-    @IBOutlet var imageView: UIImageView!
+    @IBOutlet var scrollView: UIScrollView!
     
     var imgs = [UIImage?]()
     var item: Item!
-    var transition = CATransition()
     
     var currentImage: Int! {
         didSet {
@@ -29,30 +28,37 @@ class ItemView: UIViewController {
         title = "\(currentImage + 1) of \(imgs.count)"
         navigationItem.largeTitleDisplayMode = .never
         
-        imageView.image = imgs[currentImage]
+        scrollView.isPagingEnabled = true
         
-        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
-        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
-        leftSwipe.direction = .left
-        rightSwipe.direction = .right
+        for i in 0..<imgs.count {
+            let imageView = UIImageView()
+            imageView.image = imgs[i]
+            imageView.contentMode = .scaleAspectFit
+            let xPosition = view.frame.width * CGFloat(i)
+            imageView.frame = CGRect(x: xPosition, y: -100, width: scrollView.frame.width, height: scrollView.frame.height)
+            scrollView.contentSize.width = scrollView.frame.width * CGFloat(i + 1)
+            scrollView.addSubview(imageView)
+            
+        }
         
-        imageView.isUserInteractionEnabled = true
-        imageView.addGestureRecognizer(leftSwipe)
-        imageView.addGestureRecognizer(rightSwipe)
+//        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
+//        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
+//        leftSwipe.direction = .left
+//        rightSwipe.direction = .right
+        
+//        scrollView.addGestureRecognizer(leftSwipe)
+//        scrollView.addGestureRecognizer(rightSwipe)
     }
     
     // set swipe recognizer
     @objc func getSwipeAction(_ recognizer: UISwipeGestureRecognizer) {
-        var direction: CATransitionSubtype
         
         if recognizer.direction == .left {
             print("Left swipe")
             currentImage += 1
-            direction = .fromRight
         } else {
             print("Right swipe")
             currentImage -= 1
-            direction = .fromLeft
         }
         
         if currentImage > imgs.count - 1 {
@@ -63,21 +69,7 @@ class ItemView: UIViewController {
             return
         }
         
-        animateImageView(direction: direction)
 //        imageView.image = imgs[currentImage]
-    }
-    
-    // animate swipe gesture
-    func animateImageView(direction: CATransitionSubtype) {
-        CATransaction.begin()
-        CATransaction.setAnimationDuration(0.25)
-        
-        transition.type = CATransitionType.push
-        transition.subtype = direction
-        
-        imageView.layer.add(transition, forKey: kCATransition)
-        imageView.image = imgs[currentImage]
-        CATransaction.commit()
     }
 
 }

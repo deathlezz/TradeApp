@@ -66,6 +66,7 @@ class SavedView: UICollectionViewController {
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
+            vc.imgs = savedItems[indexPath.item].photos.map {UIImage(data: $0!)}
             vc.item = savedItems[indexPath.item]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)

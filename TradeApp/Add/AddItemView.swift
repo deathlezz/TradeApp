@@ -24,7 +24,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell!
     
-    let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
+    let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
     let sectionTitles = ["Photos", "Title", "Price", "Category", "Location", "Description", "Button"]
 
@@ -195,7 +195,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for submit button
     @objc func submitTapped() {
-        let photos = images.map {$0.pngData()}
+        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
         let title = textFieldCells[0].textField.text
         let price = textFieldCells[1].textField.text
         let category = textFieldCells[2].textField.text
