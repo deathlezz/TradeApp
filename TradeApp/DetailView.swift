@@ -135,7 +135,7 @@ class DetailView: UITableViewController {
     
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "itemView") as? ItemView {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "ItemView") as? ItemView {
             vc.imgs = imgs
             vc.item = item
             vc.currentImage = currentImage
@@ -179,6 +179,7 @@ class DetailView: UITableViewController {
         super.viewWillAppear(animated)
         savedItems = Utilities.loadItems()
         navigationController?.isNavigationBarHidden = false
+        navigationController?.isToolbarHidden = false
         
         if savedItems.contains(where: {$0.title == item.title}) {
             navigationItem.rightBarButtonItems = [removeButton, actionButton]

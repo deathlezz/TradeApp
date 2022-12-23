@@ -66,7 +66,7 @@ class ViewController: UICollectionViewController {
         return filteredItems.count
     }
     
-    // set table view cell
+    // set collection view cell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
             fatalError("Unable to dequeue itemCell")

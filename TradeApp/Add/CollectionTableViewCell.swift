@@ -40,7 +40,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         return 8
     }
     
-    // set table view cell
+    // set collection view cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? PhotosCell {
             

@@ -7,9 +7,7 @@
 
 import UIKit
 
-class ItemView: UIViewController {
-    
-    @IBOutlet var scrollView: UIScrollView!
+class ItemView: UICollectionViewController {
     
     var imgs = [UIImage?]()
     var item: Item!
@@ -27,49 +25,38 @@ class ItemView: UIViewController {
         
         title = "\(currentImage + 1) of \(imgs.count)"
         navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
         
-        scrollView.isPagingEnabled = true
-        
-        for i in 0..<imgs.count {
-            let imageView = UIImageView()
-            imageView.image = imgs[i]
-            imageView.contentMode = .scaleAspectFit
-            let xPosition = view.frame.width * CGFloat(i)
-            imageView.frame = CGRect(x: xPosition, y: -100, width: scrollView.frame.width, height: scrollView.frame.height)
-            scrollView.contentSize.width = scrollView.frame.width * CGFloat(i + 1)
-            scrollView.addSubview(imageView)
-            
-        }
-        
-//        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
-//        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(getSwipeAction))
-//        leftSwipe.direction = .left
-//        rightSwipe.direction = .right
-        
-//        scrollView.addGestureRecognizer(leftSwipe)
-//        scrollView.addGestureRecognizer(rightSwipe)
+        collectionView.isPagingEnabled = true
+        navigationController?.isToolbarHidden = true
     }
     
-    // set swipe recognizer
-    @objc func getSwipeAction(_ recognizer: UISwipeGestureRecognizer) {
-        
-        if recognizer.direction == .left {
-            print("Left swipe")
-            currentImage += 1
-        } else {
-            print("Right swipe")
-            currentImage -= 1
-        }
-        
-        if currentImage > imgs.count - 1 {
-            currentImage = imgs.count - 1
-            return
-        } else if currentImage < 0 {
-            currentImage = 0
-            return
-        }
-        
-//        imageView.image = imgs[currentImage]
+    // set number of items in section
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return imgs.count
     }
+    
+    // set collection view cell
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemViewCell", for: indexPath) as? PhotosCell {
+            cell.imageView.image = imgs[indexPath.item]
+            return cell
+        }
+        
+        return UICollectionViewCell()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 
+        return CGSize(width: collectionView.frame.size.width, height: collectionView.frame.size.height)
+    }
+    
+    // update current image index
+    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let x = scrollView.contentOffset.x
+        let width = scrollView.bounds.size.width
+        currentImage = Int(ceil(x / width))
+    }
+    
+    
 }
