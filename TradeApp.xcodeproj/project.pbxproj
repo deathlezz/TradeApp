@@ -22,6 +22,7 @@
 		BC6770702927D4A600985CAB /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC67706F2927D4A600985CAB /* SearchView.swift */; };
 		BC69075B2939247F005D1EAB /* PhotosCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC69075A2939247F005D1EAB /* PhotosCell.swift */; };
 		BC69ED652938F37A00A63A79 /* AddItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC69ED642938F37A00A63A79 /* AddItemView.swift */; };
+		BC6FF4902957841100F1D772 /* ItemViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6FF48F2957841100F1D772 /* ItemViewCell.swift */; };
 		BCCE154B293BE14F00C256E4 /* ButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCE154A293BE14F00C256E4 /* ButtonCell.swift */; };
 		BCE805D929324670009CB632 /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE805D829324670009CB632 /* SavedView.swift */; };
 		BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2F94529266D2400930252 /* AppDelegate.swift */; };
@@ -50,6 +51,7 @@
 		BC67706F2927D4A600985CAB /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		BC69075A2939247F005D1EAB /* PhotosCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosCell.swift; sourceTree = "<group>"; };
 		BC69ED642938F37A00A63A79 /* AddItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemView.swift; sourceTree = "<group>"; };
+		BC6FF48F2957841100F1D772 /* ItemViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewCell.swift; sourceTree = "<group>"; };
 		BCCE154A293BE14F00C256E4 /* ButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCell.swift; sourceTree = "<group>"; };
 		BCE805D829324670009CB632 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
 		BCF2F94229266D2400930252 /* TradeApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TradeApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -123,6 +125,7 @@
 				BC5A4EEA292BAF86003A20B7 /* GalleryCell.swift */,
 				BCF2F94929266D2400930252 /* ViewController.swift */,
 				BC17416E292D33680055A0B8 /* ItemView.swift */,
+				BC6FF48F2957841100F1D772 /* ItemViewCell.swift */,
 				BCF2F95B2926D71E00930252 /* CategoryView.swift */,
 				BC67706F2927D4A600985CAB /* SearchView.swift */,
 				BCE805D829324670009CB632 /* SavedView.swift */,
@@ -217,6 +220,7 @@
 				BC69075B2939247F005D1EAB /* PhotosCell.swift in Sources */,
 				BC6770702927D4A600985CAB /* SearchView.swift in Sources */,
 				BC5A4EED292C1754003A20B7 /* Utilities.swift in Sources */,
+				BC6FF4902957841100F1D772 /* ItemViewCell.swift in Sources */,
 				BCF2F95C2926D71E00930252 /* CategoryView.swift in Sources */,
 				BCF2F95A2926CFEB00930252 /* ItemCell.swift in Sources */,
 				BCF2F94A29266D2400930252 /* ViewController.swift in Sources */,

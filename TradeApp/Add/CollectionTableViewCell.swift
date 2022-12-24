@@ -28,7 +28,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         collectionView.dragDelegate = self
         collectionView.dropDelegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadView), name: NSNotification.Name(rawValue: "reload"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadView), name: NSNotification.Name("reload"), object: nil)
         
         for _ in 0...7 {
             images.append(UIImage(systemName: "plus")!)
