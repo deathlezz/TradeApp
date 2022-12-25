@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC019D292958A85C00EB04F8 /* DetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC019D282958A85C00EB04F8 /* DetailViewCell.swift */; };
 		BC17416F292D33680055A0B8 /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC17416E292D33680055A0B8 /* ItemView.swift */; };
 		BC174171292D46B30055A0B8 /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174170292D46B30055A0B8 /* FilterView.swift */; };
 		BC174175292D55760055A0B8 /* FilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174174292D55760055A0B8 /* FilterCell.swift */; };
 		BC174177292D59FF0055A0B8 /* PriceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174176292D59FF0055A0B8 /* PriceCell.swift */; };
 		BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2626612944CDEA0049E7A9 /* CollectionTableViewCell.swift */; };
 		BC5A4EE9292BAC3A003A20B7 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5A4EE8292BAC3A003A20B7 /* DetailView.swift */; };
-		BC5A4EEB292BAF86003A20B7 /* GalleryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5A4EEA292BAF86003A20B7 /* GalleryCell.swift */; };
 		BC5A4EED292C1754003A20B7 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5A4EEC292C1754003A20B7 /* Utilities.swift */; };
 		BC5CB87E293B7D870017AE69 /* TextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5CB87D293B7D870017AE69 /* TextFieldCell.swift */; };
 		BC5CB880293B7EF10017AE69 /* TextViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5CB87F293B7EF10017AE69 /* TextViewCell.swift */; };
@@ -36,13 +36,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BC019D282958A85C00EB04F8 /* DetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewCell.swift; sourceTree = "<group>"; };
 		BC17416E292D33680055A0B8 /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
 		BC174170292D46B30055A0B8 /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
 		BC174174292D55760055A0B8 /* FilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCell.swift; sourceTree = "<group>"; };
 		BC174176292D59FF0055A0B8 /* PriceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceCell.swift; sourceTree = "<group>"; };
 		BC2626612944CDEA0049E7A9 /* CollectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionTableViewCell.swift; sourceTree = "<group>"; };
 		BC5A4EE8292BAC3A003A20B7 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
-		BC5A4EEA292BAF86003A20B7 /* GalleryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryCell.swift; sourceTree = "<group>"; };
 		BC5A4EEC292C1754003A20B7 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		BC5CB87D293B7D870017AE69 /* TextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCell.swift; sourceTree = "<group>"; };
 		BC5CB87F293B7EF10017AE69 /* TextViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewCell.swift; sourceTree = "<group>"; };
@@ -77,6 +77,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BC019D242958A72700EB04F8 /* Item View */ = {
+			isa = PBXGroup;
+			children = (
+				BC17416E292D33680055A0B8 /* ItemView.swift */,
+				BC6FF48F2957841100F1D772 /* ItemViewCell.swift */,
+			);
+			path = "Item View";
+			sourceTree = "<group>";
+		};
+		BC019D252958A76F00EB04F8 /* Detail View */ = {
+			isa = PBXGroup;
+			children = (
+				BC5A4EE8292BAC3A003A20B7 /* DetailView.swift */,
+				BC019D282958A85C00EB04F8 /* DetailViewCell.swift */,
+			);
+			path = "Detail View";
+			sourceTree = "<group>";
+		};
+		BC019D272958A7B400EB04F8 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				BCF2F94929266D2400930252 /* ViewController.swift */,
+				BCF2F95B2926D71E00930252 /* CategoryView.swift */,
+				BC67706F2927D4A600985CAB /* SearchView.swift */,
+			);
+			path = Search;
+			sourceTree = "<group>";
+		};
 		BC5CB87B293B74380017AE69 /* Filter */ = {
 			isa = PBXGroup;
 			children = (
@@ -122,14 +150,10 @@
 				BCF2F94529266D2400930252 /* AppDelegate.swift */,
 				BCF2F94729266D2400930252 /* SceneDelegate.swift */,
 				BCF2F9592926CFEB00930252 /* ItemCell.swift */,
-				BC5A4EEA292BAF86003A20B7 /* GalleryCell.swift */,
-				BCF2F94929266D2400930252 /* ViewController.swift */,
-				BC17416E292D33680055A0B8 /* ItemView.swift */,
-				BC6FF48F2957841100F1D772 /* ItemViewCell.swift */,
-				BCF2F95B2926D71E00930252 /* CategoryView.swift */,
-				BC67706F2927D4A600985CAB /* SearchView.swift */,
 				BCE805D829324670009CB632 /* SavedView.swift */,
-				BC5A4EE8292BAC3A003A20B7 /* DetailView.swift */,
+				BC019D272958A7B400EB04F8 /* Search */,
+				BC019D252958A76F00EB04F8 /* Detail View */,
+				BC019D242958A72700EB04F8 /* Item View */,
 				BC5CB87B293B74380017AE69 /* Filter */,
 				BC5CB87C293B7A090017AE69 /* Add */,
 				BC66A6EA29296D8900F33E7D /* Storage.swift */,
@@ -219,6 +243,7 @@
 				BC5A4EE9292BAC3A003A20B7 /* DetailView.swift in Sources */,
 				BC69075B2939247F005D1EAB /* PhotosCell.swift in Sources */,
 				BC6770702927D4A600985CAB /* SearchView.swift in Sources */,
+				BC019D292958A85C00EB04F8 /* DetailViewCell.swift in Sources */,
 				BC5A4EED292C1754003A20B7 /* Utilities.swift in Sources */,
 				BC6FF4902957841100F1D772 /* ItemViewCell.swift in Sources */,
 				BCF2F95C2926D71E00930252 /* CategoryView.swift in Sources */,
@@ -229,7 +254,6 @@
 				BC5CB87E293B7D870017AE69 /* TextFieldCell.swift in Sources */,
 				BC66A6E92929154B00F33E7D /* Item.swift in Sources */,
 				BC17416F292D33680055A0B8 /* ItemView.swift in Sources */,
-				BC5A4EEB292BAF86003A20B7 /* GalleryCell.swift in Sources */,
 				BC66A6EB29296D8900F33E7D /* Storage.swift in Sources */,
 				BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */,
 				BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */,

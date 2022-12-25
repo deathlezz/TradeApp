@@ -26,8 +26,6 @@ class ItemView: UICollectionViewController {
         title = "\(currentImage + 1) of \(imgs.count)"
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
-        
-        collectionView.isPagingEnabled = true
         navigationController?.isToolbarHidden = true
     }
     
@@ -39,7 +37,7 @@ class ItemView: UICollectionViewController {
     // set collection view cell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemViewCell", for: indexPath) as? ItemViewCell {
-        
+
             cell.imageView.image = imgs[indexPath.item]
             return cell
         }
@@ -61,6 +59,12 @@ class ItemView: UICollectionViewController {
         
         currentImage = index
         NotificationCenter.default.post(name: NSNotification.Name("resetZoom"), object: nil)
+    }
+    
+    // scroll to current image before view appeared
+    override func viewWillAppear(_ animated: Bool) {
+        collectionView.scrollToItem(at: IndexPath(item: currentImage, section: 0), at: .centeredHorizontally, animated: false)
+        collectionView.isPagingEnabled = true
     }
     
 }
