@@ -63,8 +63,15 @@ class ItemView: UICollectionViewController {
     
     // scroll to current image before view appeared
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         collectionView.scrollToItem(at: IndexPath(item: currentImage, section: 0), at: .centeredHorizontally, animated: false)
         collectionView.isPagingEnabled = true
+    }
+    
+    // get index before view disappeared
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.post(name: Notification.Name("getIndex"), object: nil, userInfo: ["index": currentImage!])
     }
     
 }

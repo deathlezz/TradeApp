@@ -17,12 +17,14 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     
     var imgs = [UIImage?]()
     var delegate: Index?
-    var currentImage = 1
+    var currentImage = 0
     
     override func awakeFromNib() {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.isPagingEnabled = true
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(getIndex), name: NSNotification.Name("getIndex"), object: nil)
     }
     
     // set number of items in section
@@ -43,6 +45,17 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     // set action for tapped cell
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         delegate?.pushIndex(index: indexPath.item)
+    }
+    
+    // get current image index
+    @objc func getIndex(_ notification: NSNotification) {
+        currentImage = notification.userInfo?["index"] as! Int
+        scrollToItem()
+    }
+    
+    // scroll to item before view appeared
+    func scrollToItem() {
+        collectionView.scrollToItem(at: IndexPath(item: currentImage, section: 0), at: .centeredHorizontally, animated: false)
     }
     
 }
