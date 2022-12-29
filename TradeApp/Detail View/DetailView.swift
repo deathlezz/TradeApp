@@ -23,7 +23,7 @@ class DetailView: UITableViewController, Index {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // set toolbar "call" buttoon
+        // set toolbar "call" button
         let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
         let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
         callFrame.setImage(image, for: .normal)
@@ -162,6 +162,7 @@ class DetailView: UITableViewController, Index {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         savedItems = Utilities.loadItems()
+        
         navigationController?.isNavigationBarHidden = false
         navigationController?.isToolbarHidden = false
         

@@ -206,6 +206,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
             items.append(newItem)
             recentlyAdded.append(newItem)
+            filteredItems = recentlyAdded
             showAlert(.success)
         } else {
             showAlert(.error)

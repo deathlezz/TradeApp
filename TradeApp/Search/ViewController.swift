@@ -47,8 +47,8 @@ class ViewController: UICollectionViewController {
         collectionView.refreshControl = refreshControl
         
         DispatchQueue.global().async { [weak self] in
-            self?.loadData()
             self?.resetFilters()
+            self?.loadData()
             
             DispatchQueue.main.async {
                 self?.collectionView.reloadData()
