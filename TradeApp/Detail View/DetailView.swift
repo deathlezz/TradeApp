@@ -18,7 +18,7 @@ class DetailView: UITableViewController, Index {
     var removeButton: UIBarButtonItem!
     
     var item: Item!
-    let sectionTitles = ["Image", "Title", "Tags", "Description"]
+    let sectionTitles = ["Image", "Title", "Tags", "Description", "Location"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,6 +55,7 @@ class DetailView: UITableViewController, Index {
         
         navigationItem.rightBarButtonItems = [saveButton, actionButton]
         tableView.separatorStyle = .none
+        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 83, right: 0)
         
         DispatchQueue.global().async { [weak self] in
             self?.savedItems = Utilities.loadItems()
@@ -67,12 +68,12 @@ class DetailView: UITableViewController, Index {
 
     // set number of sections
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 4
+        return sectionTitles.count
     }
     
     // set title for every section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if sectionTitles[section] == "Description" || sectionTitles[section] == "Tags" {
+        if sectionTitles[section] == "Description" || sectionTitles[section] == "Tags" || sectionTitles[section] == "Location" {
             return sectionTitles[section]
         } else {
             return nil
@@ -120,6 +121,18 @@ class DetailView: UITableViewController, Index {
             cell.isUserInteractionEnabled = false
             return cell
             
+        case "Location":
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "MapViewCell", for: indexPath) as? MapViewCell {
+                cell.cityLabel.text = item.location
+                cell.distanceLabel.text = "100 mi from you"
+                cell.distanceLabel.numberOfLines = 0
+                cell.mapView.layer.cornerRadius = 8
+                cell.mapView.mapType = .standard
+                cell.mapView.isZoomEnabled = false
+                cell.selectionStyle = .none
+                return cell
+            }
+            
         default:
             break
         }
@@ -161,7 +174,10 @@ class DetailView: UITableViewController, Index {
     // set save/remove button icon
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        savedItems = Utilities.loadItems()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.savedItems = Utilities.loadItems()
+        }
         
         navigationController?.isNavigationBarHidden = false
         navigationController?.isToolbarHidden = false

@@ -4,6 +4,14 @@
 <dict>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>We need to work with your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need to work with your photo library.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>App needs camera</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>App needs location</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>App needs location</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -241,7 +242,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" contentInsetAdjustmentBehavior="never" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="wgy-qt-pJg">
-                                            <rect key="frame" x="0.0" y="0.0" width="394.33333333333331" height="311"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="394" height="311"/>
                                             <color key="backgroundColor" red="0.14977687510000001" green="0.14977687510000001" blue="0.14977687510000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="Oxe-1u-R3A">
                                                 <size key="itemSize" width="393" height="311"/>
@@ -262,10 +263,10 @@
                                                             </imageView>
                                                         </subviews>
                                                         <constraints>
-                                                            <constraint firstItem="On2-f0-aLq" firstAttribute="leading" secondItem="HkY-FU-F1a" secondAttribute="leading" id="40j-mR-5uE"/>
-                                                            <constraint firstItem="On2-f0-aLq" firstAttribute="centerY" secondItem="HkY-FU-F1a" secondAttribute="centerY" id="c8U-Vs-1KJ"/>
-                                                            <constraint firstItem="On2-f0-aLq" firstAttribute="centerX" secondItem="HkY-FU-F1a" secondAttribute="centerX" id="cUm-uR-nUw"/>
-                                                            <constraint firstItem="On2-f0-aLq" firstAttribute="top" secondItem="HkY-FU-F1a" secondAttribute="top" id="sWE-V8-RjK"/>
+                                                            <constraint firstItem="On2-f0-aLq" firstAttribute="leading" secondItem="HkY-FU-F1a" secondAttribute="leading" id="30G-z3-rFv"/>
+                                                            <constraint firstItem="On2-f0-aLq" firstAttribute="centerY" secondItem="HkY-FU-F1a" secondAttribute="centerY" id="8qA-iX-6Xx"/>
+                                                            <constraint firstItem="On2-f0-aLq" firstAttribute="centerX" secondItem="HkY-FU-F1a" secondAttribute="centerX" id="ZwL-On-Rso"/>
+                                                            <constraint firstItem="On2-f0-aLq" firstAttribute="top" secondItem="HkY-FU-F1a" secondAttribute="top" id="pQs-2K-J24"/>
                                                         </constraints>
                                                     </collectionViewCellContentView>
                                                     <size key="customSize" width="392" height="311"/>
@@ -277,11 +278,11 @@
                                         </collectionView>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="top" secondItem="ZhR-lQ-dkZ" secondAttribute="topMargin" constant="-20" id="EQM-zt-imz"/>
-                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="centerX" secondItem="ZhR-lQ-dkZ" secondAttribute="centerX" id="L5Y-pb-djM"/>
-                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="width" secondItem="ZhR-lQ-dkZ" secondAttribute="height" multiplier="393:310" id="f3o-9i-h59"/>
-                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="centerY" secondItem="ZhR-lQ-dkZ" secondAttribute="centerY" id="lgc-Mi-m6b"/>
-                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="leading" secondItem="ZhR-lQ-dkZ" secondAttribute="leadingMargin" constant="-20" id="oWz-Qj-Kga"/>
+                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="centerX" secondItem="ZhR-lQ-dkZ" secondAttribute="centerX" id="4lQ-M8-wxa"/>
+                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="top" secondItem="ZhR-lQ-dkZ" secondAttribute="topMargin" constant="-20" id="KXJ-17-wvb"/>
+                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="leading" secondItem="ZhR-lQ-dkZ" secondAttribute="leadingMargin" constant="-20" id="PZC-i9-MaZ"/>
+                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="centerY" secondItem="ZhR-lQ-dkZ" secondAttribute="centerY" id="Pkh-FS-Xes"/>
+                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="width" secondItem="ZhR-lQ-dkZ" secondAttribute="height" multiplier="394:311" id="Rtj-7X-hN2"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
@@ -328,6 +329,56 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleAspectFit" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="MapViewCell" rowHeight="150" id="SBE-di-esn" customClass="MapViewCell" customModule="TradeApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="448.33333587646484" width="393" height="150"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SBE-di-esn" id="7ad-N9-xT0">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="150"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="City" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Imv-N6-Yuy">
+                                            <rect key="frame" x="20" y="11" width="76" height="60"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="60" id="OeS-Sm-i6G"/>
+                                                <constraint firstAttribute="width" constant="76" id="Uhk-MA-djI"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Distance" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NCR-Vn-Jv2">
+                                            <rect key="frame" x="20" y="79" width="76" height="60"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aQR-qt-gki">
+                                            <rect key="frame" x="104.33333333333331" y="11" width="279" height="128"/>
+                                            <standardMapConfiguration key="preferredConfiguration"/>
+                                        </mapView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="NCR-Vn-Jv2" firstAttribute="top" secondItem="Imv-N6-Yuy" secondAttribute="bottom" constant="8" id="1y3-yP-qjp"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="aQR-qt-gki" secondAttribute="trailing" constant="-10.333333333333314" id="5A0-rI-CNf"/>
+                                        <constraint firstItem="aQR-qt-gki" firstAttribute="leading" secondItem="Imv-N6-Yuy" secondAttribute="trailing" constant="8.3333333333333144" id="6si-Mz-EDF"/>
+                                        <constraint firstItem="Imv-N6-Yuy" firstAttribute="top" secondItem="7ad-N9-xT0" secondAttribute="topMargin" id="7A9-Jn-bvG"/>
+                                        <constraint firstItem="Imv-N6-Yuy" firstAttribute="top" secondItem="aQR-qt-gki" secondAttribute="top" id="BBh-kA-MHB"/>
+                                        <constraint firstItem="NCR-Vn-Jv2" firstAttribute="width" secondItem="7ad-N9-xT0" secondAttribute="height" multiplier="38:75" id="RxA-GO-HlX"/>
+                                        <constraint firstItem="Imv-N6-Yuy" firstAttribute="trailing" secondItem="NCR-Vn-Jv2" secondAttribute="trailing" id="SHk-S8-HbV"/>
+                                        <constraint firstItem="NCR-Vn-Jv2" firstAttribute="bottom" secondItem="aQR-qt-gki" secondAttribute="bottom" id="U6x-OP-vHD"/>
+                                        <constraint firstItem="Imv-N6-Yuy" firstAttribute="width" secondItem="7ad-N9-xT0" secondAttribute="height" multiplier="38:75" id="WUn-qR-rsp"/>
+                                        <constraint firstItem="Imv-N6-Yuy" firstAttribute="leading" secondItem="7ad-N9-xT0" secondAttribute="leadingMargin" id="XDK-2t-6zl"/>
+                                        <constraint firstItem="NCR-Vn-Jv2" firstAttribute="bottom" secondItem="7ad-N9-xT0" secondAttribute="bottomMargin" id="k6x-7a-j7h"/>
+                                        <constraint firstItem="Imv-N6-Yuy" firstAttribute="leading" secondItem="NCR-Vn-Jv2" secondAttribute="leading" id="m9o-fT-JJa"/>
+                                        <constraint firstItem="aQR-qt-gki" firstAttribute="width" secondItem="7ad-N9-xT0" secondAttribute="height" multiplier="93:50" id="xGJ-7b-OXD"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="cityLabel" destination="Imv-N6-Yuy" id="GYD-oz-pLV"/>
+                                    <outlet property="distanceLabel" destination="NCR-Vn-Jv2" id="UcR-os-OZW"/>
+                                    <outlet property="mapView" destination="aQR-qt-gki" id="uAZ-I9-aKB"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
