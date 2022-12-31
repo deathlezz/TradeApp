@@ -2,16 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>TradeApp would like to use your current location</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We need to work with your photo library.</string>
+	<string>TradeApp would like to use your photo library</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need to work with your photo library.</string>
+	<string>TradeApp would like to use your photo library</string>
 	<key>NSCameraUsageDescription</key>
-	<string>App needs camera</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>App needs location</string>
+	<string>TradeApp would like to use your camera</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>App needs location</string>
+	<string>TradeApp would like to use your current location</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

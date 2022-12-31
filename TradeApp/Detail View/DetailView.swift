@@ -128,7 +128,7 @@ class DetailView: UITableViewController, Index {
                 cell.distanceLabel.numberOfLines = 0
                 cell.mapView.layer.cornerRadius = 8
                 cell.mapView.mapType = .standard
-                cell.mapView.isZoomEnabled = false
+                cell.mapView.isUserInteractionEnabled = false
                 cell.selectionStyle = .none
                 return cell
             }
@@ -169,6 +169,12 @@ class DetailView: UITableViewController, Index {
         let vc = UIActivityViewController(activityItems: [title], applicationActivities: [])
         
         present(vc, animated: true)
+    }
+    
+    // set location after view appeared
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        NotificationCenter.default.post(name: NSNotification.Name("setLocation"), object: nil, userInfo: ["location": item.location])
     }
     
     // set save/remove button icon
