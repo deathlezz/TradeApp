@@ -47,24 +47,13 @@ class MapViewCell: UITableViewCell, MKMapViewDelegate, CLLocationManagerDelegate
         // Initialization code
         
         locationManager = CLLocationManager()
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
         
         NotificationCenter.default.addObserver(self, selector: #selector(setLocation), name: NSNotification.Name("setLocation"), object: nil)
-        
-        // Ask for Authorisation from the User.
-        self.locationManager.requestAlwaysAuthorization()
-
-        // For use in foreground
-        self.locationManager.requestWhenInUseAuthorization()
-
-        DispatchQueue.global().async { [weak self] in
-            if CLLocationManager.locationServicesEnabled() {
-                self?.locationManager.delegate = self
-                self?.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-                self?.locationManager.startUpdatingLocation()
-            }
-        }
     }
     
+    // set item location, center and zoom mapView
     @objc func setLocation(_ notification: NSNotification) {
 
         guard let city = notification.userInfo?["location"] as? String else { return }
@@ -73,34 +62,39 @@ class MapViewCell: UITableViewCell, MKMapViewDelegate, CLLocationManagerDelegate
             guard let location = location else { return }
             
             let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
-            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
+            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
             self.mapView.setRegion(region, animated: true)
             
             let itemLocation = CLLocation(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
             
             self.item = itemLocation
+            self.locationManager.requestLocation()
         }
     }
 
-    
+    // set action for changed authorization
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        
-        if status != .denied {
-            
-            guard let coordinates: CLLocationCoordinate2D = manager.location?.coordinate else { return }
-            
-            let userLocation = CLLocation(latitude: coordinates.latitude, longitude: coordinates.longitude)
-            
-            let distance = userLocation.distance(from: item)
-            print("\(distance / 1000) km")
+
+        if status == .authorizedWhenInUse {
+            locationManager.requestLocation()
         }
     }
     
+    // set action for updated user location
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let locValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
-        let userLocation = CLLocation(latitude: locValue.latitude, longitude: locValue.longitude)
-        let distance = userLocation.distance(from: item)
-        print("\(distance / 1000) km from you")
-        print("locations = \(locValue.latitude) \(locValue.longitude)")
+        if let location = locations.last {
+            print("Found user's location: \(location)")
+
+            guard let itemLocation = item else { return }
+
+            let distance = itemLocation.distance(from: location)
+            print("\(distance / 1000) km from you")
+        }
     }
+
+    // catch user location erorrs
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("Failed to find user's location: \(error.localizedDescription)")
+    }
+
 }
