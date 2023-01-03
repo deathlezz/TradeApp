@@ -15,6 +15,7 @@ class DetailView: UITableViewController, Index {
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
+    var isPushed: Bool!
     
     var item: Item!
     let sectionTitles = ["Image", "Title", "Tags", "Description", "Location"]
@@ -123,7 +124,7 @@ class DetailView: UITableViewController, Index {
         case "Location":
             if let cell = tableView.dequeueReusableCell(withIdentifier: "MapViewCell", for: indexPath) as? MapViewCell {
                 cell.cityLabel.text = item.location
-                cell.distanceLabel.text = "100 mi from you"
+                cell.distanceLabel.text = "N/A"
                 cell.distanceLabel.numberOfLines = 0
                 cell.mapView.layer.cornerRadius = 8
                 cell.mapView.mapType = .standard
@@ -137,6 +138,13 @@ class DetailView: UITableViewController, Index {
         }
         
         return UITableViewCell()
+    }
+    
+    // set action for tapped cell
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if sectionTitles[indexPath.section] == "Location" {
+            openMaps()
+        }
     }
     
     // set action for save item button
@@ -173,12 +181,15 @@ class DetailView: UITableViewController, Index {
     // set location after view appeared
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        NotificationCenter.default.post(name: NSNotification.Name("setLocation"), object: nil, userInfo: ["location": item.location])
+        NotificationCenter.default.post(name: NSNotification.Name("pushLocation"), object: nil, userInfo: ["location": item.location])
     }
     
     // set save/remove button icon
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        isPushed = false
+        NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
         
         DispatchQueue.global().async { [weak self] in
             self?.savedItems = Utilities.loadItems()
@@ -204,10 +215,7 @@ class DetailView: UITableViewController, Index {
     // set action for call button
     @objc func callTapped() {
         let phoneNumber = 123456789
-        guard let url = URL(string: "telprompt://\(phoneNumber)"), UIApplication.shared.canOpenURL(url) else {
-            return
-        }
-        
+        guard let url = URL(string: "telprompt://\(phoneNumber)"), UIApplication.shared.canOpenURL(url) else { return }
         UIApplication.shared.open(url)
     }
     
@@ -221,7 +229,43 @@ class DetailView: UITableViewController, Index {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ItemView") as? ItemView {
             vc.currentImage = index
             vc.imgs = imgs
+            isPushed = true
             navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    // remove mapView before view disappeared
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if !isPushed {
+            NotificationCenter.default.post(name: NSNotification.Name("removeMap"), object: nil)
+        }
+    }
+    
+    // open google maps or apple maps
+    func openMaps() {
+        let appleMaps = URL(string: "maps://")!
+        let googleMaps = URL(string: "comgooglemaps://")!
+        
+        if UIApplication.shared.canOpenURL(appleMaps) && UIApplication.shared.canOpenURL(googleMaps) {
+            let ac = UIAlertController(title: "Maps", message: "Choose map provider", preferredStyle: .actionSheet)
+            ac.addAction(UIAlertAction(title: "Google Maps", style: .default) { _ in
+                guard let url = URL(string: "comgooglemaps://?saddr=&daddr=55,-4") else { return }
+                UIApplication.shared.open(url)
+            })
+            ac.addAction(UIAlertAction(title: "Apple Maps", style: .default) { _ in
+                guard let url = URL(string: "maps://?saddr=&daddr=55,-4") else { return }
+                UIApplication.shared.open(url)
+            })
+            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            present(ac, animated: true)
+            
+        } else if UIApplication.shared.canOpenURL(appleMaps) {
+            guard let url = URL(string: "maps://?saddr=&daddr=55,-4") else { return }
+            UIApplication.shared.open(url)
+        } else if UIApplication.shared.canOpenURL(googleMaps) {
+            guard let url = URL(string: "comgooglemaps://?saddr=&daddr=55,-4") else { return }
+            UIApplication.shared.open(url)
         }
     }
     

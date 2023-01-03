@@ -9,67 +9,32 @@ import UIKit
 import MapKit
 import CoreLocation
 
-extension CLLocationManager {
-    func getLocation(place name: String, completion: @escaping(CLLocation?) -> Void) {
-        
-        let geocoder = CLGeocoder()
-        geocoder.geocodeAddressString(name) { placemarks, error in
-            
-            guard error == nil else {
-                print("*** Error in \(#function): \(error!.localizedDescription)")
-                completion(nil)
-                return
-            }
-            
-            guard let location = placemarks?[0].location else {
-                print("*** Error in \(#function): placemark is nil")
-                completion(nil)
-                return
-            }
-
-            completion(location)
-        }
-    }
-}
-
-class MapViewCell: UITableViewCell, MKMapViewDelegate, CLLocationManagerDelegate {
+class MapViewCell: UITableViewCell, CLLocationManagerDelegate {
     
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var cityLabel: UILabel!
     @IBOutlet var distanceLabel: UILabel!
     
-    var locationManager: CLLocationManager!
+    var didGeocode: Bool!
     
+    var locationManager: CLLocationManager!
+
     var item: CLLocation!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        didGeocode = false
         
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(setLocation), name: NSNotification.Name("setLocation"), object: nil)
-    }
-    
-    // set item location, center and zoom mapView
-    @objc func setLocation(_ notification: NSNotification) {
-
-        guard let city = notification.userInfo?["location"] as? String else { return }
+        NotificationCenter.default.addObserver(self, selector: #selector(removeMap), name: NSNotification.Name("removeMap"), object: nil)
         
-        locationManager.getLocation(place: city) { location in
-            guard let location = location else { return }
-            
-            let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
-            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
-            self.mapView.setRegion(region, animated: true)
-            
-            let itemLocation = CLLocation(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
-            
-            self.item = itemLocation
-            self.locationManager.requestLocation()
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(restoreMap), name: NSNotification.Name("restoreMap"), object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(pushLocation), name: NSNotification.Name("pushLocation"), object: nil)
     }
 
     // set action for changed authorization
@@ -83,18 +48,76 @@ class MapViewCell: UITableViewCell, MKMapViewDelegate, CLLocationManagerDelegate
     // set action for updated user location
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
-            print("Found user's location: \(location)")
-
             guard let itemLocation = item else { return }
 
-            let distance = itemLocation.distance(from: location)
-            print("\(distance / 1000) km from you")
+            let distance = itemLocation.distance(from: location) / 1000
+            let rounded = String(format: "%.0f", distance)
+            distanceLabel.text = "\(rounded) km from you"
         }
     }
 
     // catch user location erorrs
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Failed to find user's location: \(error.localizedDescription)")
+    }
+    
+    // change string into coordinates
+    func forwardGeocoding(address: String) {
+        if didGeocode == false {
+            let geocoder = CLGeocoder()
+            geocoder.geocodeAddressString(address, completionHandler: { [weak self] (placemarks, error) in
+                if error != nil {
+                    print("Failed to retrieve location")
+                    return
+                }
+                
+                var location: CLLocation?
+                
+                if let placemarks = placemarks, placemarks.count > 0 {
+                    location = placemarks.first?.location
+                }
+                
+                if let location = location {
+                    let coordinate = location.coordinate
+                    let center = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+                    let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+                    
+                    self?.mapView.setRegion(region, animated: false)
+                    self?.didGeocode = true
+                    
+                    let itemLocation = CLLocation(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+                    self?.item = itemLocation
+                    self?.locationManager.requestLocation()
+                    
+                } else {
+                    print("No matching location found")
+                }
+            })
+        }
+    }
+    
+    // remove map before view disappeared to avoid memory leak
+    @objc func removeMap() {
+        mapView.removeFromSuperview()
+        mapView = nil
+    }
+    
+    // restore map before view appeared
+    @objc func restoreMap() {
+        if mapView == nil {
+            mapView = MKMapView()
+            superview?.addSubview(mapView)
+        }
+    }
+    
+    // get location info
+    @objc func pushLocation(_ notification: NSNotification) {
+        guard let location = notification.userInfo!["location"] as? String else {
+            print("Could not find location")
+            return
+        }
+
+        forwardGeocoding(address: location)
     }
 
 }
