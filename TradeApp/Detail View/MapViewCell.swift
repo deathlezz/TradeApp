@@ -9,11 +9,17 @@ import UIKit
 import MapKit
 import CoreLocation
 
+protocol Coordinates {
+    func pushCoords(_ lat: Double, _ long: Double)
+}
+
 class MapViewCell: UITableViewCell, CLLocationManagerDelegate {
     
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var cityLabel: UILabel!
     @IBOutlet var distanceLabel: UILabel!
+    
+    var delegate: Coordinates?
     
     var didGeocode: Bool!
     
@@ -53,6 +59,7 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate {
             let distance = itemLocation.distance(from: location) / 1000
             let rounded = String(format: "%.0f", distance)
             distanceLabel.text = "\(rounded) km from you"
+            delegate?.pushCoords(itemLocation.coordinate.latitude, itemLocation.coordinate.longitude)
         }
     }
 

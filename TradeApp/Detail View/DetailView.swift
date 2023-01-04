@@ -7,8 +7,8 @@
 
 import UIKit
 
-class DetailView: UITableViewController, Index {
-    
+class DetailView: UITableViewController, Index, Coordinates {
+
     var savedItems = [Item]()
     
     var imgs = [UIImage?]()
@@ -16,6 +16,9 @@ class DetailView: UITableViewController, Index {
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
     var isPushed: Bool!
+    
+    var latitude: Double!
+    var longitude: Double!
     
     var item: Item!
     let sectionTitles = ["Image", "Title", "Tags", "Description", "Location"]
@@ -123,6 +126,7 @@ class DetailView: UITableViewController, Index {
             
         case "Location":
             if let cell = tableView.dequeueReusableCell(withIdentifier: "MapViewCell", for: indexPath) as? MapViewCell {
+                cell.delegate = self
                 cell.cityLabel.text = item.location
                 cell.distanceLabel.text = "N/A"
                 cell.distanceLabel.numberOfLines = 0
@@ -181,15 +185,15 @@ class DetailView: UITableViewController, Index {
     // set location after view appeared
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        isPushed = false
+        
         NotificationCenter.default.post(name: NSNotification.Name("pushLocation"), object: nil, userInfo: ["location": item.location])
     }
     
     // set save/remove button icon
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        isPushed = false
-        NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
         
         DispatchQueue.global().async { [weak self] in
             self?.savedItems = Utilities.loadItems()
@@ -203,6 +207,8 @@ class DetailView: UITableViewController, Index {
         } else {
             navigationItem.rightBarButtonItems = [saveButton, actionButton]
         }
+        
+        NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
     }
     
     // show save alert
@@ -242,29 +248,39 @@ class DetailView: UITableViewController, Index {
         }
     }
     
+    // push item coordinates
+    func pushCoords(_ lat: Double, _ long: Double) {
+        latitude = lat
+        longitude = long
+    }
+    
     // open google maps or apple maps
     func openMaps() {
+        guard let lat = latitude else { return }
+        guard let long = longitude else { return }
+        
         let appleMaps = URL(string: "maps://")!
         let googleMaps = URL(string: "comgooglemaps://")!
         
         if UIApplication.shared.canOpenURL(appleMaps) && UIApplication.shared.canOpenURL(googleMaps) {
             let ac = UIAlertController(title: "Maps", message: "Choose map provider", preferredStyle: .actionSheet)
             ac.addAction(UIAlertAction(title: "Google Maps", style: .default) { _ in
-                guard let url = URL(string: "comgooglemaps://?saddr=&daddr=55,-4") else { return }
+                guard let url = URL(string: "comgooglemaps://?saddr=&daddr=\(lat),\(long)") else { return }
                 UIApplication.shared.open(url)
             })
             ac.addAction(UIAlertAction(title: "Apple Maps", style: .default) { _ in
-                guard let url = URL(string: "maps://?saddr=&daddr=55,-4") else { return }
+                guard let url = URL(string: "maps://?saddr=&daddr=\(lat),\(long)") else { return }
                 UIApplication.shared.open(url)
             })
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(ac, animated: true)
             
         } else if UIApplication.shared.canOpenURL(appleMaps) {
-            guard let url = URL(string: "maps://?saddr=&daddr=55,-4") else { return }
+            guard let url = URL(string: "maps://?saddr=&daddr=\(lat),\(long)") else { return }
             UIApplication.shared.open(url)
+            
         } else if UIApplication.shared.canOpenURL(googleMaps) {
-            guard let url = URL(string: "comgooglemaps://?saddr=&daddr=55,-4") else { return }
+            guard let url = URL(string: "comgooglemaps://?saddr=&daddr=\(lat),\(long)") else { return }
             UIApplication.shared.open(url)
         }
     }
