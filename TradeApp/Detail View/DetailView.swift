@@ -182,11 +182,13 @@ class DetailView: UITableViewController, Index, Coordinates {
         present(vc, animated: true)
     }
     
-    // set location after view appeared
+    // set location and map after view appeared
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         isPushed = false
+        
+        NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
         
         NotificationCenter.default.post(name: NSNotification.Name("pushLocation"), object: nil, userInfo: ["location": item.location])
     }
@@ -195,20 +197,16 @@ class DetailView: UITableViewController, Index, Coordinates {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        DispatchQueue.global().async { [weak self] in
-            self?.savedItems = Utilities.loadItems()
-        }
-        
         navigationController?.isNavigationBarHidden = false
         navigationController?.isToolbarHidden = false
         
-        if savedItems.contains(where: {$0.title == item.title}) {
-            navigationItem.rightBarButtonItems = [removeButton, actionButton]
-        } else {
-            navigationItem.rightBarButtonItems = [saveButton, actionButton]
+        DispatchQueue.global().async { [weak self] in
+            self?.savedItems = Utilities.loadItems()
+            
+            DispatchQueue.main.async {
+                self?.isSaved()
+            }
         }
-        
-        NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
     }
     
     // show save alert
@@ -240,9 +238,9 @@ class DetailView: UITableViewController, Index, Coordinates {
         }
     }
     
-    // remove mapView before view disappeared
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
+    // remove mapView after view disappeared
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         if !isPushed {
             NotificationCenter.default.post(name: NSNotification.Name("removeMap"), object: nil)
         }
@@ -282,6 +280,15 @@ class DetailView: UITableViewController, Index, Coordinates {
         } else if UIApplication.shared.canOpenURL(googleMaps) {
             guard let url = URL(string: "comgooglemaps://?saddr=&daddr=\(lat),\(long)") else { return }
             UIApplication.shared.open(url)
+        }
+    }
+    
+    // define if item is saved or not
+    func isSaved() {
+        if savedItems.contains(where: {$0.title == item.title}) {
+            navigationItem.rightBarButtonItems = [removeButton, actionButton]
+        } else {
+            navigationItem.rightBarButtonItems = [saveButton, actionButton]
         }
     }
     

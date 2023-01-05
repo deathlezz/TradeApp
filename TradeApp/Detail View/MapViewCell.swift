@@ -55,11 +55,12 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             guard let itemLocation = item else { return }
+            
+            delegate?.pushCoords(itemLocation.coordinate.latitude, itemLocation.coordinate.longitude)
 
             let distance = itemLocation.distance(from: location) / 1000
             let rounded = String(format: "%.0f", distance)
             distanceLabel.text = "\(rounded) km from you"
-            delegate?.pushCoords(itemLocation.coordinate.latitude, itemLocation.coordinate.longitude)
         }
     }
 
