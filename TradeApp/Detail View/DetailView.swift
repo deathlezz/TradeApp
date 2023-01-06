@@ -128,7 +128,10 @@ class DetailView: UITableViewController, Index, Coordinates {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "MapViewCell", for: indexPath) as? MapViewCell {
                 cell.delegate = self
                 cell.cityLabel.text = item.location
+                cell.cityLabel.font = UIFont.systemFont(ofSize: 14)
+                cell.cityLabel.numberOfLines = 0
                 cell.distanceLabel.text = "N/A"
+                cell.distanceLabel.font = UIFont.systemFont(ofSize: 14)
                 cell.distanceLabel.numberOfLines = 0
                 cell.mapView.layer.cornerRadius = 8
                 cell.mapView.mapType = .standard

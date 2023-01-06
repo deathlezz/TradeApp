@@ -103,7 +103,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         
         if coordinator.proposal.operation == .move {
             reorderItems(coordinator: coordinator, destinationIndexPath: destinationIndexPath, collectionView: collectionView)
-            collectionView.reloadData()
+            reloadView()
         }
     }
     
@@ -125,7 +125,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     }
     
     // reload collection view
-    @objc func reloadView(_ notification: NSNotification) {
+    @objc func reloadView() {
         print("collection view reloaded")
         collectionView.reloadData()
     }
