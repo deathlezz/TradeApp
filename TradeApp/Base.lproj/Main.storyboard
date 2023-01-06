@@ -241,7 +241,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="311"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" misplaced="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" contentInsetAdjustmentBehavior="never" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="wgy-qt-pJg">
+                                        <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" contentInsetAdjustmentBehavior="never" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="wgy-qt-pJg">
                                             <rect key="frame" x="0.0" y="0.0" width="394" height="311"/>
                                             <color key="backgroundColor" red="0.14977687510000001" green="0.14977687510000001" blue="0.14977687510000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="Oxe-1u-R3A">
@@ -266,6 +266,7 @@
                                                             <constraint firstItem="On2-f0-aLq" firstAttribute="top" secondItem="HkY-FU-F1a" secondAttribute="top" id="38A-IR-AFw"/>
                                                             <constraint firstItem="On2-f0-aLq" firstAttribute="centerX" secondItem="HkY-FU-F1a" secondAttribute="centerX" id="IMM-qa-OwT"/>
                                                             <constraint firstItem="On2-f0-aLq" firstAttribute="leading" secondItem="HkY-FU-F1a" secondAttribute="leading" id="S3L-ty-Dcs"/>
+                                                            <constraint firstItem="On2-f0-aLq" firstAttribute="width" secondItem="HkY-FU-F1a" secondAttribute="height" multiplier="392:311" id="XA4-cA-8By"/>
                                                             <constraint firstItem="On2-f0-aLq" firstAttribute="centerY" secondItem="HkY-FU-F1a" secondAttribute="centerY" id="wbR-hG-mSd"/>
                                                         </constraints>
                                                     </collectionViewCellContentView>
@@ -282,6 +283,7 @@
                                         <constraint firstItem="wgy-qt-pJg" firstAttribute="centerY" secondItem="ZhR-lQ-dkZ" secondAttribute="centerY" id="Uwh-DN-ZJr"/>
                                         <constraint firstItem="wgy-qt-pJg" firstAttribute="top" secondItem="ZhR-lQ-dkZ" secondAttribute="topMargin" constant="-20" id="gCi-jM-J3Y"/>
                                         <constraint firstItem="wgy-qt-pJg" firstAttribute="centerX" secondItem="ZhR-lQ-dkZ" secondAttribute="centerX" id="hCH-5P-Tsv"/>
+                                        <constraint firstItem="wgy-qt-pJg" firstAttribute="width" secondItem="ZhR-lQ-dkZ" secondAttribute="height" multiplier="394:311" id="hhd-A2-wXg"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
