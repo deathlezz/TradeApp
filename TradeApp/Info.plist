@@ -12,6 +12,10 @@
 	<string>TradeApp would like to use your camera</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>TradeApp would like to use your current location</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>comgooglemaps</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

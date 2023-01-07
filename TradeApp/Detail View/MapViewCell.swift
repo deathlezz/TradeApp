@@ -13,7 +13,7 @@ protocol Coordinates {
     func pushCoords(_ lat: Double, _ long: Double)
 }
 
-class MapViewCell: UITableViewCell, CLLocationManagerDelegate {
+class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate {
     
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var cityLabel: UILabel!
@@ -31,6 +31,8 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate {
         super.awakeFromNib()
         // Initialization code
         didGeocode = false
+        
+        mapView.delegate = self
         
         locationManager = CLLocationManager()
         locationManager.delegate = self
@@ -88,7 +90,7 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate {
                 if let location = location {
                     let coordinate = location.coordinate
                     let center = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
-                    let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+                    let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.7, longitudeDelta: 0.7))
                     
                     self?.mapView.setRegion(region, animated: false)
                     self?.didGeocode = true
@@ -97,11 +99,26 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate {
                     self?.item = itemLocation
                     self?.locationManager.requestLocation()
                     
+                    let pin = MKPointAnnotation()
+                    pin.coordinate = center
+                    
+                    self?.mapView.addAnnotation(pin)
+                    let circle = MKCircle(center: center, radius: 20000)
+                    self?.mapView.addOverlay(circle)
+                    
                 } else {
                     print("No matching location found")
                 }
             })
         }
+    }
+    
+    // draw line circle around item region
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        let circleRenderer = MKCircleRenderer(overlay: overlay)
+        circleRenderer.strokeColor = .red
+        circleRenderer.lineWidth = 1
+        return circleRenderer
     }
     
     // remove map before view disappeared to avoid memory leak
