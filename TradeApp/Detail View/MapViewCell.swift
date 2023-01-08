@@ -99,26 +99,11 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
                     self?.item = itemLocation
                     self?.locationManager.requestLocation()
                     
-                    let pin = MKPointAnnotation()
-                    pin.coordinate = center
-                    
-                    self?.mapView.addAnnotation(pin)
-                    let circle = MKCircle(center: center, radius: 20000)
-                    self?.mapView.addOverlay(circle)
-                    
                 } else {
                     print("No matching location found")
                 }
             })
         }
-    }
-    
-    // draw line circle around item region
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        let circleRenderer = MKCircleRenderer(overlay: overlay)
-        circleRenderer.strokeColor = .red
-        circleRenderer.lineWidth = 1
-        return circleRenderer
     }
     
     // remove map before view disappeared to avoid memory leak

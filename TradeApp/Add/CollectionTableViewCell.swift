@@ -18,7 +18,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     @IBOutlet var collectionView: UICollectionView!
     
     var delegate: ImagePicker?
-    var index: Int!
+//    var index: Int!
     
 //    var images = [UIImage]()
     
@@ -57,7 +57,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         delegate?.pushIndex(indexPath: indexPath.item)
-        index = indexPath.item
+//        index = indexPath.item
         
         if images[indexPath.item] == UIImage(systemName: "plus") {
             delegate?.addNewPhoto()

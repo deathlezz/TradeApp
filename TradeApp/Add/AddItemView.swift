@@ -291,11 +291,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             self?.action = .edit
             self?.addNewPhoto()
         })
+        
         ac.addAction(UIAlertAction(title: "Rotate photo", style: .default) { [weak self] _ in
-//            self?.action = .edit
-            self?.imageRotatedByDegrees()
-            
+            self?.rotatePhoto()
         })
+        
         ac.addAction(UIAlertAction(title: "Delete photo", style: .destructive) { [weak self] _ in
             self?.action = .edit
             self?.deletePhoto()
@@ -321,19 +321,24 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         index = indexPath
     }
     
-//    // rotate photo by 90 degrees using Core Image
-//    func rotatePhoto() {
-//        let renderer = UIGraphicsImageRenderer(size: images[index].size)
-//        let photo = images[index]
-//
-//        let image = renderer.image { ctx in
-//            photo.draw(in: CGRect(x: 0, y: 0, width: images[index].size.width, height: images[index].size.height))
-//            ctx.cgContext.rotate(by: .pi / 2)
-//        }
-//
-//        images[index] = image
-//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
-//    }
+    // rotate photo by 90 degrees using Core Image
+    func rotatePhoto() {
+        var size = CGSize()
+        size.width = images[index].size.height
+        size.height = images[index].size.width
+        
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let photo = images[index]
+
+        let image = renderer.image { ctx in
+            ctx.cgContext.translateBy(x: size.width / 2, y: size.height / 2)
+            ctx.cgContext.rotate(by: -.pi / 2)
+            photo.draw(at: CGPoint(x: -size.width / 2, y: -size.height / 2))
+        }
+
+        images[index] = image
+        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+    }
     
     func imageRotatedByDegrees() {
         let size = images[index].size

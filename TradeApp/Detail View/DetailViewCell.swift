@@ -50,12 +50,13 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     // get current image index
     @objc func getIndex(_ notification: NSNotification) {
         currentImage = notification.userInfo?["index"] as! Int
+        print(currentImage)
         scrollToItem()
     }
     
     // scroll to item before view appeared
     func scrollToItem() {
-        collectionView.scrollToItem(at: IndexPath(item: currentImage, section: 0), at: .centeredHorizontally, animated: false)
+        collectionView.scrollToItem(at: IndexPath(index: currentImage), at: .centeredHorizontally, animated: false)
     }
     
 }
