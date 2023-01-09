@@ -296,6 +296,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             self?.rotatePhoto()
         })
         
+        if index != 0 {
+            ac.addAction(UIAlertAction(title: "Set as first", style: .default) { [weak self] _ in
+                self?.setAsFirst()
+            })
+        }
+        
         ac.addAction(UIAlertAction(title: "Delete photo", style: .destructive) { [weak self] _ in
             self?.action = .edit
             self?.deletePhoto()
@@ -327,38 +333,32 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         size.width = images[index].size.height
         size.height = images[index].size.width
         
+        let difference = abs(size.width - size.height) / 2
+
         let renderer = UIGraphicsImageRenderer(size: size)
         let photo = images[index]
 
         let image = renderer.image { ctx in
-            ctx.cgContext.translateBy(x: size.width / 2, y: size.height / 2)
+            
+            if photo.size.width <= size.width {
+                ctx.cgContext.translateBy(x: size.width / 2 - difference, y: size.height / 2 - difference)
+            } else {
+                ctx.cgContext.translateBy(x: size.width / 2 + difference, y: size.height / 2 + difference)
+            }
+            
             ctx.cgContext.rotate(by: -.pi / 2)
             photo.draw(at: CGPoint(x: -size.width / 2, y: -size.height / 2))
         }
-
+        
         images[index] = image
+        
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
-    func imageRotatedByDegrees() {
-        let size = images[index].size
-        
-        UIGraphicsBeginImageContext(size)
-        
-        let bitmap: CGContext = UIGraphicsGetCurrentContext()!
-        //Move the origin to the middle of the image so we will rotate and scale around the center.
-        bitmap.translateBy(x: size.width / 2, y: size.height / 2)
-        //Rotate the image context
-        bitmap.rotate(by: .pi / 2)
-        //Now, draw the rotated/scaled image into the context
-        bitmap.scaleBy(x: 1.0, y: -1.0)
-        
-        let origin = CGPoint(x: -size.width / 2, y: -size.width / 2)
-        
-        bitmap.draw(images[index].cgImage!, in: CGRect(origin: origin, size: size))
-        
-        images[index] = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
+    // swap current image with the first one
+    func setAsFirst() {
+        (images[0], images[index]) = (images[index], images[0])
+        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
 }
