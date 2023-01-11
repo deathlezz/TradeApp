@@ -115,6 +115,7 @@ class ViewController: UICollectionViewController {
     // refresh collection view before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
         navigationController?.hidesBarsOnSwipe = true
         currentFilters = Utilities.loadFilters()
         changeTitle()
@@ -149,7 +150,7 @@ class ViewController: UICollectionViewController {
     // load data in the background
     func loadData() {
         let car = UIImage(systemName: "car")?.pngData()
-        let plus = UIImage(systemName: "plus")?.jpegData(compressionQuality: 0.8)
+        let plus = UIImage(systemName: "plus")?.pngData()
         
         for _ in 0...3 {
             let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date())

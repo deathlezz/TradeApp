@@ -150,8 +150,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         textViewCell.textView.text = nil
         
-        for i in 0...7 {
-            images[i] = UIImage(systemName: "plus")!
+        images.removeAll()
+        
+        for _ in 0...7 {
+            images.append(UIImage(systemName: "plus")!)
         }
 
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
@@ -195,7 +197,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for submit button
     @objc func submitTapped() {
-        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
+        var photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
         let title = textFieldCells[0].textField.text
         let price = textFieldCells[1].textField.text
         let category = textFieldCells[2].textField.text
@@ -203,13 +205,16 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let description = textViewCell.textView.text
         
         if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
-            let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
+            var newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
             items.append(newItem)
             recentlyAdded.append(newItem)
             filteredItems = recentlyAdded
             showAlert(.success)
+            photos = []
+//            tableView.reloadData()
         } else {
             showAlert(.error)
+            photos = []
         }
     }
     
@@ -336,7 +341,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let difference = abs(size.width - size.height) / 2
 
         let renderer = UIGraphicsImageRenderer(size: size)
-        let photo = images[index]
+        var photo = images[index]
 
         let image = renderer.image { ctx in
             
@@ -350,7 +355,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             photo.draw(at: CGPoint(x: -size.width / 2, y: -size.height / 2))
         }
         
-        images[index] = image
+        photo = UIImage()
+        
+        images.remove(at: index)
+        images.insert(image, at: index)
+//        images[index] = image
         
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }

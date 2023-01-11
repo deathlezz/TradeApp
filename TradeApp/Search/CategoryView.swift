@@ -42,6 +42,7 @@ class CategoryView: UITableViewController {
         
         cell.textLabel?.text = categories[indexPath.row]
         cell.textLabel?.font = UIFont(name: "System", size: 30)
+        cell.imageView?.image = UIImage(systemName: "camera")
         
         return cell
     }
