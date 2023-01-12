@@ -738,7 +738,7 @@
                                     <outlet property="textView" destination="Wcj-B1-2VN" id="yBi-vz-oyl"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ButtonCell" rowHeight="70" id="ku5-vh-zcl" userLabel="TextCell" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="ButtonCell" rowHeight="70" id="ku5-vh-zcl" userLabel="TextCell" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="382.33333206176758" width="393" height="70"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ku5-vh-zcl" id="Fur-av-X3a">

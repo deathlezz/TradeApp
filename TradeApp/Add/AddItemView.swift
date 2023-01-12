@@ -16,6 +16,30 @@ enum ActionType {
     case edit
 }
 
+extension UIImage {
+    func rotate(radians: Float) -> UIImage? {
+        var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
+        // Trim off the extremely small float value to prevent core graphics from rounding it up
+        newSize.width = floor(newSize.width)
+        newSize.height = floor(newSize.height)
+
+        UIGraphicsBeginImageContextWithOptions(newSize, false, self.scale)
+        let context = UIGraphicsGetCurrentContext()!
+
+        // Move origin to middle
+        context.translateBy(x: newSize.width/2, y: newSize.height/2)
+        // Rotate around middle
+        context.rotate(by: CGFloat(radians))
+        // Draw the image at its center
+        self.draw(in: CGRect(x: -self.size.width/2, y: -self.size.height/2, width: self.size.width, height: self.size.height))
+
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage
+    }
+}
+
 class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     var index: Int!
@@ -197,24 +221,22 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for submit button
     @objc func submitTapped() {
-        var photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
+        print("button tapped")
+        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
         let title = textFieldCells[0].textField.text
         let price = textFieldCells[1].textField.text
         let category = textFieldCells[2].textField.text
         let location = textFieldCells[3].textField.text
         let description = textViewCell.textView.text
-        
+
         if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
-            var newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
+            let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
             items.append(newItem)
             recentlyAdded.append(newItem)
             filteredItems = recentlyAdded
             showAlert(.success)
-            photos = []
-//            tableView.reloadData()
         } else {
             showAlert(.error)
-            photos = []
         }
     }
     
@@ -298,6 +320,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         })
         
         ac.addAction(UIAlertAction(title: "Rotate photo", style: .default) { [weak self] _ in
+//            self?.action = .edit
             self?.rotatePhoto()
         })
         
@@ -334,31 +357,52 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // rotate photo by 90 degrees using Core Image
     func rotatePhoto() {
-        var size = CGSize()
-        size.width = images[index].size.height
-        size.height = images[index].size.width
+        images[index] = images[index].rotate(radians: -.pi / 2)!
+//        let photo = images[index]
+//        let width = photo.size.height
+//        let height = photo.size.width
+//
+//        let size = CGSize(width: width, height: height)
+//        let difference = abs(size.width - size.height) / 2
+//        
+//        var newSize = CGRect(origin: CGPoint.zero, size: size).applying(CGAffineTransform(rotationAngle: -.pi / 2)).size
+//        // Trim off the extremely small float value to prevent core graphics from rounding it up
+//        newSize.width = floor(newSize.width)
+//        newSize.height = floor(newSize.height)
+//
+//        UIGraphicsBeginImageContextWithOptions(newSize, false, photo.scale)
+//        let context = UIGraphicsGetCurrentContext()!
+//
+//        // Move origin to middle
+//        context.translateBy(x: newSize.width/2, y: newSize.height/2)
+//        // Rotate around middle
+//        context.rotate(by: -.pi / 2)
+//        // Draw the image at its center
+//        photo.draw(in: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height))
+//
+//        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+//        UIGraphicsEndImageContext()
+//        
+//        images[index] = newImage!
         
-        let difference = abs(size.width - size.height) / 2
-
-        let renderer = UIGraphicsImageRenderer(size: size)
-        var photo = images[index]
-
-        let image = renderer.image { ctx in
-            
-            if photo.size.width <= size.width {
-                ctx.cgContext.translateBy(x: size.width / 2 - difference, y: size.height / 2 - difference)
-            } else {
-                ctx.cgContext.translateBy(x: size.width / 2 + difference, y: size.height / 2 + difference)
-            }
-            
-            ctx.cgContext.rotate(by: -.pi / 2)
-            photo.draw(at: CGPoint(x: -size.width / 2, y: -size.height / 2))
-        }
         
-        photo = UIImage()
+//        let renderer = UIGraphicsImageRenderer(size: size)
+//
+////        guard let path = Bundle.main.path(forResource: "\(images[index])", ofType: "png") else { return }
+////        guard let photo = UIImage(contentsOfFile: path) else { return }
+//
+//        let image = renderer.image { ctx in
+//
+//            if photo.size.width <= size.width {
+//                ctx.cgContext.translateBy(x: size.width / 2 - difference, y: size.height / 2 - difference)
+//            } else {
+//                ctx.cgContext.translateBy(x: size.width / 2 + difference, y: size.height / 2 + difference)
+//            }
+//
+//            ctx.cgContext.rotate(by: -.pi / 2)
+//            photo.draw(at: CGPoint(x: -size.width / 2, y: -size.height / 2))
+//        }
         
-        images.remove(at: index)
-        images.insert(image, at: index)
 //        images[index] = image
         
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
