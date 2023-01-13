@@ -32,6 +32,11 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
         return imgs.count
     }
     
+    // set number of sections
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return imgs.count
+    }
+    
     // set collection view cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "detailViewCell", for: indexPath) as? PhotosCell {
@@ -55,7 +60,8 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     
     // scroll to item before view appeared
     func scrollToItem() {
-        collectionView.scrollToItem(at: IndexPath(item: currentImage, section: 0), at: .centeredHorizontally, animated: false)
+        let indexPath = IndexPath(row: currentImage, section: 0)
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
     }
     
 }

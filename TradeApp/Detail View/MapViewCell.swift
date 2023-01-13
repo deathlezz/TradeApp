@@ -11,6 +11,7 @@ import CoreLocation
 
 protocol Coordinates {
     func pushCoords(_ lat: Double, _ long: Double)
+    func pushDistance(_ string: String)
 }
 
 class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate {
@@ -20,11 +21,8 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
     @IBOutlet var distanceLabel: UILabel!
     
     var delegate: Coordinates?
-    
     var didGeocode: Bool!
-    
     var locationManager: CLLocationManager!
-
     var item: CLLocation!
     
     override func awakeFromNib() {
@@ -62,7 +60,10 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
 
             let distance = itemLocation.distance(from: location) / 1000
             let rounded = String(format: "%.0f", distance)
-            distanceLabel.text = "\(rounded) km from you"
+            let string = "\(rounded) km from you"
+            distanceLabel.text = string
+
+            delegate?.pushDistance(string)
         }
     }
 

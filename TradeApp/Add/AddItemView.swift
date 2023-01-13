@@ -16,30 +16,6 @@ enum ActionType {
     case edit
 }
 
-extension UIImage {
-    func rotate(radians: Float) -> UIImage? {
-        var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
-        // Trim off the extremely small float value to prevent core graphics from rounding it up
-        newSize.width = floor(newSize.width)
-        newSize.height = floor(newSize.height)
-
-        UIGraphicsBeginImageContextWithOptions(newSize, false, self.scale)
-        let context = UIGraphicsGetCurrentContext()!
-
-        // Move origin to middle
-        context.translateBy(x: newSize.width/2, y: newSize.height/2)
-        // Rotate around middle
-        context.rotate(by: CGFloat(radians))
-        // Draw the image at its center
-        self.draw(in: CGRect(x: -self.size.width/2, y: -self.size.height/2, width: self.size.width, height: self.size.height))
-
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-
-        return newImage
-    }
-}
-
 class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     var index: Int!
@@ -320,7 +296,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         })
         
         ac.addAction(UIAlertAction(title: "Rotate photo", style: .default) { [weak self] _ in
-//            self?.action = .edit
             self?.rotatePhoto()
         })
         
@@ -357,53 +332,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // rotate photo by 90 degrees using Core Image
     func rotatePhoto() {
-        images[index] = images[index].rotate(radians: -.pi / 2)!
-//        let photo = images[index]
-//        let width = photo.size.height
-//        let height = photo.size.width
-//
-//        let size = CGSize(width: width, height: height)
-//        let difference = abs(size.width - size.height) / 2
-//        
-//        var newSize = CGRect(origin: CGPoint.zero, size: size).applying(CGAffineTransform(rotationAngle: -.pi / 2)).size
-//        // Trim off the extremely small float value to prevent core graphics from rounding it up
-//        newSize.width = floor(newSize.width)
-//        newSize.height = floor(newSize.height)
-//
-//        UIGraphicsBeginImageContextWithOptions(newSize, false, photo.scale)
-//        let context = UIGraphicsGetCurrentContext()!
-//
-//        // Move origin to middle
-//        context.translateBy(x: newSize.width/2, y: newSize.height/2)
-//        // Rotate around middle
-//        context.rotate(by: -.pi / 2)
-//        // Draw the image at its center
-//        photo.draw(in: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height))
-//
-//        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-//        UIGraphicsEndImageContext()
-//        
-//        images[index] = newImage!
-        
-        
-//        let renderer = UIGraphicsImageRenderer(size: size)
-//
-////        guard let path = Bundle.main.path(forResource: "\(images[index])", ofType: "png") else { return }
-////        guard let photo = UIImage(contentsOfFile: path) else { return }
-//
-//        let image = renderer.image { ctx in
-//
-//            if photo.size.width <= size.width {
-//                ctx.cgContext.translateBy(x: size.width / 2 - difference, y: size.height / 2 - difference)
-//            } else {
-//                ctx.cgContext.translateBy(x: size.width / 2 + difference, y: size.height / 2 + difference)
-//            }
-//
-//            ctx.cgContext.rotate(by: -.pi / 2)
-//            photo.draw(at: CGPoint(x: -size.width / 2, y: -size.height / 2))
-//        }
-        
-//        images[index] = image
+        let photo = images[index]
+        images[index] = photo.rotate(radians: -.pi / 2)!
         
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
