@@ -206,7 +206,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let description = textViewCell.textView.text
 
         if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
-            let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date())
+            let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0)
             items.append(newItem)
             recentlyAdded.append(newItem)
             filteredItems = recentlyAdded

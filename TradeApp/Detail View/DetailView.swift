@@ -22,8 +22,8 @@ class DetailView: UITableViewController, Index, Coordinates {
     var longitude: Double!
     
     var item: Item!
-    let sectionTitles = ["Image", "Title", "Tags", "Description", "Location"]
-
+    let sectionTitles = ["Image", "Title", "Tags", "Description", "Location", "Views"]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -61,15 +61,18 @@ class DetailView: UITableViewController, Index, Coordinates {
         tableView.separatorStyle = .none
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 83, right: 0)
         
+        item.views += 1
+        
         DispatchQueue.global().async { [weak self] in
             self?.savedItems = Utilities.loadItems()
             
             DispatchQueue.main.async {
+                self?.isSaved()
                 self?.tableView.reloadData()
             }
         }
     }
-
+    
     // set number of sections
     override func numberOfSections(in tableView: UITableView) -> Int {
         return sectionTitles.count
@@ -77,13 +80,15 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set title for every section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if sectionTitles[section] == "Description" || sectionTitles[section] == "Tags" || sectionTitles[section] == "Location" {
-            return sectionTitles[section]
-        } else {
+        if sectionTitles[section] == "Image" || sectionTitles[section] == "Title" {
             return nil
+        } else if sectionTitles[section] == "Views" {
+            return " "
+        } else {
+            return sectionTitles[section]
         }
     }
-
+    
     // set number of rows in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
@@ -140,6 +145,14 @@ class DetailView: UITableViewController, Index, Coordinates {
                 cell.selectionStyle = .none
                 return cell
             }
+            
+        case "Views":
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Text", for: indexPath)
+            cell.textLabel?.text = "Views: \(item.views)"
+            cell.backgroundColor = .systemGray6
+            cell.textLabel?.textAlignment = .center
+            cell.textLabel?.font = UIFont.systemFont(ofSize: 12)
+            return cell
             
         default:
             break
@@ -201,17 +214,10 @@ class DetailView: UITableViewController, Index, Coordinates {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        navigationController?.toolbar.layer.position.y = 0
+        
         navigationController?.isNavigationBarHidden = false
         navigationController?.isToolbarHidden = false
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.savedItems = Utilities.loadItems()
-            
-            DispatchQueue.main.async {
-                self?.isSaved()
-                self?.tableView.reloadData()
-            }
-        }
     }
     
     // show save alert

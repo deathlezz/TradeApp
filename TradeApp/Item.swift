@@ -15,6 +15,7 @@ struct Item: Codable {
     let location: String
     let description: String
     let date: Date
+    var views: Int
 //    let phoneNumber: Int
 //    let itemID: Int
 }
