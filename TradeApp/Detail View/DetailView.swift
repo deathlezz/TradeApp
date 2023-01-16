@@ -34,6 +34,8 @@ class DetailView: UITableViewController, Index, Coordinates {
         callFrame.addTarget(self, action: #selector(callTapped), for: .touchUpInside)
         callFrame.backgroundColor = .white
         callFrame.layer.cornerRadius = 7
+        callFrame.layer.borderColor = UIColor.lightGray.cgColor
+        callFrame.layer.borderWidth = 0.2
         let callButton = UIBarButtonItem(customView: callFrame)
         
         // set toolbar "message" button
@@ -43,6 +45,8 @@ class DetailView: UITableViewController, Index, Coordinates {
         messageFrame.addTarget(self, action: #selector(messageTapped), for: .touchUpInside)
         messageFrame.backgroundColor = .white
         messageFrame.layer.cornerRadius = 7
+        messageFrame.layer.borderColor = UIColor.lightGray.cgColor
+        messageFrame.layer.borderWidth = 0.2
         let messageButton = UIBarButtonItem(customView: messageFrame)
         
         toolbarItems = [callButton, messageButton]
@@ -60,6 +64,8 @@ class DetailView: UITableViewController, Index, Coordinates {
         navigationItem.rightBarButtonItems = [saveButton, actionButton]
         tableView.separatorStyle = .none
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 83, right: 0)
+        
+        navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
         
         item.views += 1
         
@@ -213,8 +219,6 @@ class DetailView: UITableViewController, Index, Coordinates {
     // set save/remove button icon
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        navigationController?.toolbar.layer.position.y = 0
         
         navigationController?.isNavigationBarHidden = false
         navigationController?.isToolbarHidden = false
