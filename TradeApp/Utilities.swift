@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import CoreLocation
 
 // date formatter extension
 extension Date {
@@ -15,6 +16,21 @@ extension Date {
         dateFormatter.locale = Locale(identifier: "en")
         dateFormatter.dateFormat = "d MMM, HH:mm"
         return dateFormatter.string(from: self)
+    }
+}
+
+extension String {
+    func isValid() -> Bool {
+        var result = true
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(self, completionHandler: { (placemarks, error) in
+            if error != nil {
+                print("invalid location")
+                result = false
+            }
+        })
+        
+        return result
     }
 }
 

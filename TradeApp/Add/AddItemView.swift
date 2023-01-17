@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 enum AlertType {
     case error
@@ -202,10 +203,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let title = textFieldCells[0].textField.text
         let price = textFieldCells[1].textField.text
         let category = textFieldCells[2].textField.text
-        let location = textFieldCells[3].textField.text
+        let location = textFieldCells[3].textField.text?.capitalized
         let description = textViewCell.textView.text
+        
+        let testLocation = location?.isValid()
 
-        if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
+        if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty && testLocation! {
             let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0)
             items.append(newItem)
             recentlyAdded.append(newItem)
