@@ -25,6 +25,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell!
     
+//    var validCity: Bool!
+    
     let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
     let sectionTitles = ["Photos", "Title", "Price", "Category", "Location", "Description", "Button"]
@@ -198,7 +200,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for submit button
     @objc func submitTapped() {
-        print("button tapped")
         let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
         let title = textFieldCells[0].textField.text
         let price = textFieldCells[1].textField.text
@@ -206,9 +207,9 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let location = textFieldCells[3].textField.text?.capitalized
         let description = textViewCell.textView.text
         
-        let testLocation = location?.isValid()
-
-        if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty && testLocation! {
+        isCityValid(location!)
+        
+        if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty && validCity {
             let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0)
             items.append(newItem)
             recentlyAdded.append(newItem)
@@ -345,6 +346,24 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     func setAsFirst() {
         (images[0], images[index]) = (images[index], images[0])
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+    }
+    
+    // city name validation
+    func isCityValid(city: (String) -> Bool) -> Bool {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(city, completionHandler: { [weak self] (placemarks, _) in
+            
+            placemarks?.forEach { (placemark) in
+                if placemark.locality != city {
+                    print("invalid city name")
+//                    self?.validCity = false
+                    return false
+                } else {
+//                    self?.validCity = true
+                    return true
+                }
+            }
+        })
     }
     
 }

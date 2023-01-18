@@ -19,20 +19,32 @@ extension Date {
     }
 }
 
-extension String {
-    func isValid() -> Bool {
-        var result = true
-        let geocoder = CLGeocoder()
-        geocoder.geocodeAddressString(self, completionHandler: { (placemarks, error) in
-            if error != nil {
-                print("invalid location")
-                result = false
-            }
-        })
-        
-        return result
-    }
-}
+//extension String {
+//    func isCityValid() -> Bool {
+//        var result: Bool!
+//        let geocoder = CLGeocoder()
+//        geocoder.geocodeAddressString(self, completionHandler: { (placemarks, error) in
+//            if error != nil {
+//                print("invalid location")
+//                result = false
+//            }
+//            
+//            placemarks?.forEach { (placemark) in
+//                if placemark.locality != self {
+//                    result = false
+//                    print("invalid city name")
+//                    print(result!)
+//                } else {
+//                    result = true
+//                    print("valid name")
+//                    print(result!)
+//                }
+//            }
+//        })
+//        
+//        return result
+//    }
+//}
 
 // rotate image extension
 extension UIImage {
