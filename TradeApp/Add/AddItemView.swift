@@ -207,17 +207,22 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let location = textFieldCells[3].textField.text?.capitalized
         let description = textViewCell.textView.text
         
-        isCityValid(location!)
+        var cityTest: Bool!
         
-        if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty && validCity {
-            let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0)
-            items.append(newItem)
-            recentlyAdded.append(newItem)
-            filteredItems = recentlyAdded
-            showAlert(.success)
-        } else {
-            showAlert(.error)
+        isCityValid(location!) { valid in
+            cityTest = valid
+            
+            if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty && cityTest {
+                let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0)
+                items.append(newItem)
+                recentlyAdded.append(newItem)
+                filteredItems = recentlyAdded
+                self.showAlert(.success)
+            } else {
+                self.showAlert(.error)
+            }
         }
+        
     }
     
     // show alert if at least one field is empty
@@ -349,21 +354,33 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // city name validation
-    func isCityValid(city: (String) -> Bool) -> Bool {
+    func isCityValid(_ city: String, completion: @escaping (Bool) -> Void) {
+
         let geocoder = CLGeocoder()
-        geocoder.geocodeAddressString(city, completionHandler: { [weak self] (placemarks, _) in
+        geocoder.geocodeAddressString(city, completionHandler: { (placemarks, error) in
+            print("stub1")
+            
+            if error != nil {
+                print("stub2")
+                print("error")
+                completion(false)
+                return
+            }
             
             placemarks?.forEach { (placemark) in
                 if placemark.locality != city {
+                    print("stub3")
                     print("invalid city name")
-//                    self?.validCity = false
-                    return false
+                    completion(true)
                 } else {
-//                    self?.validCity = true
-                    return true
+                    print("stub4")
+                    print("valid city name")
+                    completion(true)
                 }
             }
         })
+
+        print("stub5")
     }
     
 }
