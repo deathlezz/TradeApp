@@ -19,33 +19,6 @@ extension Date {
     }
 }
 
-//extension String {
-//    func isCityValid() -> Bool {
-//        var result: Bool!
-//        let geocoder = CLGeocoder()
-//        geocoder.geocodeAddressString(self, completionHandler: { (placemarks, error) in
-//            if error != nil {
-//                print("invalid location")
-//                result = false
-//            }
-//            
-//            placemarks?.forEach { (placemark) in
-//                if placemark.locality != self {
-//                    result = false
-//                    print("invalid city name")
-//                    print(result!)
-//                } else {
-//                    result = true
-//                    print("valid name")
-//                    print(result!)
-//                }
-//            }
-//        })
-//        
-//        return result
-//    }
-//}
-
 // rotate image extension
 extension UIImage {
     func rotate(radians: Float) -> UIImage? {
@@ -72,6 +45,26 @@ extension UIImage {
 }
 
 class Utilities {
+    
+    // city name validation
+    func isCityValid(_ city: String, completion: @escaping (Bool) -> Void) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(city, completionHandler: { (placemarks, error) in
+            
+            if error != nil {
+                completion(false)
+                return
+            }
+            
+            placemarks?.forEach { (placemark) in
+                if placemark.locality != city {
+                    completion(false)
+                } else {
+                    completion(true)
+                }
+            }
+        })
+    }
     
     // save saved items
     static func saveItems(_ items: [Item]) {

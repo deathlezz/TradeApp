@@ -9,7 +9,8 @@ import UIKit
 import CoreLocation
 
 enum AlertType {
-    case error
+    case emptyField
+    case cityError
     case success
 }
 
@@ -24,8 +25,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell!
-    
-//    var validCity: Bool!
     
     let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
@@ -209,17 +208,24 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         var cityTest: Bool!
         
-        isCityValid(location!) { valid in
+        Utilities().isCityValid(location!) { [weak self] valid in
             cityTest = valid
             
-            if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty && cityTest {
-                let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0)
-                items.append(newItem)
-                recentlyAdded.append(newItem)
-                filteredItems = recentlyAdded
-                self.showAlert(.success)
+            if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
+                
+                if cityTest {
+                    let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0)
+                    items.append(newItem)
+                    recentlyAdded.append(newItem)
+                    filteredItems = recentlyAdded
+                    self?.showAlert(.success)
+                    
+                } else {
+                    self?.showAlert(.cityError)
+                }
+                
             } else {
-                self.showAlert(.error)
+                self?.showAlert(.emptyField)
             }
         }
         
@@ -227,8 +233,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // show alert if at least one field is empty
     func showAlert(_ type: AlertType) {
-        if type == .error {
+        if type == .emptyField {
             let ac = UIAlertController(title: "Field empty", message: "Fill all text fields to continue.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .cancel))
+            present(ac, animated: true)
+        } else if type == .cityError {
+            let ac = UIAlertController(title: "Invalid city name", message: "Enter valid city name to continue.", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .cancel))
             present(ac, animated: true)
         } else {
@@ -351,36 +361,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     func setAsFirst() {
         (images[0], images[index]) = (images[index], images[0])
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
-    }
-    
-    // city name validation
-    func isCityValid(_ city: String, completion: @escaping (Bool) -> Void) {
-
-        let geocoder = CLGeocoder()
-        geocoder.geocodeAddressString(city, completionHandler: { (placemarks, error) in
-            print("stub1")
-            
-            if error != nil {
-                print("stub2")
-                print("error")
-                completion(false)
-                return
-            }
-            
-            placemarks?.forEach { (placemark) in
-                if placemark.locality != city {
-                    print("stub3")
-                    print("invalid city name")
-                    completion(true)
-                } else {
-                    print("stub4")
-                    print("valid city name")
-                    completion(true)
-                }
-            }
-        })
-
-        print("stub5")
     }
     
 }

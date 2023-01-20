@@ -55,6 +55,9 @@ class DetailView: UITableViewController, Index, Coordinates {
         navigationItem.backButtonTitle = " "
         navigationController?.hidesBarsOnSwipe = false
         
+//        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+//        navigationController?.navigationBar.shadowImage = UIImage()
+        
         actionButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareTapped))
         
         saveButton = UIBarButtonItem(image: .init(systemName: "heart"), style: .plain, target: self, action: #selector(saveTapped))
@@ -309,6 +312,17 @@ class DetailView: UITableViewController, Index, Coordinates {
             navigationItem.rightBarButtonItems = [removeButton, actionButton]
         } else {
             navigationItem.rightBarButtonItems = [saveButton, actionButton]
+        }
+    }
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        var offset = scrollView.contentOffset.y / 200
+
+        if offset > 0.95 {
+            offset = 0.95
+            self.navigationController?.navigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: offset)
+        } else {
+            self.navigationController?.navigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: offset)
         }
     }
     
