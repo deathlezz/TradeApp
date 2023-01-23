@@ -38,10 +38,17 @@ class CategoryView: UITableViewController {
 
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "categoriesCell", for: indexPath)
+        
+        if indexPath.row == 0 {
+            cell.detailTextLabel?.text = "\(items.count) ads"
+        } else {
+            cell.detailTextLabel?.text = "\(items.filter {$0.category == "\(categories[indexPath.row])"}.count) ads"
+        }
         
         cell.textLabel?.text = categories[indexPath.row]
-        cell.textLabel?.font = UIFont(name: "System", size: 30)
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
+        cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 12)
         cell.imageView?.image = UIImage(systemName: "camera")
         
         return cell

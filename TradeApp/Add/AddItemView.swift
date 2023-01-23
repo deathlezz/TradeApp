@@ -22,9 +22,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     var index: Int!
     var action: ActionType!
+    var charsLeft = 200
     
     var textFieldCells = [TextFieldCell]()
-    var textViewCell: TextViewCell!
+    var textViewCell: TextViewCell?
     
     let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
@@ -54,6 +55,22 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         } else {
             return sectionTitles[section]
         }
+    }
+    
+    // set footer as number of available characters to use in description
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        if section == 5 {
+            let charsUsed = textViewCell?.textView.text.count ?? 0
+            return "Characters left: \(charsLeft - charsUsed)"
+        } else {
+            return nil
+        }
+    }
+    
+    // set footer alignment
+    override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
+        let footer: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
+        footer.textLabel?.textAlignment = .right
     }
 
     // set number of rows in section
@@ -150,7 +167,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             cell.textField.text = nil
         }
         
-        textViewCell.textView.text = nil
+        textViewCell?.textView.text = nil
         
         images.removeAll()
         
@@ -179,7 +196,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         doneToolbar.sizeToFit()
         
         textFieldCells[1].textField.inputAccessoryView = doneToolbar
-        textViewCell.textView.inputAccessoryView = doneToolbar
+        textViewCell?.textView.inputAccessoryView = doneToolbar
     }
 
     // set action for "done" button
@@ -187,7 +204,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         if textFieldCells[1].textField.isEditing {
             textFieldCells[1].textField.resignFirstResponder()
         } else {
-            textViewCell.textView.resignFirstResponder()
+            textViewCell?.textView.resignFirstResponder()
         }
     }
     
@@ -204,7 +221,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let price = textFieldCells[1].textField.text
         let category = textFieldCells[2].textField.text
         let location = textFieldCells[3].textField.text?.capitalized
-        let description = textViewCell.textView.text
+        let description = textViewCell?.textView.text
         
         var cityTest: Bool!
         
