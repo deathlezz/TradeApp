@@ -18,11 +18,10 @@ enum ActionType {
     case edit
 }
 
-class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextViewDelegate {
     
     var index: Int!
     var action: ActionType!
-    var charsLeft = 200
     
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
@@ -60,8 +59,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // set footer as number of available characters to use in description
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if section == 5 {
-            let charsUsed = textViewCell?.textView.text.count ?? 0
-            return "Characters left: \(charsLeft - charsUsed)"
+            return "Characters left: 200"
         } else {
             return nil
         }
@@ -130,6 +128,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 cell.textView.layer.cornerRadius = 5
                 cell.textView.layer.borderWidth = 0.1
                 cell.textView.layer.borderColor = UIColor.darkGray.cgColor
+                cell.textView.delegate = self
                 textViewCell = cell
                 return cell
             }
@@ -159,6 +158,20 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(ac, animated: true)
         }
+    }
+    
+    // detect textView's text changes
+    func textViewDidChange(_ textView: UITextView) {
+        let charsUsed = textView.text.count
+        
+        if charsUsed == 201 {
+            textView.text.removeLast()
+            return
+        }
+        
+        tableView.beginUpdates()
+        tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: \(200 - charsUsed)"
+        tableView.endUpdates()
     }
     
     // set action for clear button

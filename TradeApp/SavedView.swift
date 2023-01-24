@@ -11,14 +11,24 @@ class SavedView: UICollectionViewController {
     
     var savedItems = [Item]()
     
+    var selectButton: UIBarButtonItem!
+    var cancelButton: UIBarButtonItem!
+    var deleteButton: UIBarButtonItem!
+    
+    var selectedCells = [UICollectionViewCell]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         title = "Saved"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(trashTapped))
-
+        selectButton = UIBarButtonItem(title: "Select", style: .plain, target: self, action: #selector(selectTapped))
+        cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelTapped))
+        deleteButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteTapped))
+        
+        navigationItem.rightBarButtonItems = [selectButton]
+        
         // pull to refresh
         let refreshControl = UIRefreshControl()
         refreshControl.tintColor = .red
@@ -65,11 +75,32 @@ class SavedView: UICollectionViewController {
     
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-            vc.imgs = savedItems[indexPath.item].photos.map {UIImage(data: $0!)}
-            vc.item = savedItems[indexPath.item]
-            vc.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(vc, animated: true)
+        
+        if navigationItem.rightBarButtonItems == [selectButton] {
+            if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
+                vc.imgs = savedItems[indexPath.item].photos.map {UIImage(data: $0!)}
+                vc.item = savedItems[indexPath.item]
+                vc.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(vc, animated: true)
+            }
+            
+        } else {
+            
+            guard let cell = collectionView.cellForItem(at: indexPath) else { return }
+            
+            if !selectedCells.contains(cell) {
+                
+                cell.layer.borderColor = UIColor.systemRed.cgColor
+                cell.layer.borderWidth = 2
+                selectedCells.append(cell)
+                
+            } else {
+                cell.isSelected = false
+                cell.layer.borderColor = UIColor.clear.cgColor
+                cell.layer.borderWidth = 0
+                guard let index = selectedCells.firstIndex(of: cell) else { return }
+                selectedCells.remove(at: index)
+            }
         }
     }
     
@@ -88,11 +119,34 @@ class SavedView: UICollectionViewController {
         collectionView.reloadData()
     }
 
-    // set action for trash button
-    @objc func trashTapped() {
+    // set action for select button
+    @objc func selectTapped() {
         guard !savedItems.isEmpty else { return }
-        savedItems.removeAll()
-        Utilities.saveItems(savedItems)
-        collectionView.reloadData()
+        collectionView.allowsMultipleSelection = true
+        navigationItem.rightBarButtonItems = [deleteButton, cancelButton]
+        
+//        savedItems.removeAll()
+//        Utilities.saveItems(savedItems)
+//        collectionView.reloadData()
     }
+    
+    // set action for cancel button
+    @objc func cancelTapped() {
+        collectionView.allowsMultipleSelection = false
+        navigationItem.rightBarButtonItems = [selectButton]
+        for cell in selectedCells {
+            cell.isSelected = false
+            cell.layer.borderWidth = 0
+            cell.layer.borderColor = UIColor.clear.cgColor
+        }
+    }
+    
+    // set action for delete button
+    @objc func deleteTapped() {
+        guard collectionView.indexPathsForSelectedItems?.count ?? 0 > 0 else { return }
+        collectionView.allowsMultipleSelection = false
+        navigationItem.rightBarButtonItems = [selectButton]
+    }
+    
+    
 }
