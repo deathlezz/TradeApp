@@ -68,6 +68,8 @@ class SavedView: UICollectionViewController {
         cell.location.text = savedItems[indexPath.item].location
         cell.date.text = savedItems[indexPath.item].date.formatDate()
         cell.layer.cornerRadius = 10
+//        cell.layer.borderWidth = 0.2
+//        cell.layer.borderColor = UIColor.gray.cgColor
         cell.backgroundColor = .white
         
         return cell
@@ -85,22 +87,23 @@ class SavedView: UICollectionViewController {
             }
             
         } else {
-            
-            guard let cell = collectionView.cellForItem(at: indexPath) else { return }
+            guard var cell = collectionView.cellForItem(at: indexPath) else { return }
             
             if !selectedCells.contains(cell) {
-                
-                cell.layer.borderColor = UIColor.systemRed.cgColor
+                cell.isSelected = true
                 cell.layer.borderWidth = 2
+                cell.layer.borderColor = UIColor.systemRed.cgColor
                 selectedCells.append(cell)
                 
             } else {
                 cell.isSelected = false
-                cell.layer.borderColor = UIColor.clear.cgColor
                 cell.layer.borderWidth = 0
+                cell.layer.borderColor = UIColor.clear.cgColor
                 guard let index = selectedCells.firstIndex(of: cell) else { return }
                 selectedCells.remove(at: index)
             }
+            
+            collectionView.reloadData()
         }
     }
     
@@ -132,8 +135,10 @@ class SavedView: UICollectionViewController {
     
     // set action for cancel button
     @objc func cancelTapped() {
+        collectionView.reloadData()
         collectionView.allowsMultipleSelection = false
         navigationItem.rightBarButtonItems = [selectButton]
+        
         for cell in selectedCells {
             cell.isSelected = false
             cell.layer.borderWidth = 0
@@ -143,7 +148,22 @@ class SavedView: UICollectionViewController {
     
     // set action for delete button
     @objc func deleteTapped() {
-        guard collectionView.indexPathsForSelectedItems?.count ?? 0 > 0 else { return }
+        print("stub1")
+        let items = selectedCells.count
+        print("stub2")
+        guard items > 0 else { return }
+        
+        for selectedCell in selectedCells {
+            savedItems.remove(at: selectedCell)
+        }
+        
+        print("stub3")
+        
+        collectionView.deleteItems(at: items)
+        selectedCells.removeAll()
+        Utilities.saveItems(savedItems)
+        collectionView.reloadData()
+        
         collectionView.allowsMultipleSelection = false
         navigationItem.rightBarButtonItems = [selectButton]
     }
