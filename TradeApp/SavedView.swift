@@ -178,15 +178,15 @@ class SavedView: UICollectionViewController {
             collectionView.deselectItem(at: indexPath, animated: false)
         }
         
+        savedItems = self.savedItems.enumerated().filter {!indexes.contains($0.offset)}.map {$0.element}
+        collectionView.deleteItems(at: selected)
+        
         for cell in selectedCells {
             UIView.animate(withDuration: 0.1, animations: {
                 cell.layer.borderWidth = 0
                 cell.layer.borderColor = UIColor.clear.cgColor
                 cell.transform = .identity
             }) { finished in
-                self.savedItems = self.savedItems.enumerated().filter {!indexes.contains($0.offset)}.map {$0.element}
-
-                self.collectionView.deleteItems(at: selected)
                 self.selectedCells.removeAll()
                 Utilities.saveItems(self.savedItems)
             }
