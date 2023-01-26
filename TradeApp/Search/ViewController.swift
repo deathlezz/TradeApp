@@ -79,8 +79,6 @@ class ViewController: UICollectionViewController {
         cell.location.text = filteredItems[indexPath.item].location
         cell.date.text = filteredItems[indexPath.item].date.formatDate()
         cell.layer.cornerRadius = 10
-        cell.layer.borderWidth = 0.2
-        cell.layer.borderColor = UIColor.gray.cgColor
         cell.backgroundColor = .white
         
         return cell

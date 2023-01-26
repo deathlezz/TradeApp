@@ -68,14 +68,12 @@ class SavedView: UICollectionViewController {
         cell.location.text = savedItems[indexPath.item].location
         cell.date.text = savedItems[indexPath.item].date.formatDate()
         cell.layer.cornerRadius = 10
-//        cell.layer.borderWidth = 0.2
-//        cell.layer.borderColor = UIColor.gray.cgColor
         cell.backgroundColor = .white
         
         return cell
     }
     
-    // set action for tapped cell
+    // set action for selected cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         if navigationItem.rightBarButtonItems == [selectButton] {
@@ -87,23 +85,37 @@ class SavedView: UICollectionViewController {
             }
             
         } else {
-            guard var cell = collectionView.cellForItem(at: indexPath) else { return }
+            guard let cell = collectionView.cellForItem(at: indexPath) else { return }
             
-            if !selectedCells.contains(cell) {
-                cell.isSelected = true
-                cell.layer.borderWidth = 2
-                cell.layer.borderColor = UIColor.systemRed.cgColor
-                selectedCells.append(cell)
-                
-            } else {
-                cell.isSelected = false
+            if cell.isSelected {
+                UIView.animate(withDuration: 0.1, animations: {
+                    cell.layer.borderWidth = 1
+                    cell.layer.borderColor = UIColor.systemRed.cgColor
+                    cell.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+                }) { finished in
+                    self.deleteButton.isEnabled = true
+                    self.selectedCells.append(cell)
+                    self.showButton()
+                }
+            }
+        }
+    }
+    
+    // set action for deselected cell
+    override func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        
+        guard let cell = collectionView.cellForItem(at: indexPath) else { return }
+        
+        if !cell.isSelected {
+            UIView.animate(withDuration: 0.1, animations: {
                 cell.layer.borderWidth = 0
                 cell.layer.borderColor = UIColor.clear.cgColor
-                guard let index = selectedCells.firstIndex(of: cell) else { return }
-                selectedCells.remove(at: index)
+                cell.transform = .identity
+            }) { finished in
+                guard let index = self.selectedCells.firstIndex(of: cell) else { return }
+                self.selectedCells.remove(at: index)
+                self.showButton()
             }
-            
-            collectionView.reloadData()
         }
     }
     
@@ -126,47 +138,70 @@ class SavedView: UICollectionViewController {
     @objc func selectTapped() {
         guard !savedItems.isEmpty else { return }
         collectionView.allowsMultipleSelection = true
-        navigationItem.rightBarButtonItems = [deleteButton, cancelButton]
-        
-//        savedItems.removeAll()
-//        Utilities.saveItems(savedItems)
-//        collectionView.reloadData()
+        navigationItem.rightBarButtonItems = [cancelButton, deleteButton]
+        deleteButton.isEnabled = false
     }
     
     // set action for cancel button
     @objc func cancelTapped() {
-        collectionView.reloadData()
         collectionView.allowsMultipleSelection = false
         navigationItem.rightBarButtonItems = [selectButton]
         
+        guard let selected = collectionView.indexPathsForSelectedItems else { return }
+        
+        for indexPath in selected {
+            collectionView.deselectItem(at: indexPath, animated: false)
+        }
+        
         for cell in selectedCells {
-            cell.isSelected = false
-            cell.layer.borderWidth = 0
-            cell.layer.borderColor = UIColor.clear.cgColor
+            UIView.animate(withDuration: 0.1, animations: {
+                cell.layer.borderWidth = 0
+                cell.layer.borderColor = UIColor.clear.cgColor
+                cell.transform = .identity
+            }) { finished in
+                self.selectedCells.removeAll()
+            }
         }
     }
     
     // set action for delete button
     @objc func deleteTapped() {
-        print("stub1")
-        let items = selectedCells.count
-        print("stub2")
-        guard items > 0 else { return }
+        guard let selected = collectionView.indexPathsForSelectedItems else { return }
+        guard selected.count > 0 else { return }
         
-        for selectedCell in selectedCells {
-            savedItems.remove(at: selectedCell)
-        }
-        
-        print("stub3")
-        
-        collectionView.deleteItems(at: items)
-        selectedCells.removeAll()
-        Utilities.saveItems(savedItems)
-        collectionView.reloadData()
+        let indexes = selected.map { $0.item }
         
         collectionView.allowsMultipleSelection = false
         navigationItem.rightBarButtonItems = [selectButton]
+        
+        for indexPath in selected {
+            collectionView.deselectItem(at: indexPath, animated: false)
+        }
+        
+        for cell in selectedCells {
+            UIView.animate(withDuration: 0.1, animations: {
+                cell.layer.borderWidth = 0
+                cell.layer.borderColor = UIColor.clear.cgColor
+                cell.transform = .identity
+            }) { finished in
+                self.savedItems = self.savedItems.enumerated().filter {!indexes.contains($0.offset)}.map {$0.element}
+
+                self.collectionView.deleteItems(at: selected)
+                self.selectedCells.removeAll()
+                Utilities.saveItems(self.savedItems)
+            }
+        }
     }
     
+    // set show/hide delete button
+    func showButton() {
+        guard let selected = collectionView.indexPathsForSelectedItems else { return }
+        
+        if selected.count > 0 {
+            deleteButton.isEnabled = true
+        } else {
+            deleteButton.isEnabled = false
+        }
+    }
     
 }
