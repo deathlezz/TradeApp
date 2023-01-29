@@ -119,6 +119,23 @@ class SavedView: UICollectionViewController {
         }
     }
     
+    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
+                headerView.textLabel.text = "Found \(savedItems.count) ads"
+                headerView.textLabel.font = UIFont.systemFont(ofSize: 14)
+                return headerView
+            }
+            
+        default:
+            assert(false, "Unexpected element kind")
+        }
+        
+        return UICollectionReusableView()
+    }
+    
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
         collectionView.reloadData()
