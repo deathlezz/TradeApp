@@ -93,7 +93,6 @@ class SavedView: UICollectionViewController {
                     cell.layer.borderColor = UIColor.systemRed.cgColor
                     cell.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
                 }) { finished in
-                    self.deleteButton.isEnabled = true
                     self.selectedCells.append(cell)
                     self.showButton()
                 }
@@ -119,13 +118,14 @@ class SavedView: UICollectionViewController {
         }
     }
     
+    // set collection view header
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
                 headerView.textLabel.text = "Found \(savedItems.count) ads"
-                headerView.textLabel.font = UIFont.systemFont(ofSize: 14)
+                headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 12)
                 return headerView
             }
             
