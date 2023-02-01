@@ -68,6 +68,8 @@ class SavedView: UICollectionViewController {
         cell.location.text = savedItems[indexPath.item].location
         cell.date.text = savedItems[indexPath.item].date.formatDate()
         cell.layer.cornerRadius = 10
+        cell.layer.borderWidth = 0.2
+        cell.layer.borderColor = UIColor.lightGray.cgColor
         cell.backgroundColor = .white
         
         return cell
@@ -107,8 +109,8 @@ class SavedView: UICollectionViewController {
         
         if !cell.isSelected {
             UIView.animate(withDuration: 0.1, animations: {
-                cell.layer.borderWidth = 0
-                cell.layer.borderColor = UIColor.clear.cgColor
+                cell.layer.borderWidth = 0.2
+                cell.layer.borderColor = UIColor.lightGray.cgColor
                 cell.transform = .identity
             }) { finished in
                 guard let index = self.selectedCells.firstIndex(of: cell) else { return }
@@ -174,8 +176,8 @@ class SavedView: UICollectionViewController {
         
         for cell in selectedCells {
             UIView.animate(withDuration: 0.1, animations: {
-                cell.layer.borderWidth = 0
-                cell.layer.borderColor = UIColor.clear.cgColor
+                cell.layer.borderWidth = 0.2
+                cell.layer.borderColor = UIColor.lightGray.cgColor
                 cell.transform = .identity
             }) { finished in
                 self.selectedCells.removeAll()
@@ -202,8 +204,8 @@ class SavedView: UICollectionViewController {
         
         for cell in selectedCells {
             UIView.animate(withDuration: 0.1, animations: {
-                cell.layer.borderWidth = 0
-                cell.layer.borderColor = UIColor.clear.cgColor
+                cell.layer.borderWidth = 0.2
+                cell.layer.borderColor = UIColor.lightGray.cgColor
                 cell.transform = .identity
             }) { finished in
                 self.selectedCells.removeAll()

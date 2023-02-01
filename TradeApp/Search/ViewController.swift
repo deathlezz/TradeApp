@@ -78,6 +78,8 @@ class ViewController: UICollectionViewController {
         cell.price.text = "£\(filteredItems[indexPath.item].price)"
         cell.location.text = filteredItems[indexPath.item].location
         cell.date.text = filteredItems[indexPath.item].date.formatDate()
+        cell.layer.borderWidth = 0.2
+        cell.layer.borderColor = UIColor.lightGray.cgColor
         cell.layer.cornerRadius = 10
         cell.backgroundColor = .white
         
