@@ -75,7 +75,6 @@ class SavedView: UICollectionViewController {
     
     // set action for selected cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
         if navigationItem.rightBarButtonItems == [selectButton] {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
                 vc.imgs = savedItems[indexPath.item].photos.map {UIImage(data: $0!)}
@@ -95,6 +94,7 @@ class SavedView: UICollectionViewController {
                 }) { finished in
                     self.selectedCells.append(cell)
                     self.showButton()
+                    self.updateHeader()
                 }
             }
         }
@@ -114,22 +114,22 @@ class SavedView: UICollectionViewController {
                 guard let index = self.selectedCells.firstIndex(of: cell) else { return }
                 self.selectedCells.remove(at: index)
                 self.showButton()
+                self.updateHeader()
             }
         }
     }
     
-    // set collection view header
+    // set number of showed ads as collection view header
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
-        switch kind {
-        case UICollectionView.elementKindSectionHeader:
+        if kind == UICollectionView.elementKindSectionHeader {
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
                 headerView.textLabel.text = "Found \(savedItems.count) ads"
                 headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 12)
                 return headerView
             }
             
-        default:
+        } else {
             assert(false, "Unexpected element kind")
         }
         
@@ -157,12 +157,14 @@ class SavedView: UICollectionViewController {
         collectionView.allowsMultipleSelection = true
         navigationItem.rightBarButtonItems = [cancelButton, deleteButton]
         deleteButton.isEnabled = false
+        updateHeader()
     }
     
     // set action for cancel button
     @objc func cancelTapped() {
         collectionView.allowsMultipleSelection = false
         navigationItem.rightBarButtonItems = [selectButton]
+        updateHeader()
         
         guard let selected = collectionView.indexPathsForSelectedItems else { return }
         
@@ -206,6 +208,7 @@ class SavedView: UICollectionViewController {
             }) { finished in
                 self.selectedCells.removeAll()
                 Utilities.saveItems(self.savedItems)
+                self.updateHeader()
             }
         }
     }
@@ -218,6 +221,20 @@ class SavedView: UICollectionViewController {
             deleteButton.isEnabled = true
         } else {
             deleteButton.isEnabled = false
+        }
+    }
+    
+    // update collection view header
+    func updateHeader() {
+        let header = collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader)
+        let label = header[0].subviews[0] as? UILabel
+        
+        if navigationItem.rightBarButtonItems != [selectButton] {
+            guard let selected = collectionView.indexPathsForSelectedItems else { return }
+            label?.text = "Selected \(selected.count) ads"
+            
+        } else {
+            label?.text = "Found \(savedItems.count) ads"
         }
     }
     
