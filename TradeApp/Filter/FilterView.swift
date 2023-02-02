@@ -48,7 +48,7 @@ class FilterView: UITableViewController {
 
     // set number of rows in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        section == 2 ? 2 : 1
     }
     
     // set table view cell
@@ -70,15 +70,30 @@ class FilterView: UITableViewController {
                 filterCells.append(cell)
                 return cell
             case "Location":
-                cell.filterTextField.placeholder = "None"
-                cell.filterTextField.text = currentFilters["Location"]
-                cell.filterTextField.clearButtonMode = .whileEditing
-                cell.selectionStyle = .none
-                cell.filterTextField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
-                filterCells.append(cell)
-                return cell
+                if indexPath.row == 0 {
+                    cell.filterTextField.placeholder = "None"
+                    cell.filterTextField.text = currentFilters["Location"]
+                    cell.filterTextField.clearButtonMode = .whileEditing
+                    cell.selectionStyle = .none
+                    cell.filterTextField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
+                    filterCells.append(cell)
+                    return cell
+                }
             default:
                 break
+            }
+        }
+        
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "radiusCell", for: indexPath) as? RadiusCell {
+            if sectionTitles[indexPath.section] == "Location" {
+                if indexPath.row == 1 {
+                    cell.minusButton.setTitle("-", for: .normal)
+                    cell.plusButton.setTitle("+", for: .normal)
+                    cell.textField.placeholder = "Radius"
+                    
+                    cell.selectionStyle = .none
+                    return cell
+                }
             }
         }
         
