@@ -10,5 +10,5 @@ import UIKit
 class RadiusCell: UITableViewCell {
     @IBOutlet var minusButton: UIButton!
     @IBOutlet var plusButton: UIButton!
-    @IBOutlet var textField: UITextField!
+    @IBOutlet var radiusLabel: UILabel!
 }

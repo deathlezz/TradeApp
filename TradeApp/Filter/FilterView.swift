@@ -9,11 +9,15 @@ import UIKit
 
 class FilterView: UITableViewController {
     
+    var radiusStages = [0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 175, 200]
+    var radiusCounter = 0
+    
     var categories = [String]()
     var currentFilters = [String: String]()
     
     var filterCells = [FilterCell]()
     var priceCell: PriceCell!
+    var radiusCell: RadiusCell!
     
     let sectionTitles = ["Sort", "Category", "Location", "Price", "Button"]
     
@@ -28,6 +32,10 @@ class FilterView: UITableViewController {
         title = "Filter"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.hidesBarsOnSwipe = false
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearTapped))
         
@@ -87,11 +95,11 @@ class FilterView: UITableViewController {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "radiusCell", for: indexPath) as? RadiusCell {
             if sectionTitles[indexPath.section] == "Location" {
                 if indexPath.row == 1 {
-                    cell.minusButton.setTitle("-", for: .normal)
-                    cell.plusButton.setTitle("+", for: .normal)
-                    cell.textField.placeholder = "Radius"
-                    
+                    cell.radiusLabel.text = currentFilters["Radius"] ?? "+ 0 km"
+                    cell.minusButton.addTarget(self, action: #selector(minusTapped), for: .touchUpInside)
+                    cell.plusButton.addTarget(self, action: #selector(plusTapped), for: .touchUpInside)
                     cell.selectionStyle = .none
+                    radiusCell = cell
                     return cell
                 }
             }
@@ -158,6 +166,7 @@ class FilterView: UITableViewController {
         var priceFrom = priceCell.firstTextField.text ?? ""
         var priceTo = priceCell.secondTextField.text ?? ""
         let sortText = filterCells[0].filterTextField.text ?? ""
+        let radius = radiusStages[radiusCounter]
         
         if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
             filteredItems = items.filter {$0.category == currentFilters["Category"]}
@@ -250,10 +259,17 @@ class FilterView: UITableViewController {
         
         priceCell.firstTextField.text = nil
         priceCell.secondTextField.text = nil
+        radiusCell.radiusLabel.text = "+ 0 km"
+        radiusCounter = 0
     }
     
     // set action for "return" keyboard button
     @objc func returnTapped(_ textField: UITextField) {
+        if filterCells[2].filterTextField.text == "" {
+            radiusCell.radiusLabel.text = "+ 0 km"
+            radiusCounter = 0
+        }
+        
         textField.resignFirstResponder()
     }
     
@@ -286,6 +302,34 @@ class FilterView: UITableViewController {
         } else {
             priceCell.secondTextField.resignFirstResponder()
         }
+    }
+    
+    @objc func minusTapped() {
+        guard filterCells[2].filterTextField.text != "" else { return }
+        
+        radiusCounter -= 1
+        
+        if radiusCounter < 0 {
+            radiusCounter = 0
+        }
+        
+        radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
+    }
+    
+    @objc func plusTapped() {
+        guard filterCells[2].filterTextField.text != "" else { return }
+        
+        radiusCounter += 1
+        
+        if radiusCounter > 16 {
+            radiusCounter = 16
+        }
+        
+        radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
+    }
+    
+    @objc func hideKeyboard() {
+        print("tapped")
     }
 
 }
