@@ -33,11 +33,9 @@ class FilterView: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.hidesBarsOnSwipe = false
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
-        
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearTapped))
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateRadius), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         DispatchQueue.global().async { [weak self] in
             self?.currentFilters = Utilities.loadFilters()
@@ -157,10 +155,14 @@ class FilterView: UITableViewController {
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(ac, animated: true)
         }
+
+        updateRadius()
     }
     
     // set action for apply button
     @objc func applyTapped() {
+        updateRadius()
+        
         let categoryText = filterCells[1].filterTextField.text ?? ""
         let locationText = filterCells[2].filterTextField.text ?? ""
         var priceFrom = priceCell.firstTextField.text ?? ""
@@ -304,6 +306,7 @@ class FilterView: UITableViewController {
         }
     }
     
+    // set action for tapped minus button
     @objc func minusTapped() {
         guard filterCells[2].filterTextField.text != "" else { return }
         
@@ -316,6 +319,7 @@ class FilterView: UITableViewController {
         radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
     }
     
+    // set action for tapped plus button
     @objc func plusTapped() {
         guard filterCells[2].filterTextField.text != "" else { return }
         
@@ -328,8 +332,12 @@ class FilterView: UITableViewController {
         radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
     }
     
-    @objc func hideKeyboard() {
-        print("tapped")
+    // hide keyboard
+    @objc func updateRadius() {
+        if filterCells[2].filterTextField.text == "" {
+            radiusCell.radiusLabel.text = "+ 0 km"
+            radiusCounter = 0
+        }
     }
 
 }
