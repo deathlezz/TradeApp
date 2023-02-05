@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 class FilterView: UITableViewController {
     
@@ -164,7 +165,7 @@ class FilterView: UITableViewController {
         updateRadius()
         
         let categoryText = filterCells[1].filterTextField.text ?? ""
-        let locationText = filterCells[2].filterTextField.text ?? ""
+        let locationText = filterCells[2].filterTextField.text?.capitalized ?? ""
         var priceFrom = priceCell.firstTextField.text ?? ""
         var priceTo = priceCell.secondTextField.text ?? ""
         let sortText = filterCells[0].filterTextField.text ?? ""
@@ -200,7 +201,29 @@ class FilterView: UITableViewController {
         
         // location filter
         if !locationText.isEmpty {
-            filteredItems = filteredItems.filter {$0.location == locationText}
+            
+            var matched = [Item]()
+            
+            Utilities().forwardGeocoding(address: locationText) { (lat, long) in
+                
+                let cityLocation = CLLocation(latitude: lat, longitude: long)
+                
+                print(lat)
+                print(long)
+                
+                for item in filteredItems {
+                    let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
+                    let distance = Int(cityLocation.distance(from: itemLocation) / 1000)
+                    
+                    if distance <= radius {
+                        matched.append(item)
+                    }
+                }
+            }
+            
+            filteredItems = matched
+            print(matched.count)
+//            filteredItems = filteredItems.filter {$0.location == locationText}
             currentFilters["Location"] = locationText
         } else {
             currentFilters["Location"] = nil

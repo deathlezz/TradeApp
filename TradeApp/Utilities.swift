@@ -66,6 +66,31 @@ class Utilities {
         })
     }
     
+    // change city name to coordinates
+    func forwardGeocoding(address: String, completion: @escaping (Double, Double) -> Void) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address, completionHandler: { (placemarks, error) in
+            if error != nil {
+                print("Failed to retrieve location")
+                return
+            }
+            
+            var location: CLLocation?
+            
+            if let placemarks = placemarks, placemarks.count > 0 {
+                location = placemarks.first?.location
+            }
+            
+            if let location = location {
+                let coordinate = location.coordinate
+                completion(coordinate.latitude, coordinate.longitude)
+                
+            } else {
+                print("No matching location found")
+            }
+        })
+    }
+    
     // save saved items
     static func saveItems(_ items: [Item]) {
         let jsonEncoder = JSONEncoder()

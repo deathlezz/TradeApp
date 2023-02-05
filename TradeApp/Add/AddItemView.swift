@@ -230,25 +230,27 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // set action for submit button
     @objc func submitTapped() {
         let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
-        let title = textFieldCells[0].textField.text
+        let title = textFieldCells[0].textField.text?.capitalized
         let price = textFieldCells[1].textField.text
         let category = textFieldCells[2].textField.text
         let location = textFieldCells[3].textField.text?.capitalized
         let description = textViewCell?.textView.text
         
-        var cityTest: Bool!
+//        var cityTest: Bool!
         
         Utilities().isCityValid(location!) { [weak self] valid in
-            cityTest = valid
+//            cityTest = valid
             
             if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
                 
-                if cityTest {
-                    let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0)
-                    items.append(newItem)
-                    recentlyAdded.append(newItem)
-                    filteredItems = recentlyAdded
-                    self?.showAlert(.success)
+                if valid {
+                    Utilities().forwardGeocoding(address: location!) { (lat, long) in
+                        let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0, lat: lat, long: long)
+                        items.append(newItem)
+                        recentlyAdded.append(newItem)
+                        filteredItems = recentlyAdded
+                        self?.showAlert(.success)
+                    }
                     
                 } else {
                     self?.showAlert(.cityError)
@@ -258,7 +260,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 self?.showAlert(.emptyField)
             }
         }
-        
     }
     
     // show alert if at least one field is empty

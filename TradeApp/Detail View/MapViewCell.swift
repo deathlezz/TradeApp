@@ -96,7 +96,7 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
                     self?.mapView.setRegion(region, animated: false)
                     self?.didGeocode = true
                     
-                    let itemLocation = CLLocation(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+                    let itemLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
                     self?.item = itemLocation
                     self?.locationManager.requestLocation()
                     
