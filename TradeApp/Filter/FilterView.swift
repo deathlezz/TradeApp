@@ -13,6 +13,9 @@ class FilterView: UITableViewController {
     var radiusStages = [0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 175, 200]
     var radiusCounter = 0
     
+    var isCityValid: Bool!
+    var matched = [Item]()
+    
     var categories = [String]()
     var currentFilters = [String: String]()
     
@@ -40,6 +43,7 @@ class FilterView: UITableViewController {
         
         DispatchQueue.global().async { [weak self] in
             self?.currentFilters = Utilities.loadFilters()
+            self?.radiusCounter = Int(self?.currentFilters["Radius"] ?? "0") ?? 0
         }
     }
 
@@ -94,7 +98,7 @@ class FilterView: UITableViewController {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "radiusCell", for: indexPath) as? RadiusCell {
             if sectionTitles[indexPath.section] == "Location" {
                 if indexPath.row == 1 {
-                    cell.radiusLabel.text = currentFilters["Radius"] ?? "+ 0 km"
+                    cell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
                     cell.minusButton.addTarget(self, action: #selector(minusTapped), for: .touchUpInside)
                     cell.plusButton.addTarget(self, action: #selector(plusTapped), for: .touchUpInside)
                     cell.selectionStyle = .none
@@ -202,31 +206,59 @@ class FilterView: UITableViewController {
         // location filter
         if !locationText.isEmpty {
             
-            var matched = [Item]()
+//            var matched = [Item]()
+            var cityLocation = CLLocation()
             
-            Utilities().forwardGeocoding(address: locationText) { (lat, long) in
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            
+            print("before closure")
+            
+            Utilities().isCityValid(locationText) { [weak self] valid in
                 
-                let cityLocation = CLLocation(latitude: lat, longitude: long)
+                print("inside closure")
                 
-                print(lat)
-                print(long)
-                
-                for item in filteredItems {
-                    let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
-                    let distance = Int(cityLocation.distance(from: itemLocation) / 1000)
-                    
-                    if distance <= radius {
-                        matched.append(item)
+                if valid {
+                    print("valid")
+//                    self?.isCityValid = valid
+                    Utilities().forwardGeocoding(address: locationText) { (lat, long) in
+                        print("inside second closure")
+                        
+                        cityLocation = CLLocation(latitude: lat, longitude: long)
+                        
+                        dispatchGroup.leave()
                     }
+                    
+                } else {
+//                    self?.isCityValid = valid
                 }
             }
             
-            filteredItems = matched
-            print(matched.count)
-//            filteredItems = filteredItems.filter {$0.location == locationText}
-            currentFilters["Location"] = locationText
+            dispatchGroup.notify(queue: DispatchQueue.main) {
+                print("dispatch group notify")
+                for item in filteredItems {
+                    print("loop enter")
+                    let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
+                    let distance = Int(itemLocation.distance(from: cityLocation) / 1000)
+                    
+                    if distance <= radius {
+                        self.matched.append(item)
+                    }
+                    
+                    print("loop exit")
+                }
+                
+                filteredItems = self.matched
+                print(self.matched.count)
+                self.currentFilters["Location"] = locationText
+                self.currentFilters["Radius"] = String(self.radiusCounter)
+                
+                print("saved filters")
+            }
+            
         } else {
             currentFilters["Location"] = nil
+            currentFilters["Radius"] = nil
         }
         
         // price filter
@@ -274,6 +306,15 @@ class FilterView: UITableViewController {
         
         Utilities.saveFilters(currentFilters)
         navigationController?.popToRootViewController(animated: true)
+        
+//        if isCityValid {
+//            Utilities.saveFilters(currentFilters)
+//            navigationController?.popToRootViewController(animated: true)
+//        } else {
+//            let ac = UIAlertController(title: "Wrong city name", message: "Please enter valid city name", preferredStyle: .alert)
+//            ac.addAction(UIAlertAction(title: "OK", style: .default))
+//            present(ac, animated: true)
+//        }
     }
     
     // set action for clear button
@@ -317,6 +358,7 @@ class FilterView: UITableViewController {
     // add "done" button after view appeard
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+//        radiusCounter = Int(currentFilters["Radius"] ?? "0") ?? 0
         addDoneButtonToKeyboard()
     }
     
