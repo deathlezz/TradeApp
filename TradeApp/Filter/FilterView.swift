@@ -14,7 +14,6 @@ class FilterView: UITableViewController {
     var radiusCounter = 0
     
     var isCityValid: Bool!
-    var matched = [Item]()
     
     var categories = [String]()
     var currentFilters = [String: String]()
@@ -203,64 +202,6 @@ class FilterView: UITableViewController {
             currentFilters["Category"] = nil
         }
         
-        // location filter
-        if !locationText.isEmpty {
-            
-//            var matched = [Item]()
-            var cityLocation = CLLocation()
-            
-            let dispatchGroup = DispatchGroup()
-            dispatchGroup.enter()
-            
-            print("before closure")
-            
-            Utilities().isCityValid(locationText) { [weak self] valid in
-                
-                print("inside closure")
-                
-                if valid {
-                    print("valid")
-//                    self?.isCityValid = valid
-                    Utilities().forwardGeocoding(address: locationText) { (lat, long) in
-                        print("inside second closure")
-                        
-                        cityLocation = CLLocation(latitude: lat, longitude: long)
-                        
-                        dispatchGroup.leave()
-                    }
-                    
-                } else {
-//                    self?.isCityValid = valid
-                }
-            }
-            
-            dispatchGroup.notify(queue: DispatchQueue.main) {
-                print("dispatch group notify")
-                for item in filteredItems {
-                    print("loop enter")
-                    let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
-                    let distance = Int(itemLocation.distance(from: cityLocation) / 1000)
-                    
-                    if distance <= radius {
-                        self.matched.append(item)
-                    }
-                    
-                    print("loop exit")
-                }
-                
-                filteredItems = self.matched
-                print(self.matched.count)
-                self.currentFilters["Location"] = locationText
-                self.currentFilters["Radius"] = String(self.radiusCounter)
-                
-                print("saved filters")
-            }
-            
-        } else {
-            currentFilters["Location"] = nil
-            currentFilters["Radius"] = nil
-        }
-        
         // price filter
         if !priceFrom.isEmpty && !priceTo.isEmpty {
             if Int(priceFrom)! > Int(priceTo)! {
@@ -298,14 +239,78 @@ class FilterView: UITableViewController {
             currentFilters["Sort"] = nil
         }
         
+        // location filter
+        if !locationText.isEmpty {
+            
+            var matched = [Item]()
+            var cityLocation: CLLocation!
+            
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            
+            print("before closure")
+            
+            Utilities().isCityValid(locationText) { valid in
+                
+                print("inside closure")
+                
+                if valid {
+                    print(valid)
+//                    self?.isCityValid = valid
+                    Utilities().forwardGeocoding(address: locationText) { (lat, long) in
+                        print("inside second closure")
+                        
+                        cityLocation = CLLocation(latitude: lat, longitude: long)
+                        print(cityLocation!)
+                        
+                        dispatchGroup.leave()
+                    }
+                    
+                } else {
+//                    self?.isCityValid = valid
+                    print("invalid city")
+                    dispatchGroup.leave()
+                }
+                
+            }
+            
+            dispatchGroup.notify(queue: .main) {
+                for item in filteredItems {
+                    let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
+                    print(itemLocation)
+                    let distance = Int(cityLocation.distance(from: itemLocation) / 1000)
+                    print(distance)
+                    
+                    if Int(distance) <= radius {
+                        matched.append(item)
+                    }
+                }
+                
+                filteredItems = matched
+                print(matched.count)
+                print(filteredItems.count)
+                self.currentFilters["Location"] = locationText
+                self.currentFilters["Radius"] = String(self.radiusCounter)
+                
+                print("saved filters")
+                
+                Utilities.saveFilters(self.currentFilters)
+                self.navigationController?.popToRootViewController(animated: true)
+            }
+            
+        } else {
+            currentFilters["Location"] = nil
+            currentFilters["Radius"] = nil
+        }
+        
         if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
             filteredItems = recentlyAdded
             currentFilters.removeAll()
             Utilities.saveFilters(currentFilters)
         }
         
-        Utilities.saveFilters(currentFilters)
-        navigationController?.popToRootViewController(animated: true)
+//        Utilities.saveFilters(currentFilters)
+//        navigationController?.popToRootViewController(animated: true)
         
 //        if isCityValid {
 //            Utilities.saveFilters(currentFilters)
