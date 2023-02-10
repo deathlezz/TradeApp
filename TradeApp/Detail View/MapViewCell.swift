@@ -76,7 +76,8 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
     func forwardGeocoding(address: String) {
         if didGeocode == false {
             let geocoder = CLGeocoder()
-            geocoder.geocodeAddressString(address, completionHandler: { [weak self] (placemarks, error) in
+            let locale = Locale(identifier: "en")
+            geocoder.geocodeAddressString(address, in: nil, preferredLocale: locale, completionHandler: { [weak self] (placemarks, error) in
                 if error != nil {
                     print("Failed to retrieve location")
                     return

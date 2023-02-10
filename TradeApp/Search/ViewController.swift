@@ -173,7 +173,7 @@ class ViewController: UICollectionViewController {
         let plus = UIImage(systemName: "plus")?.pngData()
         
         for _ in 0...3 {
-            let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 0, lat: 51.507351, long: -0.127758)
+            let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 0, lat: 51.50334660, long: -0.07939650)
             let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date(), views: 0, lat: 56.116524, long: -3.936903)
             let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date(), views: 0, lat: 55.864239, long: -4.251806)
             items.append(tesla)

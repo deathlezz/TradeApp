@@ -239,60 +239,50 @@ class FilterView: UITableViewController {
             currentFilters["Sort"] = nil
         }
         
+        // reset filters
+        if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
+            filteredItems = recentlyAdded
+            currentFilters.removeAll()
+            Utilities.saveFilters(currentFilters)
+            navigationController?.popToRootViewController(animated: true)
+            return
+        }
+        
         // location filter
         if !locationText.isEmpty {
-            
             var matched = [Item]()
-            var cityLocation: CLLocation!
             
             let dispatchGroup = DispatchGroup()
             dispatchGroup.enter()
             
-            print("before closure")
-            
-            Utilities().isCityValid(locationText) { valid in
-                
-                print("inside closure")
-                
+            Utilities().isCityValid(locationText) { [weak self] valid in
                 if valid {
-                    print(valid)
-//                    self?.isCityValid = valid
                     Utilities().forwardGeocoding(address: locationText) { (lat, long) in
-                        print("inside second closure")
+                        let cityLocation = CLLocation(latitude: lat, longitude: long)
                         
-                        cityLocation = CLLocation(latitude: lat, longitude: long)
-                        print(cityLocation!)
+                        for item in filteredItems {
+                            let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
+                            let distance = Int(cityLocation.distance(from: itemLocation) / 1000)
+                            
+                            if Int(distance) <= radius {
+                                matched.append(item)
+                            }
+                        }
                         
                         dispatchGroup.leave()
                     }
                     
                 } else {
-//                    self?.isCityValid = valid
-                    print("invalid city")
-                    dispatchGroup.leave()
+                    let ac = UIAlertController(title: "Wrong city name", message: "Please enter valid city name", preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "OK", style: .default))
+                    self?.present(ac, animated: true)
                 }
-                
             }
             
             dispatchGroup.notify(queue: .main) {
-                for item in filteredItems {
-                    let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
-                    print(itemLocation)
-                    let distance = Int(cityLocation.distance(from: itemLocation) / 1000)
-                    print(distance)
-                    
-                    if Int(distance) <= radius {
-                        matched.append(item)
-                    }
-                }
-                
                 filteredItems = matched
-                print(matched.count)
-                print(filteredItems.count)
                 self.currentFilters["Location"] = locationText
                 self.currentFilters["Radius"] = String(self.radiusCounter)
-                
-                print("saved filters")
                 
                 Utilities.saveFilters(self.currentFilters)
                 self.navigationController?.popToRootViewController(animated: true)
@@ -301,25 +291,10 @@ class FilterView: UITableViewController {
         } else {
             currentFilters["Location"] = nil
             currentFilters["Radius"] = nil
-        }
-        
-        if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
-            filteredItems = recentlyAdded
-            currentFilters.removeAll()
+            
             Utilities.saveFilters(currentFilters)
+            navigationController?.popToRootViewController(animated: true)
         }
-        
-//        Utilities.saveFilters(currentFilters)
-//        navigationController?.popToRootViewController(animated: true)
-        
-//        if isCityValid {
-//            Utilities.saveFilters(currentFilters)
-//            navigationController?.popToRootViewController(animated: true)
-//        } else {
-//            let ac = UIAlertController(title: "Wrong city name", message: "Please enter valid city name", preferredStyle: .alert)
-//            ac.addAction(UIAlertAction(title: "OK", style: .default))
-//            present(ac, animated: true)
-//        }
     }
     
     // set action for clear button
@@ -363,7 +338,6 @@ class FilterView: UITableViewController {
     // add "done" button after view appeard
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        radiusCounter = Int(currentFilters["Radius"] ?? "0") ?? 0
         addDoneButtonToKeyboard()
     }
     

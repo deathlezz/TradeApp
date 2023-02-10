@@ -49,8 +49,8 @@ class Utilities {
     // city name validation
     func isCityValid(_ city: String, completion: @escaping (Bool) -> Void) {
         let geocoder = CLGeocoder()
-        let locale = Locale(identifier: "en_US")
-        geocoder.geocodeAddressString(city, in: CLRegion(), preferredLocale: locale, completionHandler: { (placemarks, error) in
+        let locale = Locale(identifier: "en")
+        geocoder.geocodeAddressString(city, in: nil, preferredLocale: locale, completionHandler: { (placemarks, error) in
             
             if error != nil {
                 completion(false)
@@ -70,8 +70,8 @@ class Utilities {
     // change city name to coordinates
     func forwardGeocoding(address: String, completion: @escaping (Double, Double) -> Void) {
         let geocoder = CLGeocoder()
-        let locale = Locale(identifier: "en_US")
-        geocoder.geocodeAddressString(address, in: CLRegion(), preferredLocale: locale, completionHandler: { (placemarks, error) in
+        let locale = Locale(identifier: "en")
+        geocoder.geocodeAddressString(address, in: nil, preferredLocale: locale, completionHandler: { (placemarks, error) in
             if error != nil {
                 print("Failed to retrieve location")
                 return
