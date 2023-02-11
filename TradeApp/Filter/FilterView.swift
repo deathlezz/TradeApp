@@ -13,8 +13,6 @@ class FilterView: UITableViewController {
     var radiusStages = [0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 175, 200]
     var radiusCounter = 0
     
-    var isCityValid: Bool!
-    
     var categories = [String]()
     var currentFilters = [String: String]()
     
@@ -376,7 +374,7 @@ class FilterView: UITableViewController {
         radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
     }
     
-    // hide keyboard
+    // update radius
     @objc func updateRadius() {
         if filterCells[2].filterTextField.text == "" {
             radiusCell.radiusLabel.text = "+ 0 km"

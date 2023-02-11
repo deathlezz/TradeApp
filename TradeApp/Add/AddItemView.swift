@@ -49,11 +49,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set section title
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 6 {
-            return " "
-        } else {
-            return sectionTitles[section]
-        }
+        section == 6 ? " " : sectionTitles[section]
     }
     
     // set footer as number of available characters to use in description
@@ -236,11 +232,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let location = textFieldCells[3].textField.text?.capitalized
         let description = textViewCell?.textView.text
         
-//        var cityTest: Bool!
-        
         Utilities().isCityValid(location!) { [weak self] valid in
-//            cityTest = valid
-            
             if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
                 
                 if valid {
