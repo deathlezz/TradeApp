@@ -9,7 +9,12 @@ import UIKit
 
 class LoginView: UITableViewController {
     
-    let sections = ["Segment", "Email", "Password", "Button"]
+    var sections = ["Segment", "Email", "Password", "Button"]
+    
+    var segment: SegmentedControllCell!
+    var email: TextFieldCell!
+    var password: TextFieldCell!
+    var repeatPassword: TextFieldCell!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +33,7 @@ class LoginView: UITableViewController {
     
     // set header title for each section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 0 || section == 3 {
+        if sections[section] == "Segment" || sections[section] == "Button" {
             return " "
         } else {
             return sections[section]
@@ -44,6 +49,10 @@ class LoginView: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "SegmentedCell", for: indexPath) as? SegmentedControllCell {
             if sections[indexPath.section] == "Segment" {
+                cell.segment.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.white], for: .selected)
+                cell.segment.addTarget(self, action: #selector(handleSegmentChange), for: .primaryActionTriggered)
+                cell.selectionStyle = .none
+                segment = cell
                 return cell
             }
         }
@@ -51,9 +60,27 @@ class LoginView: UITableViewController {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "LoginCell", for: indexPath) as? TextFieldCell {
             switch sections[indexPath.section] {
             case "Email":
+                cell.textField.clearButtonMode = .whileEditing
+                cell.textField.placeholder = "none"
+                cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
+                cell.selectionStyle = .none
+                email = cell
                 return cell
             case "Password":
+                cell.textField.clearButtonMode = .whileEditing
+                cell.textField.placeholder = "none"
+                cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
+                cell.selectionStyle = .none
+                password = cell
                 return cell
+            case "Repeat password":
+                cell.textField.clearButtonMode = .whileEditing
+                cell.textField.placeholder = "none"
+                cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
+                cell.selectionStyle = .none
+                repeatPassword = cell
+                return cell
+                
             default:
                 break
             }
@@ -66,6 +93,24 @@ class LoginView: UITableViewController {
         }
         
         return UITableViewCell()
+    }
+    
+    // set action for "return" keyboard button
+    @objc func returnTapped(_ textField: UITextField) {
+        textField.resignFirstResponder()
+    }
+    
+    // set action for segment change
+    @objc func handleSegmentChange(_ sender: UISegmentedControl) {
+        print(sender.selectedSegmentIndex)
+        
+        if sender.selectedSegmentIndex == 0 {
+            sections = ["Segment", "Email", "Password", "Button"]
+        } else {
+            sections = ["Segment", "Email", "Password", "Repeat password", "Button"]
+        }
+        
+        tableView.reloadData()
     }
     
     
