@@ -69,6 +69,7 @@ class LoginView: UITableViewController {
             case "Password":
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.placeholder = "none"
+                cell.textField.isSecureTextEntry = true
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 cell.selectionStyle = .none
                 password = cell
@@ -76,6 +77,7 @@ class LoginView: UITableViewController {
             case "Repeat password":
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.placeholder = "none"
+                cell.textField.isSecureTextEntry = true
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 cell.selectionStyle = .none
                 repeatPassword = cell
@@ -102,17 +104,15 @@ class LoginView: UITableViewController {
     
     // set action for segment change
     @objc func handleSegmentChange(_ sender: UISegmentedControl) {
-        print(sender.selectedSegmentIndex)
-        
         if sender.selectedSegmentIndex == 0 {
             sections = ["Segment", "Email", "Password", "Button"]
+            let indexSet = IndexSet(integer: sections.count - 1)
+            tableView.deleteSections(indexSet, with: .automatic)
         } else {
             sections = ["Segment", "Email", "Password", "Repeat password", "Button"]
+            let indexSet = IndexSet(integer: sections.count - 2)
+            tableView.insertSections(indexSet, with: .automatic)
         }
-        
-        tableView.reloadData()
     }
-    
-    
 
 }
