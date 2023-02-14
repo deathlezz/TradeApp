@@ -87,27 +87,27 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             
             switch sectionTitles[indexPath.section] {
             case "Title":
-                cell.textField.placeholder = "None"
+                cell.textField.placeholder = "e.g. iPhone 14 Pro"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 textFieldCells.append(cell)
                 return cell
             case "Price":
-                cell.textField.placeholder = "None"
+                cell.textField.placeholder = "£"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.keyboardType = .numberPad
                 textFieldCells.append(cell)
                 return cell
             case "Category":
-                cell.textField.placeholder = "None"
+                cell.textField.placeholder = "e.g. Electronics"
                 cell.textField.isUserInteractionEnabled = false
                 cell.selectionStyle = .none
                 textFieldCells.append(cell)
                 return cell
             case "Location":
-                cell.textField.placeholder = "None"
+                cell.textField.placeholder = "City"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
