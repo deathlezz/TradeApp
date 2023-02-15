@@ -7,6 +7,11 @@
 
 import UIKit
 
+enum AccountAction {
+    case login
+    case register
+}
+
 class LoginView: UITableViewController {
     
     var sections = ["Segment", "Email", "Password", "Button"]
@@ -119,18 +124,53 @@ class LoginView: UITableViewController {
     
     // set action for tapped button
     @objc func submitTapped() {
-        if isEmailValid() {
-            print("email ok")
+        let mail = email.textField.text!
+        let passText = password.textField.text
+        let rePassText = repeatPassword.textField.text
+        
+        if segment.segment.selectedSegmentIndex == 0 {
             
-            if isPasswordValid() {
-                print("password ok")
+            if users.contains(where: {$0.key == mail}) {
+                guard users[mail] == passText else {
+                    password.textField.text = nil
+                    return showAlert(title: "Error", message: "Wrong password")
+                }
+                
+                resetView(.login)
+                
+                if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
+                    let mySceneDelegate = view.window?.windowScene?.keyWindow
+                    mySceneDelegate?.rootViewController = vc
+                    navigationController?.pushViewController(vc, animated: true)
+                }
                 
             } else {
-                showAlert(title: "Invalid password format", message: "Your password need between 8-16 characters, at least 1 uppercase, 1 lowercase and 1 number")
+                showAlert(title: "Error", message: "Wrong email address")
             }
             
         } else {
-            showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*")
+            guard isEmailValid() else {
+                return showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*")
+            }
+            
+            guard isPasswordValid() else {
+                return showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*")
+            }
+            
+            guard passText == rePassText else {
+                repeatPassword.textField.text = nil
+                return showAlert(title: "Password repeated incorrectly", message: "Re-enter password again")
+            }
+            
+            // new user account created
+            if !users.contains(where: {$0.key == mail}) {
+                users[mail] = passText
+                resetView(.register)
+                showAlert(title: "Success", message: "You can sign in now")
+                
+            } else {
+                showAlert(title: "Error", message: "This email is already used")
+            }
         }
     }
     
@@ -164,6 +204,17 @@ class LoginView: UITableViewController {
         let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
+    }
+    
+    // reset view after user account creation
+    func resetView(_ after: AccountAction) {
+        email.textField.text = nil
+        password.textField.text = nil
+        repeatPassword.textField.text = nil
+        
+        guard after == .register else { return }
+        segment.segment.selectedSegmentIndex = 0
+        handleSegmentChange(segment.segment)
     }
 
 }
