@@ -139,8 +139,9 @@ class LoginView: UITableViewController {
                 resetView(.login)
                 
                 if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
-                    let mySceneDelegate = view.window?.windowScene?.keyWindow
-                    mySceneDelegate?.rootViewController = vc
+                    vc.mail = mail
+//                    let mySceneDelegate = view.window?.windowScene?.keyWindow
+//                    mySceneDelegate?.rootViewController = vc
                     navigationController?.pushViewController(vc, animated: true)
                 }
                 
