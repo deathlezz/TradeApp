@@ -20,6 +20,8 @@ class AccountView: UITableViewController {
         title = "Account"
         navigationController?.navigationBar.prefersLargeTitles = true
         tableView.isScrollEnabled = false
+        
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AccountCell")
     }
     
     // set number of sections
@@ -50,17 +52,21 @@ class AccountView: UITableViewController {
         case "Your ads":
             if indexPath.row == 0 {
                 cell.textLabel?.text = "Active: 0"
+                cell.accessoryType = .disclosureIndicator
             } else {
                 cell.textLabel?.text = "Ended: 0"
+                cell.accessoryType = .disclosureIndicator
             }
             return cell
         case "Settings":
             cell.textLabel?.text = settingsSection[indexPath.row]
+            cell.accessoryType = .disclosureIndicator
             return cell
         default:
             if indexPath.row == 0 {
                 cell.textLabel?.text = mail
                 cell.textLabel?.textAlignment = .center
+                cell.textLabel?.textColor = .systemBlue
                 cell.selectionStyle = .none
                 cell.accessoryType = .none
             } else {
@@ -68,7 +74,7 @@ class AccountView: UITableViewController {
                 cell.textLabel?.textAlignment = .center
                 cell.textLabel?.textColor = .systemRed
                 cell.accessoryType = .none
-                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 1000)
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: view.bounds.width)
             }
             return cell
         }

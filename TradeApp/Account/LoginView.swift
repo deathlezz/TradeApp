@@ -29,6 +29,8 @@ class LoginView: UITableViewController {
         
         tableView.separatorStyle = .none
         tableView.isScrollEnabled = false
+        
+        users["mail@wp.pl"] = "passWord123"
     }
     
     // set number of sections
@@ -126,10 +128,8 @@ class LoginView: UITableViewController {
     @objc func submitTapped() {
         let mail = email.textField.text!
         let passText = password.textField.text
-        let rePassText = repeatPassword.textField.text
         
         if segment.segment.selectedSegmentIndex == 0 {
-            
             if users.contains(where: {$0.key == mail}) {
                 guard users[mail] == passText else {
                     password.textField.text = nil
@@ -140,6 +140,7 @@ class LoginView: UITableViewController {
                 
                 if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
                     vc.mail = mail
+                    
 //                    let mySceneDelegate = view.window?.windowScene?.keyWindow
 //                    mySceneDelegate?.rootViewController = vc
                     navigationController?.pushViewController(vc, animated: true)
@@ -150,6 +151,8 @@ class LoginView: UITableViewController {
             }
             
         } else {
+            let rePassText = repeatPassword.textField.text
+            
             guard isEmailValid() else {
                 return showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*")
             }
@@ -211,10 +214,10 @@ class LoginView: UITableViewController {
     func resetView(_ after: AccountAction) {
         email.textField.text = nil
         password.textField.text = nil
-        repeatPassword.textField.text = nil
         
         guard after == .register else { return }
         segment.segment.selectedSegmentIndex = 0
+        repeatPassword.textField.text = nil
         handleSegmentChange(segment.segment)
     }
 
