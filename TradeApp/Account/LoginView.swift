@@ -140,9 +140,7 @@ class LoginView: UITableViewController {
                 
                 if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
                     vc.mail = mail
-                    
-//                    let mySceneDelegate = view.window?.windowScene?.keyWindow
-//                    mySceneDelegate?.rootViewController = vc
+                    vc.navigationItem.hidesBackButton = true
                     navigationController?.pushViewController(vc, animated: true)
                 }
                 

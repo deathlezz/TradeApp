@@ -19,8 +19,9 @@ class AccountView: UITableViewController {
 
         title = "Account"
         navigationController?.navigationBar.prefersLargeTitles = true
-        tableView.isScrollEnabled = false
         
+        tableView.separatorStyle = .none
+        tableView.isScrollEnabled = false
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AccountCell")
     }
     
@@ -53,12 +54,25 @@ class AccountView: UITableViewController {
             if indexPath.row == 0 {
                 cell.textLabel?.text = "Active: 0"
                 cell.accessoryType = .disclosureIndicator
+                cell.imageView?.image = UIImage(systemName: "checkmark")
             } else {
                 cell.textLabel?.text = "Ended: 0"
                 cell.accessoryType = .disclosureIndicator
+                cell.imageView?.image = UIImage(systemName: "xmark")
             }
             return cell
         case "Settings":
+            switch indexPath.row {
+            case 0:
+                cell.imageView?.image = UIImage(systemName: "person")
+            case 1:
+                cell.imageView?.image = UIImage(systemName: "at")
+            case 2:
+                cell.imageView?.image = UIImage(systemName: "lock")
+            default:
+                cell.imageView?.image = UIImage(systemName: "trash")
+            }
+            
             cell.textLabel?.text = settingsSection[indexPath.row]
             cell.accessoryType = .disclosureIndicator
             return cell
@@ -67,14 +81,14 @@ class AccountView: UITableViewController {
                 cell.textLabel?.text = mail
                 cell.textLabel?.textAlignment = .center
                 cell.textLabel?.textColor = .systemBlue
+                cell.backgroundColor = .systemGray6
                 cell.selectionStyle = .none
                 cell.accessoryType = .none
             } else {
-                cell.textLabel?.text = "Log out"
+                cell.textLabel?.text = "Sign out"
                 cell.textLabel?.textAlignment = .center
                 cell.textLabel?.textColor = .systemRed
                 cell.accessoryType = .none
-                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: view.bounds.width)
             }
             return cell
         }
