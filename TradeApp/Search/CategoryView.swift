@@ -42,14 +42,15 @@ class CategoryView: UITableViewController {
         
         if indexPath.row == 0 {
             cell.detailTextLabel?.text = "\(items.count) ads"
+            cell.imageView?.image = UIImage(systemName: "cart")
         } else {
             cell.detailTextLabel?.text = "\(items.filter {$0.category == "\(categories[indexPath.row])"}.count) ads"
+            cell.imageView?.image = UIImage(systemName: "car")
         }
         
         cell.textLabel?.text = categories[indexPath.row]
         cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
         cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 12)
-        cell.imageView?.image = UIImage(systemName: "camera")
         
         return cell
     }

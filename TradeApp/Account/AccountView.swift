@@ -9,7 +9,7 @@ import UIKit
 
 class AccountView: UITableViewController {
     
-    let sections = ["Your ads", "Settings", "Log out"]
+    let sections = ["User", "Your ads", "Settings", "Log out"]
     let settingsSection = ["Edit profile", "Change email", "Change password", "Delete account"]
     
     var mail: String!
@@ -30,19 +30,25 @@ class AccountView: UITableViewController {
         sections.count
     }
     
-    // set header title for each section
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        section == 2 ? " " : sections[section]
-    }
-    
     // set number of rows in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0, 2:
+        case 0, 3:
+            return 1
+        case 1:
             return 2
         default:
             return 4
         }
+    }
+    
+    // set section header height
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 1 {
+            return 0.01
+        }
+        
+        return CGFloat()
     }
     
     // set table view cell
@@ -50,6 +56,14 @@ class AccountView: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "AccountCell", for: indexPath)
 
         switch sections[indexPath.section] {
+        case "User":
+            cell.textLabel?.text = mail
+            cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+            cell.backgroundColor = .systemGray6
+            cell.textLabel?.textColor = .darkGray
+            cell.selectionStyle = .none
+            cell.accessoryType = .none
+            return cell
         case "Your ads":
             if indexPath.row == 0 {
                 cell.textLabel?.text = "Active: 0"
@@ -77,19 +91,10 @@ class AccountView: UITableViewController {
             cell.accessoryType = .disclosureIndicator
             return cell
         default:
-            if indexPath.row == 0 {
-                cell.textLabel?.text = mail
-                cell.textLabel?.textAlignment = .center
-                cell.textLabel?.textColor = .systemBlue
-                cell.backgroundColor = .systemGray6
-                cell.selectionStyle = .none
-                cell.accessoryType = .none
-            } else {
-                cell.textLabel?.text = "Sign out"
-                cell.textLabel?.textAlignment = .center
-                cell.textLabel?.textColor = .systemRed
-                cell.accessoryType = .none
-            }
+            cell.textLabel?.text = "Sign out"
+            cell.textLabel?.textAlignment = .center
+            cell.textLabel?.textColor = .systemRed
+            cell.accessoryType = .none
             return cell
         }
     }
