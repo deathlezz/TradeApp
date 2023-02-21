@@ -47,6 +47,16 @@ class LoginView: UITableViewController {
         }
     }
     
+    // set footer title for each section
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        section == 0 ? " " : nil
+    }
+    
+    // set section footer height
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 15
+    }
+    
     // set number of rows in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
@@ -68,7 +78,7 @@ class LoginView: UITableViewController {
             switch sections[indexPath.section] {
             case "Email":
                 cell.textField.clearButtonMode = .whileEditing
-                cell.textField.placeholder = "youremail@domain.com"
+                cell.textField.placeholder = "email@domain.com"
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 cell.selectionStyle = .none
                 email = cell

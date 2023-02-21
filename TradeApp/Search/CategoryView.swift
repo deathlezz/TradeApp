@@ -12,7 +12,7 @@ class CategoryView: UITableViewController {
     var categories = [String]()
     var currentFilters = [String: String]()
     
-    let categoryImages = ["car", "house", "case", "chair.lounge", "laptopcomputer.and.ipad", "tshirt", "leaf", "tortoise", "teddybear", "basketball", "airpodspro", "dollarsign"]
+    let categoryImages = ["car", "house", "case", "chair.lounge", "laptopcomputer.and.ipad", "tshirt", "leaf", "bird", "teddybear", "basketball", "airpodspro", "dollarsign"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,19 +41,19 @@ class CategoryView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "categoriesCell", for: indexPath)
+        let conf = UIImage.SymbolConfiguration(scale: .large)
         
         if indexPath.row == 0 {
             cell.detailTextLabel?.text = "\(items.count) ads"
-            cell.imageView?.image = UIImage(systemName: "cart")
+            cell.imageView?.image = UIImage(systemName: "cart", withConfiguration: conf)
         } else {
             cell.detailTextLabel?.text = "\(items.filter {$0.category == "\(categories[indexPath.row])"}.count) ads"
-            cell.imageView?.image = UIImage(systemName: categoryImages[indexPath.row - 1])
+            cell.imageView?.image = UIImage(systemName: categoryImages[indexPath.row - 1], withConfiguration: conf)
         }
         
         cell.textLabel?.text = categories[indexPath.row]
         cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
         cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 12)
-        
         return cell
     }
     
