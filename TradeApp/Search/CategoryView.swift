@@ -11,6 +11,8 @@ class CategoryView: UITableViewController {
     
     var categories = [String]()
     var currentFilters = [String: String]()
+    
+    let categoryImages = ["car", "house", "case", "chair.lounge", "laptopcomputer.and.ipad", "tshirt", "leaf", "tortoise", "teddybear", "basketball", "airpodspro", "dollarsign"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,7 +47,7 @@ class CategoryView: UITableViewController {
             cell.imageView?.image = UIImage(systemName: "cart")
         } else {
             cell.detailTextLabel?.text = "\(items.filter {$0.category == "\(categories[indexPath.row])"}.count) ads"
-            cell.imageView?.image = UIImage(systemName: "car")
+            cell.imageView?.image = UIImage(systemName: categoryImages[indexPath.row - 1])
         }
         
         cell.textLabel?.text = categories[indexPath.row]
