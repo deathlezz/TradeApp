@@ -9,10 +9,13 @@ import UIKit
 
 class AccountView: UITableViewController {
     
-    let sections = ["User", "Your ads", "Settings", "Log out"]
+    let sections = ["User", "Your ads", "Settings", "Sign out"]
     let settingsSection = ["Edit profile", "Change email", "Change password", "Delete account"]
     
     var mail: String!
+    
+    var active = 0
+    var ended = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,20 +64,23 @@ class AccountView: UITableViewController {
             cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 16)
             cell.backgroundColor = .systemGray6
             cell.textLabel?.textColor = .darkGray
+            cell.isUserInteractionEnabled = false
             cell.selectionStyle = .none
             cell.accessoryType = .none
             return cell
+            
         case "Your ads":
             if indexPath.row == 0 {
-                cell.textLabel?.text = "Active: 0"
+                cell.textLabel?.text = "Active: \(active)"
                 cell.accessoryType = .disclosureIndicator
                 cell.imageView?.image = UIImage(systemName: "checkmark")
             } else {
-                cell.textLabel?.text = "Ended: 0"
+                cell.textLabel?.text = "Ended: \(ended)"
                 cell.accessoryType = .disclosureIndicator
                 cell.imageView?.image = UIImage(systemName: "xmark")
             }
             return cell
+            
         case "Settings":
             switch indexPath.row {
             case 0:
@@ -90,6 +96,7 @@ class AccountView: UITableViewController {
             cell.textLabel?.text = settingsSection[indexPath.row]
             cell.accessoryType = .disclosureIndicator
             return cell
+            
         default:
             cell.textLabel?.text = "Sign out"
             cell.textLabel?.textAlignment = .center
@@ -97,6 +104,43 @@ class AccountView: UITableViewController {
             cell.accessoryType = .none
             return cell
         }
+    }
+    
+    // set action for selected cell
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch sections[indexPath.section] {
+        case "Settings":
+            switch indexPath.row {
+            case 0:
+                break
+            case 1:
+                break
+            case 2:
+                break
+            default:
+                deleteAccount()
+            }
+            
+        default:
+            Utilities.isLogedIn(false)
+            navigationController?.popToRootViewController(animated: true)
+        }
+    }
+    
+    // show delete account alert
+    func deleteAccount() {
+        let ac = UIAlertController(title: "Delete account", message: "Are you sure, you want to delete your account?", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
+            guard let email = self?.mail else { return }
+            users[email] = nil
+            Utilities.isLogedIn(false)
+            self?.navigationController?.popToRootViewController(animated: true)
+        })
+        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
+            let indexPath = IndexPath(row: 3, section: 2)
+            self?.tableView.deselectRow(at: indexPath, animated: true)
+        })
+        present(ac, animated: true)
     }
     
 }

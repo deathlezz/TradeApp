@@ -93,6 +93,22 @@ class Utilities {
         })
     }
     
+    // set user login status
+    static func isLogedIn(_ status: Bool) {
+        let defaults = UserDefaults.standard
+        defaults.set(status, forKey: "isLogedIn")
+    }
+    
+    // load user login status
+    static func loginStatus() -> Bool {
+        let defaults = UserDefaults.standard
+        if let status = defaults.object(forKey: "isLogedIn") as? Bool {
+            return status
+        } else {
+            return false
+        }
+    }
+    
     // save saved items
     static func saveItems(_ items: [Item]) {
         let jsonEncoder = JSONEncoder()

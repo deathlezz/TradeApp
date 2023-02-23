@@ -16,6 +16,8 @@ class LoginView: UITableViewController {
     
     var sections = ["Segment", "Email", "Password", "Button"]
     
+    var isLogedIn: Bool!
+    
     var segment: SegmentedControllCell!
     var email: TextFieldCell!
     var password: TextFieldCell!
@@ -30,7 +32,11 @@ class LoginView: UITableViewController {
         tableView.separatorStyle = .none
         tableView.isScrollEnabled = false
         
-        users["mail@wp.pl"] = "passWord123"
+        DispatchQueue.global().async { [weak self] in
+            users["mail@wp.pl"] = "passWord123"
+            self?.isLogedIn = Utilities.loginStatus()
+        }
+        
     }
     
     // set number of sections
@@ -147,6 +153,7 @@ class LoginView: UITableViewController {
                 }
                 
                 resetView(.login)
+                Utilities.isLogedIn(true)
                 
                 if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
                     vc.mail = mail
@@ -227,6 +234,19 @@ class LoginView: UITableViewController {
         segment.segment.selectedSegmentIndex = 0
         repeatPassword.textField.text = nil
         handleSegmentChange(segment.segment)
+    }
+    
+    // push vc if user is signed in
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print(isLogedIn!)
+        if isLogedIn {
+            if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
+                vc.mail = "mail"
+                vc.navigationItem.hidesBackButton = true
+                navigationController?.pushViewController(vc, animated: true)
+            }
+        }
     }
 
 }
