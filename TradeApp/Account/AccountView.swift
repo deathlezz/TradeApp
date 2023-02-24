@@ -122,7 +122,7 @@ class AccountView: UITableViewController {
             }
             
         default:
-            Utilities.isLogedIn(false)
+            Utilities.setUser(nil)
             navigationController?.popToRootViewController(animated: true)
         }
     }
@@ -133,7 +133,7 @@ class AccountView: UITableViewController {
         ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
             guard let email = self?.mail else { return }
             users[email] = nil
-            Utilities.isLogedIn(false)
+            Utilities.setUser(nil)
             self?.navigationController?.popToRootViewController(animated: true)
         })
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in

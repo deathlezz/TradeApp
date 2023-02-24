@@ -93,19 +93,23 @@ class Utilities {
         })
     }
     
-    // set user login status
-    static func isLogedIn(_ status: Bool) {
+    // set logged user
+    static func setUser(_ user: String?) {
         let defaults = UserDefaults.standard
-        defaults.set(status, forKey: "isLogedIn")
+        if user != nil {
+            defaults.set(user, forKey: "loggedUser")
+        } else {
+            defaults.removeObject(forKey: "loggedUser")
+        }
     }
     
-    // load user login status
-    static func loginStatus() -> Bool {
+    // load logged user
+    static func loadUser() -> String? {
         let defaults = UserDefaults.standard
-        if let status = defaults.object(forKey: "isLogedIn") as? Bool {
-            return status
+        if let user = defaults.object(forKey: "loggedUser") as? String {
+            return user
         } else {
-            return false
+            return nil
         }
     }
     

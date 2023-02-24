@@ -16,7 +16,7 @@ class LoginView: UITableViewController {
     
     var sections = ["Segment", "Email", "Password", "Button"]
     
-    var isLogedIn: Bool!
+    var loggedUser: String!
     
     var segment: SegmentedControllCell!
     var email: TextFieldCell!
@@ -34,9 +34,12 @@ class LoginView: UITableViewController {
         
         DispatchQueue.global().async { [weak self] in
             users["mail@wp.pl"] = "passWord123"
-            self?.isLogedIn = Utilities.loginStatus()
+            self?.loggedUser = Utilities.loadUser()
+            
+            DispatchQueue.main.async {
+                self?.loginPush()
+            }
         }
-        
     }
     
     // set number of sections
@@ -153,8 +156,8 @@ class LoginView: UITableViewController {
                 }
                 
                 resetView(.login)
-                Utilities.isLogedIn(true)
-                
+                Utilities.setUser(mail)
+
                 if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
                     vc.mail = mail
                     vc.navigationItem.hidesBackButton = true
@@ -236,16 +239,20 @@ class LoginView: UITableViewController {
         handleSegmentChange(segment.segment)
     }
     
-    // push vc if user is signed in
+    // load login status before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        print(isLogedIn!)
-        if isLogedIn {
-            if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
-                vc.mail = "mail"
-                vc.navigationItem.hidesBackButton = true
-                navigationController?.pushViewController(vc, animated: true)
-            }
+        loggedUser = Utilities.loadUser()
+        print(loggedUser ?? "nil")
+    }
+    
+    // push vc if user is signed in
+    func loginPush() {
+        guard loggedUser != nil else { return }
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
+            vc.mail = loggedUser
+            vc.navigationItem.hidesBackButton = true
+            navigationController?.pushViewController(vc, animated: true)
         }
     }
 
