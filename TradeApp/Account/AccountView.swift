@@ -10,7 +10,7 @@ import UIKit
 class AccountView: UITableViewController {
     
     let sections = ["User", "Your ads", "Settings", "Sign out"]
-    let settingsSection = ["Edit profile", "Change email", "Change password", "Delete account"]
+    let settingsSection = ["Change distance unit", "Change email", "Change password", "Delete account"]
     
     var mail: String!
     
@@ -84,7 +84,7 @@ class AccountView: UITableViewController {
         case "Settings":
             switch indexPath.row {
             case 0:
-                cell.imageView?.image = UIImage(systemName: "person")
+                cell.imageView?.image = UIImage(systemName: "lines.measurement.horizontal")
             case 1:
                 cell.imageView?.image = UIImage(systemName: "at")
             case 2:
@@ -112,7 +112,7 @@ class AccountView: UITableViewController {
         case "Settings":
             switch indexPath.row {
             case 0:
-                break
+                pushToDistanceView()
             case 1:
                 break
             case 2:
@@ -141,6 +141,13 @@ class AccountView: UITableViewController {
             self?.tableView.deselectRow(at: indexPath, animated: true)
         })
         present(ac, animated: true)
+    }
+    
+    // push vc to DistanceUnitView
+    func pushToDistanceView() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "DistanceUnitView") as? DistanceUnitView {
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
 }

@@ -18,7 +18,7 @@ class LoginView: UITableViewController {
     
     var loggedUser: String!
     
-    var segment: SegmentedControllCell!
+    var segment: SegmentedControlCell!
     var email: TextFieldCell!
     var password: TextFieldCell!
     var repeatPassword: TextFieldCell!
@@ -73,7 +73,7 @@ class LoginView: UITableViewController {
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "SegmentedCell", for: indexPath) as? SegmentedControllCell {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "SegmentedCell", for: indexPath) as? SegmentedControlCell {
             if sections[indexPath.section] == "Segment" {
                 cell.segment.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.white], for: .selected)
                 cell.segment.addTarget(self, action: #selector(handleSegmentChange), for: .primaryActionTriggered)

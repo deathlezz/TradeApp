@@ -22,13 +22,7 @@ class SearchView: UITableViewController {
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.hidesBarsOnSwipe = false
         
-        textField = UITextField(frame: CGRect(x: 0, y: 0, width: (navigationController?.navigationBar.frame.width)!, height: 30))
-        textField.borderStyle = .roundedRect
-        textField.clearButtonMode = .whileEditing
-        textField.placeholder = "Find something for yourself"
-        textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
-        textField.returnKeyType = .search
-        navigationItem.titleView = textField
+        setUpSearchBar()
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
         
@@ -164,6 +158,20 @@ class SearchView: UITableViewController {
     func loadHistory() {
         let defaults = UserDefaults.standard
         recentlySearched = defaults.object(forKey: "recentlySearched") as? [String] ?? [String]()
+    }
+    
+    // set up search bar
+    func setUpSearchBar() {
+        textField = UITextField(frame: CGRect(x: 0, y: 0, width: (navigationController?.navigationBar.frame.width)!, height: 30))
+        textField.borderStyle = .roundedRect
+        textField.clearButtonMode = .whileEditing
+        textField.placeholder = "Find something for yourself"
+        textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
+        textField.returnKeyType = .search
+        textField.leftViewMode = .always
+        textField.leftView = UIImageView(image: UIImage(systemName: "magnifyingglass"))
+        textField.leftView?.tintColor = .systemGray4
+        navigationItem.titleView = textField
     }
     
 }
