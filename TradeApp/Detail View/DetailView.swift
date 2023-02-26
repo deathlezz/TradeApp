@@ -17,7 +17,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     var removeButton: UIBarButtonItem!
     var isPushed: Bool!
     
-    var distance: String!
+//    var distance: String!
     var latitude: Double!
     var longitude: Double!
     
@@ -142,7 +142,7 @@ class DetailView: UITableViewController, Index, Coordinates {
                 cell.cityLabel.text = item.location
                 cell.cityLabel.font = UIFont.systemFont(ofSize: 14)
                 cell.cityLabel.numberOfLines = 0
-                cell.distanceLabel.text = distance ?? "--"
+                cell.distanceLabel.text = "--"
                 cell.distanceLabel.font = UIFont.systemFont(ofSize: 14)
                 cell.distanceLabel.numberOfLines = 0
                 cell.mapView.layer.cornerRadius = 8
@@ -262,9 +262,9 @@ class DetailView: UITableViewController, Index, Coordinates {
     }
     
     // push distance between user and item
-    func pushDistance(_ string: String) {
-        distance = string
-    }
+//    func pushDistance(_ string: String) {
+//        distance = string
+//    }
     
     // push item coordinates
     func pushCoords(_ lat: Double, _ long: Double) {

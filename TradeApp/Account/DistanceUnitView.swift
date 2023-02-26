@@ -13,6 +13,8 @@ class DistanceUnitView: UITableViewController {
     
     var segment: SegmentedControlCell!
     var unit: UITableViewCell!
+    
+    var currentUnit: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,6 +23,14 @@ class DistanceUnitView: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         tableView.separatorStyle = .none
         tableView.isScrollEnabled = false
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.currentUnit = Utilities.loadDistanceUnit()
+            
+            DispatchQueue.main.async {
+                self?.updateSegment()
+            }
+        }
 
     }
     
@@ -79,6 +89,15 @@ class DistanceUnitView: UITableViewController {
     func setDistanceUnit(_ unit: String) {
         let defaults = UserDefaults.standard
         defaults.set(unit, forKey: "DistanceUnit")
+    }
+    
+    // set segment control index
+    func updateSegment() {
+        if currentUnit == "mi" {
+            segment.segment.selectedSegmentIndex = 0
+        } else {
+            segment.segment.selectedSegmentIndex = 1
+        }
     }
 
 }

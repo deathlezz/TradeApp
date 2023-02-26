@@ -13,6 +13,8 @@ class FilterView: UITableViewController {
     var radiusStages = [0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 175, 200]
     var radiusCounter = 0
     
+    var currentUnit: String!
+    
     var categories = [String]()
     var currentFilters = [String: String]()
     
@@ -40,6 +42,7 @@ class FilterView: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateRadius), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         DispatchQueue.global().async { [weak self] in
+            self?.currentUnit = Utilities.loadDistanceUnit()
             self?.currentFilters = Utilities.loadFilters()
             self?.radiusCounter = Int(self?.currentFilters["Radius"] ?? "0") ?? 0
         }
@@ -96,7 +99,7 @@ class FilterView: UITableViewController {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "radiusCell", for: indexPath) as? RadiusCell {
             if sectionTitles[indexPath.section] == "Location" {
                 if indexPath.row == 1 {
-                    cell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
+                    cell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) \(currentUnit!)"
                     cell.minusButton.addTarget(self, action: #selector(minusTapped), for: .touchUpInside)
                     cell.plusButton.addTarget(self, action: #selector(plusTapped), for: .touchUpInside)
                     cell.selectionStyle = .none
@@ -259,9 +262,18 @@ class FilterView: UITableViewController {
                     Utilities().forwardGeocoding(address: locationText) { (lat, long) in
                         let cityLocation = CLLocation(latitude: lat, longitude: long)
                         
+                        var unit: Double
+                        
+                        if self?.currentUnit == "mi" {
+                            unit = 1609
+                        } else {
+                            unit = 1000
+                        }
+                        
                         for item in filteredItems {
+                            
                             let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
-                            let distance = Int(cityLocation.distance(from: itemLocation) / 1000)
+                            let distance = Int(cityLocation.distance(from: itemLocation) / unit)
                             
                             if Int(distance) <= radius {
                                 matched.append(item)
@@ -304,14 +316,14 @@ class FilterView: UITableViewController {
         
         priceCell.firstTextField.text = nil
         priceCell.secondTextField.text = nil
-        radiusCell.radiusLabel.text = "+ 0 km"
+        updateUnit()
         radiusCounter = 0
     }
     
     // set action for "return" keyboard button
     @objc func returnTapped(_ textField: UITextField) {
         if filterCells[2].filterTextField.text == "" {
-            radiusCell.radiusLabel.text = "+ 0 km"
+            updateUnit()
             radiusCounter = 0
         }
         
@@ -359,7 +371,12 @@ class FilterView: UITableViewController {
             radiusCounter = 0
         }
         
-        radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
+        if currentUnit == "mi" {
+            radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) mi"
+        } else {
+            radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
+        }
+        
     }
     
     // set action for tapped plus button
@@ -372,14 +389,28 @@ class FilterView: UITableViewController {
             radiusCounter = 16
         }
         
-        radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
+        if currentUnit == "mi" {
+            radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) mi"
+        } else {
+            radiusCell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) km"
+        }
     }
     
     // update radius
     @objc func updateRadius() {
         if filterCells[2].filterTextField.text == "" {
-            radiusCell.radiusLabel.text = "+ 0 km"
+            updateUnit()
+            
             radiusCounter = 0
+        }
+    }
+    
+    // update distance unit
+    func updateUnit() {
+        if currentUnit == "mi" {
+            radiusCell.radiusLabel.text = "+ 0 mi"
+        } else {
+            radiusCell.radiusLabel.text = "+ 0 km"
         }
     }
 

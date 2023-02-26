@@ -11,7 +11,7 @@ import CoreLocation
 
 protocol Coordinates {
     func pushCoords(_ lat: Double, _ long: Double)
-    func pushDistance(_ string: String)
+//    func pushDistance(_ string: String)
 }
 
 class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate {
@@ -24,6 +24,8 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
     var didGeocode: Bool!
     var locationManager: CLLocationManager!
     var item: CLLocation!
+    
+    var currentUnit: String!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -41,6 +43,10 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
         NotificationCenter.default.addObserver(self, selector: #selector(restoreMap), name: NSNotification.Name("restoreMap"), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(pushLocation), name: NSNotification.Name("pushLocation"), object: nil)
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.currentUnit = Utilities.loadDistanceUnit()
+        }
     }
 
     // set action for changed authorization
@@ -57,13 +63,19 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
             guard let itemLocation = item else { return }
             
             delegate?.pushCoords(itemLocation.coordinate.latitude, itemLocation.coordinate.longitude)
-
-            let distance = itemLocation.distance(from: location) / 1000
+            
+            var distance = itemLocation.distance(from: location)
+            
+            if currentUnit == "mi" {
+                distance /= 1609
+            } else {
+                distance /= 1000
+            }
+            
             let rounded = String(format: "%.0f", distance)
-            let string = "\(rounded) km from you"
-            distanceLabel.text = string
+            distanceLabel.text = updateUnit(rounded)
 
-            delegate?.pushDistance(string)
+//            delegate?.pushDistance(updateUnit(rounded))
         }
     }
 
@@ -130,6 +142,19 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
         }
 
         forwardGeocoding(address: location)
+    }
+    
+    // update distance unit
+    func updateUnit(_ text: String) -> String {
+        var result: String
+        
+        if currentUnit == "mi" {
+            result = "\(text) mi from you"
+        } else {
+            result = "\(text) km from you"
+        }
+        
+        return result
     }
 
 }

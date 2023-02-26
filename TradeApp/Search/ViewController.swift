@@ -98,12 +98,12 @@ class ViewController: UICollectionViewController {
     
     // set collection view header
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
                 headerView.textLabel.text = "Found \(filteredItems.count) ads"
                 headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 12)
+                headerView.textLabel.textColor = .darkGray
                 return headerView
             }
             
@@ -136,7 +136,6 @@ class ViewController: UICollectionViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
-        navigationController?.hidesBarsOnSwipe = true
         currentFilters = Utilities.loadFilters()
         changeTitle()
         hideButtons()

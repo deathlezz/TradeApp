@@ -55,6 +55,8 @@ class SearchView: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "historyCell", for: indexPath)
         cell.textLabel?.text = recentlySearched[indexPath.row]
+        cell.imageView?.image = UIImage(systemName: "clock")
+        cell.imageView?.tintColor = .systemGray
         return cell
     }
     
@@ -168,10 +170,23 @@ class SearchView: UITableViewController {
         textField.placeholder = "Find something for yourself"
         textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
         textField.returnKeyType = .search
-        textField.leftViewMode = .always
-        textField.leftView = UIImageView(image: UIImage(systemName: "magnifyingglass"))
-        textField.leftView?.tintColor = .systemGray4
+        
         navigationItem.titleView = textField
+        
+        let imageView = UIImageView(frame: CGRect(x: 6, y: 4, width: 22, height: 22))
+        let image = UIImage(systemName: "magnifyingglass")
+        imageView.image = image
+        imageView.tintColor = .systemGray4
+        imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = .clear
+        
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: 26, height: 30))
+        view.addSubview(imageView)
+        view.backgroundColor = .clear
+        
+        textField.leftViewMode = .always
+        textField.leftView?.tintColor = .systemGray4
+        textField.leftView = view
     }
     
 }

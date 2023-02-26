@@ -19,7 +19,6 @@ class CategoryView: UITableViewController {
         
         title = "Categories"
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.hidesBarsOnSwipe = false
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "categoryCell")
         

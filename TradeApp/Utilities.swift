@@ -113,6 +113,16 @@ class Utilities {
         }
     }
     
+    // load distance measurement unit
+    static func loadDistanceUnit() -> String {
+        let defaults = UserDefaults.standard
+        if let unit = defaults.object(forKey: "DistanceUnit") as? String {
+            return unit
+        } else {
+            return "mi"
+        }
+    }
+    
     // save saved items
     static func saveItems(_ items: [Item]) {
         let jsonEncoder = JSONEncoder()
