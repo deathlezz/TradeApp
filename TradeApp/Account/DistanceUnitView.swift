@@ -95,8 +95,10 @@ class DistanceUnitView: UITableViewController {
     func updateSegment() {
         if currentUnit == "mi" {
             segment.segment.selectedSegmentIndex = 0
+            unit.textLabel?.text = "1 mi = 1.609 km"
         } else {
             segment.segment.selectedSegmentIndex = 1
+            unit.textLabel?.text = "1 km = 0.621 mi"
         }
     }
 
