@@ -987,10 +987,10 @@
             </objects>
             <point key="canvasLocation" x="2630" y="2135"/>
         </scene>
-        <!--Distance Unit View-->
+        <!--Change Unit View-->
         <scene sceneID="dPq-Na-AGq">
             <objects>
-                <tableViewController storyboardIdentifier="DistanceUnitView" id="jlB-gV-x5x" customClass="DistanceUnitView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="ChangeUnitView" id="jlB-gV-x5x" customClass="ChangeUnitView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="n7A-66-JIj">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1026,7 +1026,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="120"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="1 mi = 1609 km" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="120" id="AeB-B2-iTP">
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="1 mi = 1.609 km" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="120" id="AeB-B2-iTP">
                                             <rect key="frame" x="20" y="0.0" width="353" height="120"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="22"/>
@@ -1046,6 +1046,72 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1BQ-kh-eis" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3533.5877862595416" y="2134.5070422535214"/>
+        </scene>
+        <!--Change Email View-->
+        <scene sceneID="6jh-SM-O9Y">
+            <objects>
+                <tableViewController storyboardIdentifier="ChangeEmailView" id="woL-Ab-gyP" customClass="ChangeEmailView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="Sgd-Vz-NLH">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="EmailCell" id="Ttf-6k-C4d" customClass="TextFieldCell" customModule="TradeApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Ttf-6k-C4d" id="j71-1Z-dAQ">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="FKv-C4-qyC">
+                                            <rect key="frame" x="20" y="4" width="353" height="34"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <textInputTraits key="textInputTraits" autocorrectionType="no" returnKeyType="done"/>
+                                        </textField>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="textField" destination="FKv-C4-qyC" id="jCC-7p-Mg0"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ButtonCell" rowHeight="70" id="hoB-9V-iiR" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="93.666667938232422" width="393" height="70"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hoB-9V-iiR" id="0u0-cK-VtA">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="70"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UWD-hf-itM">
+                                            <rect key="frame" x="20" y="4" width="353" height="62"/>
+                                            <state key="normal" title="Button"/>
+                                            <buttonConfiguration key="configuration" style="filled" title="Submit"/>
+                                        </button>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="UWD-hf-itM" firstAttribute="centerY" secondItem="0u0-cK-VtA" secondAttribute="centerY" id="1Zp-ga-v2s"/>
+                                        <constraint firstItem="UWD-hf-itM" firstAttribute="centerX" secondItem="0u0-cK-VtA" secondAttribute="centerX" id="6KD-bO-edq"/>
+                                        <constraint firstItem="UWD-hf-itM" firstAttribute="leading" secondItem="0u0-cK-VtA" secondAttribute="leading" constant="20" symbolic="YES" id="CeX-b8-Ypg"/>
+                                        <constraint firstItem="UWD-hf-itM" firstAttribute="width" secondItem="0u0-cK-VtA" secondAttribute="height" multiplier="353:70" id="W4P-d0-Rdi"/>
+                                        <constraint firstAttribute="trailing" secondItem="UWD-hf-itM" secondAttribute="trailing" constant="20" symbolic="YES" id="fbD-Gd-otI"/>
+                                        <constraint firstItem="UWD-hf-itM" firstAttribute="top" secondItem="0u0-cK-VtA" secondAttribute="top" constant="4" id="let-gL-LqQ"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="submitButton" destination="UWD-hf-itM" id="qoY-pH-iMB"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="woL-Ab-gyP" id="fk6-lS-hNt"/>
+                            <outlet property="delegate" destination="woL-Ab-gyP" id="Zkz-00-bEj"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kcl-2e-0wW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4429.7709923664124" y="2134.5070422535214"/>
         </scene>
         <!--Add-->
         <scene sceneID="qSk-8s-6XE">

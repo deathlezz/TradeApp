@@ -7,7 +7,7 @@
 
 import UIKit
 
-class DistanceUnitView: UITableViewController {
+class ChangeUnitView: UITableViewController {
     
     let sections = ["Segment", "Unit"]
     
@@ -22,7 +22,6 @@ class DistanceUnitView: UITableViewController {
         title = "Distance"
         navigationController?.navigationBar.prefersLargeTitles = true
         tableView.separatorStyle = .none
-        tableView.isScrollEnabled = false
         
         DispatchQueue.global().async { [weak self] in
             self?.currentUnit = Utilities.loadDistanceUnit()

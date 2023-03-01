@@ -24,7 +24,6 @@ class AccountView: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         tableView.separatorStyle = .none
-        tableView.isScrollEnabled = false
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AccountCell")
     }
     
@@ -112,9 +111,9 @@ class AccountView: UITableViewController {
         case "Settings":
             switch indexPath.row {
             case 0:
-                pushToDistanceView()
+                pushToChangeUnitView()
             case 1:
-                break
+                pushToChangeEmailView()
             case 2:
                 break
             default:
@@ -143,9 +142,17 @@ class AccountView: UITableViewController {
         present(ac, animated: true)
     }
     
-    // push vc to DistanceUnitView
-    func pushToDistanceView() {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "DistanceUnitView") as? DistanceUnitView {
+    // push vc to ChangeUnitView
+    func pushToChangeUnitView() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeUnitView") as? ChangeUnitView {
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    // push vc to ChangeEmailView
+    func pushToChangeEmailView() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeEmailView") as? ChangeEmailView {
+            vc.mail = mail
             navigationController?.pushViewController(vc, animated: true)
         }
     }

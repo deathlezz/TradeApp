@@ -135,7 +135,10 @@ class ViewController: UICollectionViewController {
     // refresh collection view before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        collectionView.reloadData()
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
+        navigationController?.isToolbarHidden = true
+        navigationController?.isNavigationBarHidden = false
         currentFilters = Utilities.loadFilters()
         changeTitle()
         hideButtons()
@@ -143,11 +146,11 @@ class ViewController: UICollectionViewController {
     }
     
     // hide toolbar after view appeared
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        navigationController?.isToolbarHidden = true
-        navigationController?.isNavigationBarHidden = false
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        navigationController?.isToolbarHidden = true
+//        navigationController?.isNavigationBarHidden = false
+//    }
     
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {

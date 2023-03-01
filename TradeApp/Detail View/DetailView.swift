@@ -216,7 +216,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         NotificationCenter.default.post(name: NSNotification.Name("pushLocation"), object: nil, userInfo: ["location": item.location])
     }
     
-    // set save/remove button icon
+    // show tab bar and navigation bar before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         

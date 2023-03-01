@@ -30,7 +30,6 @@ class LoginView: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         tableView.separatorStyle = .none
-        tableView.isScrollEnabled = false
         
         DispatchQueue.global().async { [weak self] in
             users["mail@wp.pl"] = "passWord123"
@@ -196,7 +195,7 @@ class LoginView: UITableViewController {
         }
     }
     
-    // check email address format "mail@domain.com"
+    // check email address format
     func isEmailValid() -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
