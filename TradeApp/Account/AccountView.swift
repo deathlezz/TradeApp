@@ -115,7 +115,7 @@ class AccountView: UITableViewController {
             case 1:
                 pushToChangeEmailView()
             case 2:
-                break
+                pushToChangePasswordView()
             default:
                 deleteAccount()
             }
@@ -152,6 +152,14 @@ class AccountView: UITableViewController {
     // push vc to ChangeEmailView
     func pushToChangeEmailView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeEmailView") as? ChangeEmailView {
+            vc.mail = mail
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    // push vc to ChangePasswordView
+    func pushToChangePasswordView() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangePasswordView") as? ChangePasswordView {
             vc.mail = mail
             navigationController?.pushViewController(vc, animated: true)
         }

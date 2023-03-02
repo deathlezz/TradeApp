@@ -101,6 +101,10 @@ class ChangeEmailView: UITableViewController {
             return showAlert(title: "Error", message: "Incorrect current address")
         }
         
+        guard currentMailText != newMailText else {
+            return showAlert(title: "Error", message: "New email can't be the same as the old one")
+        }
+        
         guard isEmailValid() else {
             return showAlert(title: "Error", message: "Incorrect new email format")
         }
@@ -121,7 +125,9 @@ class ChangeEmailView: UITableViewController {
         
         let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            users[mail] = to
+            let password = users[mail]
+            users[mail] = nil
+            users[to] = password
             Utilities.setUser(nil)
             self?.navigationController?.popToRootViewController(animated: true)
         })

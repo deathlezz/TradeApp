@@ -991,7 +991,7 @@
         <scene sceneID="dPq-Na-AGq">
             <objects>
                 <tableViewController storyboardIdentifier="ChangeUnitView" id="jlB-gV-x5x" customClass="ChangeUnitView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="n7A-66-JIj">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" id="n7A-66-JIj">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1051,7 +1051,7 @@
         <scene sceneID="6jh-SM-O9Y">
             <objects>
                 <tableViewController storyboardIdentifier="ChangeEmailView" id="woL-Ab-gyP" customClass="ChangeEmailView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="Sgd-Vz-NLH">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" id="Sgd-Vz-NLH">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1150,6 +1150,72 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jCb-ua-IH4" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="775" y="2135"/>
+        </scene>
+        <!--Change Password View-->
+        <scene sceneID="edA-FT-Cbe">
+            <objects>
+                <tableViewController storyboardIdentifier="ChangePasswordView" id="RLz-bh-Sn8" customClass="ChangePasswordView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" id="n6v-mV-p1b">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="PasswordCell" id="j1P-N5-KFW" customClass="TextFieldCell" customModule="TradeApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="j1P-N5-KFW" id="rj4-2E-3cY">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="UdW-Dc-Xnb">
+                                            <rect key="frame" x="20" y="4" width="353" height="34"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <textInputTraits key="textInputTraits" autocorrectionType="no" returnKeyType="done"/>
+                                        </textField>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="textField" destination="UdW-Dc-Xnb" id="b9w-ey-KWF"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ButtonCell" rowHeight="70" id="3Vl-f6-igm" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="93.666667938232422" width="393" height="70"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="3Vl-f6-igm" id="9mi-n9-45i">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="70"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gZE-bV-2XS">
+                                            <rect key="frame" x="20" y="4" width="353" height="62"/>
+                                            <state key="normal" title="Button"/>
+                                            <buttonConfiguration key="configuration" style="filled" title="Submit"/>
+                                        </button>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="gZE-bV-2XS" firstAttribute="width" secondItem="9mi-n9-45i" secondAttribute="height" multiplier="353:70" id="Hv8-Y3-c9r"/>
+                                        <constraint firstItem="gZE-bV-2XS" firstAttribute="centerY" secondItem="9mi-n9-45i" secondAttribute="centerY" id="Tqe-DY-IT2"/>
+                                        <constraint firstItem="gZE-bV-2XS" firstAttribute="leading" secondItem="9mi-n9-45i" secondAttribute="leading" constant="20" symbolic="YES" id="aFe-Da-IsN"/>
+                                        <constraint firstItem="gZE-bV-2XS" firstAttribute="centerX" secondItem="9mi-n9-45i" secondAttribute="centerX" id="ahM-2K-nfI"/>
+                                        <constraint firstAttribute="trailing" secondItem="gZE-bV-2XS" secondAttribute="trailing" constant="20" symbolic="YES" id="nOx-dM-AIU"/>
+                                        <constraint firstItem="gZE-bV-2XS" firstAttribute="top" secondItem="9mi-n9-45i" secondAttribute="top" constant="4" id="oxe-SQ-qLy"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="submitButton" destination="gZE-bV-2XS" id="Cw7-P4-4yt"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="RLz-bh-Sn8" id="Mro-do-czY"/>
+                            <outlet property="delegate" destination="RLz-bh-Sn8" id="Wc1-f9-5VI"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QDv-na-g9G" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5305" y="2135"/>
         </scene>
     </scenes>
     <resources>
