@@ -11,12 +11,7 @@ class ChangePasswordView: UITableViewController {
     
     let sections = ["Current password", "New password", "Repeat password", "Button"]
     
-//    var currentPassword: TextFieldCell!
-//    var newPassword: TextFieldCell!
-//    var repeatPassword: TextFieldCell!
-    
-    var cells = [TextFieldCell]()
-    
+    var cells = [TextFieldCell]()    
     var mail: String!
 
     override func viewDidLoad() {
@@ -51,6 +46,7 @@ class ChangePasswordView: UITableViewController {
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.placeholder = "yourPassword123"
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
+                cell.textField.isSecureTextEntry = true
                 cell.selectionStyle = .none
                 cells.append(cell)
                 return cell
@@ -58,6 +54,7 @@ class ChangePasswordView: UITableViewController {
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.placeholder = "yourNewPassword123"
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
+                cell.textField.isSecureTextEntry = true
                 cell.selectionStyle = .none
                 cells.append(cell)
                 return cell
@@ -65,6 +62,7 @@ class ChangePasswordView: UITableViewController {
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.placeholder = "yourNewPassword123"
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
+                cell.textField.isSecureTextEntry = true
                 cell.selectionStyle = .none
                 cells.append(cell)
                 return cell
@@ -98,17 +96,56 @@ class ChangePasswordView: UITableViewController {
     
     // set action for tapped button
     @objc func submitTapped() {
+        guard let currentPassword = cells[0].textField.text else { return }
+        guard let newPassword = cells[1].textField.text else { return }
+        guard let repeatPassword = cells[2].textField.text else { return }
         
+        guard currentPassword == users[mail] else {
+            return showAlert(title: "Error", message: "Wrong current password")
+        }
         
+        guard newPassword != currentPassword else {
+            return showAlert(title: "Error", message: "New password can't be the same as the old one")
+        }
+        
+        guard isPasswordValid() else {
+            return showAlert(title: "Error", message: "Wrong new password format")
+        }
+        
+        guard repeatPassword == newPassword else {
+            return showAlert(title: "Error", message: "Password repeated incorrectly")
+        }
+        
+        changePassword(to: newPassword)
     }
     
     // set password change function
     func changePassword(to: String) {
+        guard let mail = mail else { return }
+        guard let password = cells[1].textField.text else { return }
+        
+        users[mail] = password
+        Utilities.setUser(nil)
+        
+        let ac = UIAlertController(title: "Password has been changed", message: "You can sign in now", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+            self?.navigationController?.popToRootViewController(animated: true)
+        })
+        present(ac, animated: true)
         
     }
     
-    
-    
-    
+    // check password format
+    // check if password has minimum 8 characters at least 1 uppercase alphabet, 1 lowercase alphabet and 1 number
+    func isPasswordValid() -> Bool {
+        let passRegEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$"
+        let passPred = NSPredicate(format:"SELF MATCHES %@", passRegEx)
+        
+        if passPred.evaluate(with: cells[1].textField.text) {
+            return true
+        } else {
+            return false
+        }
+    }
 
 }

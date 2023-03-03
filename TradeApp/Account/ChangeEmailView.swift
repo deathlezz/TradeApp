@@ -123,12 +123,13 @@ class ChangeEmailView: UITableViewController {
     func changeEmail(to: String) {
         guard let mail = mail else { return }
         
+        let password = users[mail]
+        users[mail] = nil
+        users[to] = password
+        Utilities.setUser(nil)
+        
         let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            let password = users[mail]
-            users[mail] = nil
-            users[to] = password
-            Utilities.setUser(nil)
             self?.navigationController?.popToRootViewController(animated: true)
         })
         present(ac, animated: true)
