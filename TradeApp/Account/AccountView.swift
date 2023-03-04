@@ -108,6 +108,12 @@ class AccountView: UITableViewController {
     // set action for selected cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch sections[indexPath.section] {
+        case "Your ads":
+            if indexPath.row == 0 {
+                pushToActiveAdsView()
+            } else {
+                
+            }
         case "Settings":
             switch indexPath.row {
             case 0:
@@ -140,6 +146,13 @@ class AccountView: UITableViewController {
             self?.tableView.deselectRow(at: indexPath, animated: true)
         })
         present(ac, animated: true)
+    }
+    
+    // push vc to ActiveAdsView
+    func pushToActiveAdsView() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "ActiveAdsView") as? ActiveAdsView {
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // push vc to ChangeUnitView

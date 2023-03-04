@@ -237,7 +237,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 
                 if valid {
                     Utilities().forwardGeocoding(address: location!) { (lat, long) in
-                        let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0, lat: lat, long: long)
+                        let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0, saved: 0, lat: lat, long: long)
                         items.append(newItem)
                         recentlyAdded.append(newItem)
                         filteredItems = recentlyAdded

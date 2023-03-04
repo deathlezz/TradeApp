@@ -15,6 +15,8 @@
 		BC174177292D59FF0055A0B8 /* PriceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174176292D59FF0055A0B8 /* PriceCell.swift */; };
 		BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2626612944CDEA0049E7A9 /* CollectionTableViewCell.swift */; };
 		BC325C442986A0AD00EF83AB /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC325C432986A0AD00EF83AB /* HeaderView.swift */; };
+		BC54D04329B3DEDB00E6F45F /* ActiveAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC54D04229B3DEDB00E6F45F /* ActiveAdsView.swift */; };
+		BC54D04529B3EDDD00E6F45F /* AdCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC54D04429B3EDDD00E6F45F /* AdCell.swift */; };
 		BC56DC822997B678002790B8 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC56DC812997B678002790B8 /* LoginView.swift */; };
 		BC56DC842997B6F4002790B8 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC56DC832997B6F4002790B8 /* AccountView.swift */; };
 		BC56DC872997C20C002790B8 /* SegmentedControlCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC56DC862997C20C002790B8 /* SegmentedControlCell.swift */; };
@@ -53,6 +55,8 @@
 		BC174176292D59FF0055A0B8 /* PriceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceCell.swift; sourceTree = "<group>"; };
 		BC2626612944CDEA0049E7A9 /* CollectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionTableViewCell.swift; sourceTree = "<group>"; };
 		BC325C432986A0AD00EF83AB /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
+		BC54D04229B3DEDB00E6F45F /* ActiveAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveAdsView.swift; sourceTree = "<group>"; };
+		BC54D04429B3EDDD00E6F45F /* AdCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdCell.swift; sourceTree = "<group>"; };
 		BC56DC812997B678002790B8 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		BC56DC832997B6F4002790B8 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 		BC56DC862997C20C002790B8 /* SegmentedControlCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControlCell.swift; sourceTree = "<group>"; };
@@ -135,6 +139,8 @@
 				BC611B9C29AA9C2C00F259FD /* ChangeUnitView.swift */,
 				BC16850129AF625A002ED0C5 /* ChangeEmailView.swift */,
 				BC72B09329B0C92E00703FF4 /* ChangePasswordView.swift */,
+				BC54D04229B3DEDB00E6F45F /* ActiveAdsView.swift */,
+				BC54D04429B3EDDD00E6F45F /* AdCell.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -277,6 +283,7 @@
 				BC174171292D46B30055A0B8 /* FilterView.swift in Sources */,
 				BC5A4EE9292BAC3A003A20B7 /* DetailView.swift in Sources */,
 				BC69075B2939247F005D1EAB /* PhotosCell.swift in Sources */,
+				BC54D04329B3DEDB00E6F45F /* ActiveAdsView.swift in Sources */,
 				BC56DC842997B6F4002790B8 /* AccountView.swift in Sources */,
 				BC6770702927D4A600985CAB /* SearchView.swift in Sources */,
 				BC67B219298C6245000E45D1 /* RadiusCell.swift in Sources */,
@@ -298,6 +305,7 @@
 				BC16850229AF625A002ED0C5 /* ChangeEmailView.swift in Sources */,
 				BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */,
 				BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */,
+				BC54D04529B3EDDD00E6F45F /* AdCell.swift in Sources */,
 				BC56DC822997B678002790B8 /* LoginView.swift in Sources */,
 				BC5CB880293B7EF10017AE69 /* TextViewCell.swift in Sources */,
 				BC174177292D59FF0055A0B8 /* PriceCell.swift in Sources */,
