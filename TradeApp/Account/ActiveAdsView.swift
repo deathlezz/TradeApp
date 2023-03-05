@@ -17,28 +17,31 @@ class ActiveAdsView: UITableViewController {
         title = "Active"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        tableView.separatorStyle = .none
+        tableView.separatorStyle = .singleLine
         tableView.sectionHeaderTopPadding = 0
+        tableView.separatorInset.left = 17
+        tableView.contentInset.top = -10
+        tableView.setContentOffset(CGPoint(x: 0, y: -40), animated: false)
     }
     
     // set number of sections
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return activeAds
+        return 1
     }
     
     // set header title for each section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return ""
+        return "Found \(activeAds) ads"
     }
     
     // set header height
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 10
+        return 35
     }
     
     // set number of rows
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return activeAds
     }
     
     // set header font
@@ -51,7 +54,10 @@ class ActiveAdsView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "AdCell", for: indexPath) as? AdCell {
-            return cell
+            if indexPath.section == 0 {
+                cell.separatorInset = .zero
+                return cell
+            }
         }
         return UITableViewCell()
     }
