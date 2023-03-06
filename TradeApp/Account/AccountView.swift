@@ -10,7 +10,7 @@ import UIKit
 class AccountView: UITableViewController {
     
     let sections = ["User", "Your ads", "Settings", "Sign out"]
-    let settingsSection = ["Change distance unit", "Change email", "Change password", "Delete account"]
+    let settingsSection = ["Change distance unit", "Change phone number", "Change email", "Change password", "Delete account"]
     
     var mail: String!
     
@@ -40,7 +40,7 @@ class AccountView: UITableViewController {
         case 1:
             return 2
         default:
-            return 4
+            return settingsSection.count
         }
     }
     
@@ -85,8 +85,10 @@ class AccountView: UITableViewController {
             case 0:
                 cell.imageView?.image = UIImage(systemName: "lines.measurement.horizontal")
             case 1:
-                cell.imageView?.image = UIImage(systemName: "at")
+                cell.imageView?.image = UIImage(systemName: "phone")
             case 2:
+                cell.imageView?.image = UIImage(systemName: "at")
+            case 3:
                 cell.imageView?.image = UIImage(systemName: "lock")
             default:
                 cell.imageView?.image = UIImage(systemName: "trash")
@@ -119,8 +121,10 @@ class AccountView: UITableViewController {
             case 0:
                 pushToChangeUnitView()
             case 1:
-                pushToChangeEmailView()
+                pushToChangePhoneNumber()
             case 2:
+                pushToChangeEmailView()
+            case 3:
                 pushToChangePasswordView()
             default:
                 deleteAccount()
@@ -142,7 +146,7 @@ class AccountView: UITableViewController {
             self?.navigationController?.popToRootViewController(animated: true)
         })
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
-            let indexPath = IndexPath(row: 3, section: 2)
+            let indexPath = IndexPath(row: 4, section: 2)
             self?.tableView.deselectRow(at: indexPath, animated: true)
         })
         present(ac, animated: true)
@@ -160,6 +164,11 @@ class AccountView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeUnitView") as? ChangeUnitView {
             navigationController?.pushViewController(vc, animated: true)
         }
+    }
+    
+    // push vc to ChangePhoneNumber
+    func pushToChangePhoneNumber() {
+        
     }
     
     // push vc to ChangeEmailView
