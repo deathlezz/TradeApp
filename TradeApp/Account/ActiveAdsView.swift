@@ -80,6 +80,11 @@ class ActiveAdsView: UITableViewController {
         }
     }
     
+    // set action for tapped cell
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+    }
+    
     // set action for tapped state button
     @objc func stateTapped() {
         

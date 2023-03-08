@@ -121,7 +121,7 @@ class AccountView: UITableViewController {
             case 0:
                 pushToChangeUnitView()
             case 1:
-                pushToChangePhoneNumber()
+                pushToChangeNumberView()
             case 2:
                 pushToChangeEmailView()
             case 3:
@@ -155,6 +155,7 @@ class AccountView: UITableViewController {
     // push vc to ActiveAdsView
     func pushToActiveAdsView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ActiveAdsView") as? ActiveAdsView {
+            vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -162,19 +163,24 @@ class AccountView: UITableViewController {
     // push vc to ChangeUnitView
     func pushToChangeUnitView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeUnitView") as? ChangeUnitView {
+            vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
     }
     
-    // push vc to ChangePhoneNumber
-    func pushToChangePhoneNumber() {
-        
+    // push vc to ChangeNumberView
+    func pushToChangeNumberView() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeNumberView") as? ChangeNumberView {
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // push vc to ChangeEmailView
     func pushToChangeEmailView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeEmailView") as? ChangeEmailView {
             vc.mail = mail
+            vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -183,6 +189,7 @@ class AccountView: UITableViewController {
     func pushToChangePasswordView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangePasswordView") as? ChangePasswordView {
             vc.mail = mail
+            vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
     }

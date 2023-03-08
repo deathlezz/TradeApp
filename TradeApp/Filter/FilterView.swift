@@ -31,7 +31,6 @@ class FilterView: UITableViewController {
         super.viewDidLoad()
         
         tableView.separatorStyle = .none
-        tableView.isScrollEnabled = false
         
         title = "Filter"
         navigationController?.navigationBar.prefersLargeTitles = true

@@ -84,12 +84,7 @@ class ChangeEmailView: UITableViewController {
     func isEmailValid() -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        
-        if emailPred.evaluate(with: newEmail.textField.text) {
-            return true
-        } else {
-            return false
-        }
+        return emailPred.evaluate(with: newEmail.textField.text)
     }
     
     // set action for tapped button

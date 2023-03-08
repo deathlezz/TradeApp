@@ -1047,6 +1047,72 @@
             </objects>
             <point key="canvasLocation" x="3533.5877862595416" y="2134.5070422535214"/>
         </scene>
+        <!--Change Number View-->
+        <scene sceneID="szx-SD-cbg">
+            <objects>
+                <tableViewController storyboardIdentifier="ChangeNumberView" id="4iE-vQ-OEz" customClass="ChangeNumberView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="interactive" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="NyR-sP-uQY">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="NumberCell" id="ypX-iu-ebg" customClass="TextFieldCell" customModule="TradeApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ypX-iu-ebg" id="CNg-VI-OgG">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="NJW-nG-5gg">
+                                            <rect key="frame" x="20" y="4" width="353" height="34"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                        </textField>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="textField" destination="NJW-nG-5gg" id="dFX-CX-bXv"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ButtonCell" rowHeight="70" id="8mf-Mf-Ows" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="93.666667938232422" width="393" height="70"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="8mf-Mf-Ows" id="kld-1o-Meo">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="70"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ed2-Qj-MnY">
+                                            <rect key="frame" x="20" y="4" width="353" height="62"/>
+                                            <state key="normal" title="Button"/>
+                                            <buttonConfiguration key="configuration" style="filled" title="Submit"/>
+                                        </button>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="ed2-Qj-MnY" firstAttribute="top" secondItem="kld-1o-Meo" secondAttribute="top" constant="4" id="WfJ-JI-ciU"/>
+                                        <constraint firstItem="ed2-Qj-MnY" firstAttribute="width" secondItem="kld-1o-Meo" secondAttribute="height" multiplier="353:70" id="nG2-sh-3DR"/>
+                                        <constraint firstItem="ed2-Qj-MnY" firstAttribute="centerX" secondItem="kld-1o-Meo" secondAttribute="centerX" id="oIa-ef-yCN"/>
+                                        <constraint firstItem="ed2-Qj-MnY" firstAttribute="centerY" secondItem="kld-1o-Meo" secondAttribute="centerY" id="pHb-9v-Sih"/>
+                                        <constraint firstAttribute="trailing" secondItem="ed2-Qj-MnY" secondAttribute="trailing" constant="20" symbolic="YES" id="pWx-sO-80p"/>
+                                        <constraint firstItem="ed2-Qj-MnY" firstAttribute="leading" secondItem="kld-1o-Meo" secondAttribute="leading" constant="20" symbolic="YES" id="rzA-Fd-dnn"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="submitButton" destination="ed2-Qj-MnY" id="Abi-Ko-pF5"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="4iE-vQ-OEz" id="3eE-gU-XxA"/>
+                            <outlet property="delegate" destination="4iE-vQ-OEz" id="ccQ-Lf-19d"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7VP-7e-Lbj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4438.9312977099235" y="2134.5070422535214"/>
+        </scene>
         <!--Change Email View-->
         <scene sceneID="6jh-SM-O9Y">
             <objects>
@@ -1111,7 +1177,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kcl-2e-0wW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4429.7709923664124" y="2134.5070422535214"/>
+            <point key="canvasLocation" x="5349" y="2135"/>
         </scene>
         <!--Add-->
         <scene sceneID="qSk-8s-6XE">
@@ -1215,7 +1281,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QDv-na-g9G" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5305" y="2135"/>
+            <point key="canvasLocation" x="6285" y="2135"/>
         </scene>
         <!--Active Ads View-->
         <scene sceneID="wDl-OE-hQq">
@@ -1312,7 +1378,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9To-Oj-g6M" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6168.7022900763359" y="2134.5070422535214"/>
+            <point key="canvasLocation" x="7236" y="2135"/>
         </scene>
     </scenes>
     <resources>

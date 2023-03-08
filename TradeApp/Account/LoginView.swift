@@ -199,12 +199,7 @@ class LoginView: UITableViewController {
     func isEmailValid() -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        
-        if emailPred.evaluate(with: email.textField.text) {
-            return true
-        } else {
-            return false
-        }
+        return emailPred.evaluate(with: email.textField.text)
     }
     
     // check password format
@@ -212,12 +207,7 @@ class LoginView: UITableViewController {
     func isPasswordValid() -> Bool {
         let passRegEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$"
         let passPred = NSPredicate(format:"SELF MATCHES %@", passRegEx)
-        
-        if passPred.evaluate(with: password.textField.text) {
-            return true
-        } else {
-            return false
-        }
+        return passPred.evaluate(with: password.textField.text)
     }
     
     // set alert for incorect textField input

@@ -140,12 +140,7 @@ class ChangePasswordView: UITableViewController {
     func isPasswordValid() -> Bool {
         let passRegEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$"
         let passPred = NSPredicate(format:"SELF MATCHES %@", passRegEx)
-        
-        if passPred.evaluate(with: cells[1].textField.text) {
-            return true
-        } else {
-            return false
-        }
+        return passPred.evaluate(with: cells[1].textField.text)
     }
 
 }
