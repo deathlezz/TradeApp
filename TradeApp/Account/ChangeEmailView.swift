@@ -117,10 +117,9 @@ class ChangeEmailView: UITableViewController {
     // set email change function
     func changeEmail(to: String) {
         guard let mail = mail else { return }
+        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
         
-        let password = users[mail]
-        users[mail] = nil
-        users[to] = password
+        users[index].mail = newEmail.textField.text
         Utilities.setUser(nil)
         
         let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)

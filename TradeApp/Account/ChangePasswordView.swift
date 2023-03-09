@@ -100,19 +100,25 @@ class ChangePasswordView: UITableViewController {
         guard let newPassword = cells[1].textField.text else { return }
         guard let repeatPassword = cells[2].textField.text else { return }
         
-        guard currentPassword == users[mail] else {
+        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+        
+        guard currentPassword == users[index].mail else {
+            cells[0].textField.text = nil
             return showAlert(title: "Error", message: "Wrong current password")
         }
         
         guard newPassword != currentPassword else {
+            cells[1].textField.text = nil
             return showAlert(title: "Error", message: "New password can't be the same as the old one")
         }
         
         guard isPasswordValid() else {
+            cells[1].textField.text = nil
             return showAlert(title: "Error", message: "Wrong new password format")
         }
         
         guard repeatPassword == newPassword else {
+            cells[2].textField.text = nil
             return showAlert(title: "Error", message: "Password repeated incorrectly")
         }
         
@@ -124,7 +130,9 @@ class ChangePasswordView: UITableViewController {
         guard let mail = mail else { return }
         guard let password = cells[1].textField.text else { return }
         
-        users[mail] = password
+        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+        
+        users[index].password = password
         Utilities.setUser(nil)
         
         let ac = UIAlertController(title: "Password has been changed", message: "You can sign in now", preferredStyle: .alert)

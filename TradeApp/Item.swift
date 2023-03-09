@@ -8,16 +8,16 @@
 import Foundation
 
 struct Item: Codable {
-    let photos: [Data?]
-    let title: String
-    let price: Int
-    let category: String
-    let location: String
-    let description: String
-    let date: Date
+    var photos: [Data?]
+    var title: String
+    var price: Int
+    var category: String
+    var location: String
+    var description: String
+    var date: Date
     var views: Int
     var saved: Int
-    let lat: Double
-    let long: Double
-//    let itemID: Int
+    var lat: Double
+    var long: Double
+//    var itemID: Int
 }

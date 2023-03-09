@@ -140,10 +140,12 @@ class AccountView: UITableViewController {
     func deleteAccount() {
         let ac = UIAlertController(title: "Delete account", message: "Are you sure, you want to delete your account?", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
-            guard let email = self?.mail else { return }
-            users[email] = nil
+            guard let mail = self?.mail else { return }
+            guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+            users.remove(at: index)
             Utilities.setUser(nil)
             self?.navigationController?.popToRootViewController(animated: true)
+            self?.showAlert(title: "Success", message: "Your account has been deleted")
         })
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
             let indexPath = IndexPath(row: 4, section: 2)
@@ -192,6 +194,13 @@ class AccountView: UITableViewController {
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
+    }
+    
+    // set alert for incorect textField input
+    func showAlert(title: String, message: String) {
+        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
     }
     
 }

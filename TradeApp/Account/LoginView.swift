@@ -32,7 +32,8 @@ class LoginView: UITableViewController {
         tableView.separatorStyle = .none
         
         DispatchQueue.global().async { [weak self] in
-            users["mail@wp.pl"] = "passWord123"
+            let newUser = User(mail: "mail@wp.pl", password: "passWord123")
+            users.append(newUser)
             self?.loggedUser = Utilities.loadUser()
             
             DispatchQueue.main.async {
@@ -146,10 +147,11 @@ class LoginView: UITableViewController {
     @objc func submitTapped() {
         let mail = email.textField.text!
         let passText = password.textField.text
-        
+                
         if segment.segment.selectedSegmentIndex == 0 {
-            if users.contains(where: {$0.key == mail}) {
-                guard users[mail] == passText else {
+            if let index = users.firstIndex(where: {$0.mail == mail}) {
+                
+                guard users[index].password == passText else {
                     password.textField.text = nil
                     return showAlert(title: "Error", message: "Wrong password")
                 }
@@ -184,13 +186,13 @@ class LoginView: UITableViewController {
             }
             
             // new user account created
-            if !users.contains(where: {$0.key == mail}) {
-                users[mail] = passText
+            if let _ = users.firstIndex(where: {$0.mail == mail}) {
+                showAlert(title: "Error", message: "This email is already used")
+            } else {
+                let newUser = User(mail: mail, password: passText)
+                users.append(newUser)
                 resetView(.register)
                 showAlert(title: "Success", message: "You can sign in now")
-                
-            } else {
-                showAlert(title: "Error", message: "This email is already used")
             }
         }
     }
