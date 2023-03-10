@@ -102,18 +102,22 @@ class ChangePasswordView: UITableViewController {
         
         guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
         
-        guard currentPassword == users[index].mail else {
-            cells[0].textField.text = nil
+        guard currentPassword == users[index].password else {
+            for cell in cells {
+                cell.textField.text = nil
+            }
             return showAlert(title: "Error", message: "Wrong current password")
         }
         
         guard newPassword != currentPassword else {
             cells[1].textField.text = nil
+            cells[2].textField.text = nil
             return showAlert(title: "Error", message: "New password can't be the same as the old one")
         }
         
         guard isPasswordValid() else {
             cells[1].textField.text = nil
+            cells[2].textField.text = nil
             return showAlert(title: "Error", message: "Wrong new password format")
         }
         

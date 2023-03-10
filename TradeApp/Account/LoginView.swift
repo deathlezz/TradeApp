@@ -177,6 +177,8 @@ class LoginView: UITableViewController {
             }
             
             guard isPasswordValid() else {
+                password.textField.text = nil
+                repeatPassword.textField.text = nil
                 return showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*")
             }
             
@@ -191,8 +193,7 @@ class LoginView: UITableViewController {
             } else {
                 let newUser = User(mail: mail, password: passText)
                 users.append(newUser)
-                resetView(.register)
-                showAlert(title: "Success", message: "You can sign in now")
+                accountCreatedAlert()
             }
         }
     }
@@ -212,7 +213,7 @@ class LoginView: UITableViewController {
         return passPred.evaluate(with: password.textField.text)
     }
     
-    // set alert for incorect textField input
+    // set alert for correct/incorect textField input
     func showAlert(title: String, message: String) {
         let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default))
@@ -245,6 +246,15 @@ class LoginView: UITableViewController {
             vc.navigationItem.hidesBackButton = true
             navigationController?.pushViewController(vc, animated: true)
         }
+    }
+    
+    // set alert for created account
+    func accountCreatedAlert() {
+        let ac = UIAlertController(title: "Success", message: "You can sign in now", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+            self?.resetView(.register)
+        })
+        present(ac, animated: true)
     }
 
 }

@@ -114,6 +114,17 @@ class ViewController: UICollectionViewController {
         return UICollectionReusableView()
     }
     
+    // set hide/show bars on scroll
+    override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if velocity.y > 0 {
+            navigationController?.setNavigationBarHidden(true, animated: true)
+            setTabBarHidden(true, animated: true)
+        } else {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+            setTabBarHidden(false, animated: true)
+        }
+    }
+    
     // set action for categories button
     @objc func categoriesTapped() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "CategoryView") as? CategoryView {
@@ -135,7 +146,6 @@ class ViewController: UICollectionViewController {
     // refresh collection view before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        collectionView.reloadData()
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
         navigationController?.isToolbarHidden = true
         navigationController?.isNavigationBarHidden = false
@@ -144,13 +154,6 @@ class ViewController: UICollectionViewController {
         hideButtons()
         collectionView.reloadData()
     }
-    
-    // hide toolbar after view appeared
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//        navigationController?.isToolbarHidden = true
-//        navigationController?.isNavigationBarHidden = false
-//    }
     
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
@@ -236,6 +239,22 @@ class ViewController: UICollectionViewController {
     func resetFilters() {
         currentFilters.removeAll()
         Utilities.saveFilters(currentFilters)
+    }
+    
+    // set hide/show tab bar
+    func setTabBarHidden(_ hidden: Bool, animated: Bool) {
+        guard let tabBar = self.tabBarController?.tabBar else { return }
+        if tabBar.isHidden == hidden { return }
+        let frame = tabBar.frame
+        let offset = hidden ? frame.size.height : -frame.size.height
+        let duration = animated ? 0.2 : 0.0
+        tabBar.isHidden = false
+
+        UIView.animate(withDuration: duration, animations: {
+            tabBar.frame = frame.offsetBy(dx: 0, dy: offset)
+        }, completion: { (true) in
+            tabBar.isHidden = hidden
+        })
     }
     
 }

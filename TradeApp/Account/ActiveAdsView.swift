@@ -80,6 +80,15 @@ class ActiveAdsView: UITableViewController {
         }
     }
     
+    // set hide/show bars on scroll
+    override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if velocity.y > 0 {
+            navigationController?.setNavigationBarHidden(true, animated: true)
+        } else {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+        }
+    }
+    
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         

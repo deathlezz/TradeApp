@@ -139,6 +139,17 @@ class SavedView: UICollectionViewController {
         return UICollectionReusableView()
     }
     
+    // set hide/show bars on scroll
+    override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if velocity.y > 0 {
+            navigationController?.setNavigationBarHidden(true, animated: true)
+            setTabBarHidden(true, animated: false)
+        } else {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+            setTabBarHidden(false, animated: true)
+        }
+    }
+    
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
         collectionView.reloadData()
@@ -239,6 +250,22 @@ class SavedView: UICollectionViewController {
         } else {
             label?.text = "Found \(savedItems.count) ads"
         }
+    }
+    
+    // set hide/show tab bar
+    func setTabBarHidden(_ hidden: Bool, animated: Bool) {
+        guard let tabBar = self.tabBarController?.tabBar else { return }
+        if tabBar.isHidden == hidden { return }
+        let frame = tabBar.frame
+        let offset = hidden ? frame.size.height : -frame.size.height
+        let duration = animated ? 0.2 : 0.0
+        tabBar.isHidden = false
+
+        UIView.animate(withDuration: duration, animations: {
+            tabBar.frame = frame.offsetBy(dx: 0, dy: offset)
+        }, completion: { (true) in
+            tabBar.isHidden = hidden
+        })
     }
     
 }

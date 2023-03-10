@@ -22,6 +22,7 @@ class ChangeUnitView: UITableViewController {
         title = "Distance"
         navigationController?.navigationBar.prefersLargeTitles = true
         tableView.separatorStyle = .none
+        tableView.contentInset.top = 30
         
         DispatchQueue.global().async { [weak self] in
             self?.currentUnit = Utilities.loadDistanceUnit()
