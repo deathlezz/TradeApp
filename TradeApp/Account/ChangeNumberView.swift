@@ -7,11 +7,20 @@
 
 import UIKit
 
+enum NumberAction {
+    case add
+    case delete
+}
+
 class ChangeNumberView: UITableViewController {
     
-    let sections = ["Current number", "New number", "Button"]
+    var sections = ["New number", "Button"]
     
-    var cells = [TextFieldCell]()
+    var oldNumber: UITableViewCell!
+    var newNumber: TextFieldCell!
+    
+    var mail: String!
+    var currentNumber: Int!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +29,14 @@ class ChangeNumberView: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
 
         tableView.separatorStyle = .none
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.loadCurrentNumber()
+            
+            DispatchQueue.main.async {
+//                self?.updateRows()
+            }
+        }
     }
     
     // set number of sections
@@ -29,7 +46,16 @@ class ChangeNumberView: UITableViewController {
     
     // set header title for each section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        section == 2 ? " " : sections[section]
+        switch sections[section] {
+        case "New number":
+            if currentNumber != nil {
+                return sections[section]
+            } else {
+                return "Set number"
+            }
+        default:
+            return " "
+        }
     }
     
     // set number of rows in each section
@@ -39,20 +65,13 @@ class ChangeNumberView: UITableViewController {
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "NumberCell", for: indexPath) as? TextFieldCell {
-            if sections[indexPath.section] == "Current number" {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "NewNumberCell", for: indexPath) as? TextFieldCell {
+            if sections[indexPath.section] == "New number" {
                 cell.textField.placeholder = "e.g. 1234567890"
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 cell.textField.clearButtonMode = .whileEditing
                 cell.selectionStyle = .none
-                cells.append(cell)
-                return cell
-            } else if sections[indexPath.section] == "New number" {
-                cell.textField.placeholder = "e.g. 1234567890"
-                cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
-                cell.textField.clearButtonMode = .whileEditing
-                cell.selectionStyle = .none
-                cells.append(cell)
+                newNumber = cell
                 return cell
             }
         }
@@ -65,16 +84,50 @@ class ChangeNumberView: UITableViewController {
             }
         }
         
+        if currentNumber != nil {
+            if sections[indexPath.section] == "Current number" {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentNumberCell", for: indexPath)
+                cell.textLabel?.text = "\(currentNumber!)"
+                cell.selectionStyle = .none
+                oldNumber = cell
+                return cell
+            }
+        }
+        
         return UITableViewCell()
     }
     
     // set action for tapped button
     @objc func submitTapped() {
-        if isNumberValid() {
+        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+        
+        if isNumberValid() && sections.count == 2 {
             print("number valid")
+            users[index].phoneNumber = Int(newNumber.textField.text!)
+            currentNumber = Int(newNumber.textField.text!)
+            newNumber.textField.text = nil
+            updateRows()
+        } else if isNumberValid() && sections.count == 3 {
+            print("phone number changed")
+            users[index].phoneNumber = Int(newNumber.textField.text!)
+            currentNumber = Int(newNumber.textField.text!)
+            newNumber.textField.text = nil
+            updateNumberCell()
+        } else if newNumber.textField.text == "" && sections.count == 3 {
+            print("number cleared")
+            users[index].phoneNumber = Int(newNumber.textField.text!)
+            newNumber.textField.text = nil
+            currentNumber = nil
+            updateRows()
         } else {
             print("number invalid")
+            showAlert(title: "Error", message: "Invalid number format")
         }
+    }
+    
+    // add "done" button to numeric keyboard
+    override func viewDidAppear(_ animated: Bool) {
+        addDoneButtonToKeyboard()
     }
     
     // set action for "return" keyboard button
@@ -86,16 +139,75 @@ class ChangeNumberView: UITableViewController {
     func isNumberValid() -> Bool {
         let phoneRegex = "^[0-9+]{0,1}+[0-9]{6,14}$"
         let phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneRegex)
-        return phoneTest.evaluate(with: cells[1].textField.text)
+        return phoneTest.evaluate(with: newNumber.textField.text)
     }
     
-    // set alert for incorect textField input
+    // load user's current phone number
+    func loadCurrentNumber() {
+        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+        currentNumber = users[index].phoneNumber
+    }
+    
+    // update table view rows
+    func updateRows() {
+        let indexSet = IndexSet(integer: 0)
+        
+        if currentNumber != nil {
+            sections = ["Current number", "New number", "Button"]
+            tableView.insertSections(indexSet, with: .automatic)
+            updateHeader(after: .add)
+        } else {
+            sections = ["New number", "Button"]
+            tableView.deleteSections(indexSet, with: .automatic)
+            updateHeader(after: .delete)
+        }
+    }
+    
+    // update table view header
+    func updateHeader(after: NumberAction) {
+        tableView.beginUpdates()
+        
+        if after == .add {
+            tableView.headerView(forSection: 1)?.textLabel?.text = "New number"
+            tableView.headerView(forSection: 1)?.textLabel?.sizeToFit()
+        } else {
+            tableView.headerView(forSection: 0)?.textLabel?.text = "Set number"
+        }
+        
+        tableView.endUpdates()
+    }
+    
+    // set alert for correct/incorect textField input
     func showAlert(title: String, message: String) {
         let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
     }
     
+    // update phone number cell
+    func updateNumberCell() {
+        let indexPath = IndexPath(row: 0, section: 0)
+        oldNumber.textLabel?.text = String(currentNumber)
+        tableView.reloadRows(at: [indexPath], with: .automatic)
+    }
     
-
+    // set "done" button for numeric keyboard
+    func addDoneButtonToKeyboard() {
+        let doneToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        doneToolbar.barStyle = .default
+        
+        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(doneTapped))
+        
+        let items = [spacer, done]
+        doneToolbar.items = items
+        doneToolbar.sizeToFit()
+        
+        newNumber.textField.inputAccessoryView = doneToolbar
+    }
+    
+    // set action for tapped "done" button
+    @objc func doneTapped() {
+        newNumber.textField.resignFirstResponder()
+    }
 }

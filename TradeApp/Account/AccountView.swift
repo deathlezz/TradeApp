@@ -173,6 +173,7 @@ class AccountView: UITableViewController {
     // push vc to ChangeNumberView
     func pushToChangeNumberView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeNumberView") as? ChangeNumberView {
+            vc.mail = mail
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
