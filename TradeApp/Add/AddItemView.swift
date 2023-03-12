@@ -107,7 +107,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 textFieldCells.append(cell)
                 return cell
             case "Location":
-                cell.textField.placeholder = "City"
+                cell.textField.placeholder = "e.g. City"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)

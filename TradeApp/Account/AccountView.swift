@@ -157,6 +157,7 @@ class AccountView: UITableViewController {
     // push vc to ActiveAdsView
     func pushToActiveAdsView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ActiveAdsView") as? ActiveAdsView {
+            vc.mail = mail
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }

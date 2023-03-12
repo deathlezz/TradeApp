@@ -12,6 +12,8 @@ class ActiveAdsView: UITableViewController {
     var activeAds = 6
     var header: UILabel!
     
+    var mail: String!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -70,6 +72,15 @@ class ActiveAdsView: UITableViewController {
         return UITableViewCell()
     }
     
+    // set action for tapped cell
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
+            guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+            vc.item = users[index].items[indexPath.row]
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
@@ -87,11 +98,6 @@ class ActiveAdsView: UITableViewController {
         } else {
             navigationController?.setNavigationBarHidden(false, animated: true)
         }
-    }
-    
-    // set action for tapped cell
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
     }
     
     // set action for tapped state button
