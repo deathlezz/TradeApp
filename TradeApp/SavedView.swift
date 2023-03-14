@@ -79,7 +79,7 @@ class SavedView: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if navigationItem.rightBarButtonItems == [selectButton] {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-                vc.imgs = savedItems[indexPath.item].photos.map {UIImage(data: $0!)}
+//                vc.imgs = savedItems[indexPath.item].photos.map {UIImage(data: $0!)}
                 vc.item = savedItems[indexPath.item]
                 vc.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(vc, animated: true)

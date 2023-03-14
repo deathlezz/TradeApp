@@ -18,6 +18,8 @@ class ViewController: UICollectionViewController {
     
     var filterButton: UIBarButtonItem!
     var sortButton: UIBarButtonItem!
+    
+    var mail = "mail@wp.pl"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,7 +50,11 @@ class ViewController: UICollectionViewController {
         
         DispatchQueue.global().async { [weak self] in
             self?.resetFilters()
+            let newUser = User(mail: "mail@wp.pl", password: "passWord123")
+            users.append(newUser)
             self?.loadData()
+            
+//            self?.mail = Utilities.loadUser()
             
             DispatchQueue.main.async {
                 self?.collectionView.reloadData()
@@ -89,7 +95,7 @@ class ViewController: UICollectionViewController {
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-            vc.imgs = filteredItems[indexPath.item].photos.map {UIImage(data: $0!)}
+//            vc.imgs = filteredItems[indexPath.item].photos.map {UIImage(data: $0!)}
             vc.item = filteredItems[indexPath.item]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
@@ -177,13 +183,23 @@ class ViewController: UICollectionViewController {
         let car = UIImage(systemName: "car")?.pngData()
         let plus = UIImage(systemName: "plus")?.pngData()
         
+        print("before index")
+        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+        print("after index")
+        
         for _ in 0...3 {
             let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 0, saved: 0, lat: 51.50334660, long: -0.07939650)
             let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date(), views: 0, saved: 0, lat: 56.116524, long: -3.936903)
             let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date(), views: 0, saved: 0, lat: 55.864239, long: -4.251806)
-            items.append(tesla)
-            items.append(bmw)
-            items.append(fiat)
+            
+            users[index].items.append(tesla)
+            users[index].items.append(bmw)
+            users[index].items.append(fiat)
+            
+            
+//            items.append(tesla)
+//            items.append(bmw)
+//            items.append(fiat)
             recentlyAdded.append(fiat)
         }
         

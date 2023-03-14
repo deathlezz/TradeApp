@@ -11,7 +11,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     var savedItems = [Item]()
     
-    var imgs = [UIImage?]()
+//    var imgs = [UIImage?]()
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
@@ -105,7 +105,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         switch sectionTitles[indexPath.section] {
         case "Image":
             if let cell = tableView.dequeueReusableCell(withIdentifier: "detailCollectionView") as? DetailViewCell {
-                cell.imgs = imgs
+                cell.imgs = item.photos.map {UIImage(data: $0!)}
                 cell.delegate = self
                 cell.selectionStyle = .none
                 return cell
@@ -247,7 +247,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     func pushIndex(index: Int) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ItemView") as? ItemView {
             vc.currentImage = index
-            vc.imgs = imgs
+            vc.imgs = item.photos.map {UIImage(data: $0!)}
             isPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }

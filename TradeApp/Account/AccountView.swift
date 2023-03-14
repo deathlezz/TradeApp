@@ -23,6 +23,8 @@ class AccountView: UITableViewController {
         title = "Account"
         navigationController?.navigationBar.prefersLargeTitles = true
         
+        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
+        
         tableView.separatorStyle = .none
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AccountCell")
     }
@@ -203,6 +205,12 @@ class AccountView: UITableViewController {
         let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
+    }
+    
+    // set title color before view appears
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
     }
     
 }
