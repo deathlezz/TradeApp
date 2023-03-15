@@ -47,7 +47,7 @@ extension UIImage {
 class Utilities {
     
     // city name validation
-    func isCityValid(_ city: String, completion: @escaping (Bool) -> Void) {
+    static func isCityValid(_ city: String, completion: @escaping (Bool) -> Void) {
         let geocoder = CLGeocoder()
         let locale = Locale(identifier: "en")
         geocoder.geocodeAddressString(city, in: nil, preferredLocale: locale, completionHandler: { (placemarks, error) in
@@ -68,7 +68,7 @@ class Utilities {
     }
     
     // change city name to coordinates
-    func forwardGeocoding(address: String, completion: @escaping (Double, Double) -> Void) {
+    static func forwardGeocoding(address: String, completion: @escaping (Double, Double) -> Void) {
         let geocoder = CLGeocoder()
         let locale = Locale(identifier: "en")
         geocoder.geocodeAddressString(address, in: nil, preferredLocale: locale, completionHandler: { (placemarks, error) in
@@ -174,26 +174,26 @@ class Utilities {
         
         // location filter
         if currentLocation != nil {
-            filteredItems = filteredItems.filter {$0.location == currentLocation}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.location == currentLocation}
         }
         
         // price filter
         if currentPriceFrom != nil && currentPriceTo != nil {
-            filteredItems = filteredItems.filter {$0.price >= Int(currentPriceFrom!)! && $0.price <= Int(currentPriceTo!)!}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(currentPriceFrom!)! && $0.price <= Int(currentPriceTo!)!}
         } else if currentPriceFrom != nil {
-            filteredItems = filteredItems.filter {$0.price >= Int(currentPriceFrom!)!}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(currentPriceFrom!)!}
         } else if currentPriceTo != nil {
-            filteredItems = filteredItems.filter {$0.price <= Int(currentPriceTo!)!}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price <= Int(currentPriceTo!)!}
         }
         
         // sort filter
         if currentSort != nil {
             if currentSort == "Lowest price" {
-                filteredItems.sort(by: {$0.price < $1.price})
+                Storage.shared.filteredItems.sort(by: {$0.price < $1.price})
             } else if currentSort == "Highest price" {
-                filteredItems.sort(by: {$0.price > $1.price})
+                Storage.shared.filteredItems.sort(by: {$0.price > $1.price})
             } else if currentSort == "Date added" {
-                filteredItems.sort(by: {$0.date < $1.date})
+                Storage.shared.filteredItems.sort(by: {$0.date < $1.date})
             }
         }
     }

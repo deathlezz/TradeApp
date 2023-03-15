@@ -75,20 +75,20 @@ class SearchView: UITableViewController {
         // category filter
         if currentCategory != nil {
             if currentCategory == categories[0] {
-                filteredItems = items
+                Storage.shared.filteredItems = Storage.shared.items
             } else if currentCategory != categories[0] {
-                filteredItems = items.filter {$0.category == currentCategory}
+                Storage.shared.filteredItems = Storage.shared.items.filter {$0.category == currentCategory}
             }
         }
         
         if !word.isEmpty && currentFilters["Category"] != nil {
-            filteredItems = filteredItems.filter {$0.title.lowercased().contains(word.lowercased())}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.title.lowercased().contains(word.lowercased())}
             Utilities.manageFilters(currentFilters)
             isUnique(word)
             currentFilters["Search"] = word
 
         } else if !word.isEmpty && currentFilters["Category"] == nil {
-            filteredItems = items.filter {$0.title.lowercased().contains(word.lowercased())}
+            Storage.shared.filteredItems = Storage.shared.items.filter {$0.title.lowercased().contains(word.lowercased())}
             Utilities.manageFilters(currentFilters)
             isUnique(word)
             currentFilters["Category"] = categories[0]
@@ -99,7 +99,7 @@ class SearchView: UITableViewController {
             currentFilters["Search"] = nil
 
         } else if word.isEmpty && currentFilters["Category"] == nil {
-            filteredItems = recentlyAdded
+            Storage.shared.filteredItems = Storage.shared.recentlyAdded
             currentFilters.removeAll()
         }
         

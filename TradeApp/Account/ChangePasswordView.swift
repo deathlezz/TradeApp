@@ -100,9 +100,9 @@ class ChangePasswordView: UITableViewController {
         guard let newPassword = cells[1].textField.text else { return }
         guard let repeatPassword = cells[2].textField.text else { return }
         
-        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         
-        guard currentPassword == users[index].password else {
+        guard currentPassword == Storage.shared.users[index].password else {
             for cell in cells {
                 cell.textField.text = nil
             }
@@ -134,9 +134,9 @@ class ChangePasswordView: UITableViewController {
         guard let mail = mail else { return }
         guard let password = cells[1].textField.text else { return }
         
-        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         
-        users[index].password = password
+        Storage.shared.users[index].password = password
         Utilities.setUser(nil)
         
         let ac = UIAlertController(title: "Password has been changed", message: "You can sign in now", preferredStyle: .alert)

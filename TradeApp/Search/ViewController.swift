@@ -19,7 +19,7 @@ class ViewController: UICollectionViewController {
     var filterButton: UIBarButtonItem!
     var sortButton: UIBarButtonItem!
     
-    var mail = "mail@wp.pl"
+    var mail: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,10 +51,10 @@ class ViewController: UICollectionViewController {
         DispatchQueue.global().async { [weak self] in
             self?.resetFilters()
             let newUser = User(mail: "mail@wp.pl", password: "passWord123")
-            users.append(newUser)
+            Storage.shared.users.append(newUser)
+            self?.mail = Utilities.loadUser()
             self?.loadData()
-            
-//            self?.mail = Utilities.loadUser()
+            self?.loadItems()
             
             DispatchQueue.main.async {
                 self?.collectionView.reloadData()
@@ -69,7 +69,7 @@ class ViewController: UICollectionViewController {
     
     // number of items in section
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return filteredItems.count
+        return Storage.shared.filteredItems.count
     }
     
     // set collection view cell
@@ -77,13 +77,13 @@ class ViewController: UICollectionViewController {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
             fatalError("Unable to dequeue itemCell")
         }
-        let thumbnail = UIImage(data: filteredItems[indexPath.item].photos[0]!)
+        let thumbnail = UIImage(data: Storage.shared.filteredItems[indexPath.item].photos[0]!)
         
         cell.image.image = thumbnail
-        cell.title.text = filteredItems[indexPath.item].title
-        cell.price.text = "£\(filteredItems[indexPath.item].price)"
-        cell.location.text = filteredItems[indexPath.item].location
-        cell.date.text = filteredItems[indexPath.item].date.formatDate()
+        cell.title.text = Storage.shared.filteredItems[indexPath.item].title
+        cell.price.text = "£\(Storage.shared.filteredItems[indexPath.item].price)"
+        cell.location.text = Storage.shared.filteredItems[indexPath.item].location
+        cell.date.text = Storage.shared.filteredItems[indexPath.item].date.formatDate()
         cell.layer.borderWidth = 0.2
         cell.layer.borderColor = UIColor.lightGray.cgColor
         cell.layer.cornerRadius = 10
@@ -96,7 +96,7 @@ class ViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
 //            vc.imgs = filteredItems[indexPath.item].photos.map {UIImage(data: $0!)}
-            vc.item = filteredItems[indexPath.item]
+            vc.item = Storage.shared.filteredItems[indexPath.item]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -107,7 +107,7 @@ class ViewController: UICollectionViewController {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
-                headerView.textLabel.text = "Found \(filteredItems.count) ads"
+                headerView.textLabel.text = "Found \(Storage.shared.filteredItems.count) ads"
                 headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 12)
                 headerView.textLabel.textColor = .darkGray
                 return headerView
@@ -184,7 +184,7 @@ class ViewController: UICollectionViewController {
         let plus = UIImage(systemName: "plus")?.pngData()
         
         print("before index")
-        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         print("after index")
         
         for _ in 0...3 {
@@ -192,37 +192,33 @@ class ViewController: UICollectionViewController {
             let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date(), views: 0, saved: 0, lat: 56.116524, long: -3.936903)
             let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date(), views: 0, saved: 0, lat: 55.864239, long: -4.251806)
             
-            users[index].items.append(tesla)
-            users[index].items.append(bmw)
-            users[index].items.append(fiat)
+            Storage.shared.users[index].items.append(tesla)
+            Storage.shared.users[index].items.append(bmw)
+            Storage.shared.users[index].items.append(fiat)
             
-            
-//            items.append(tesla)
-//            items.append(bmw)
-//            items.append(fiat)
-            recentlyAdded.append(fiat)
+            Storage.shared.recentlyAdded.append(fiat)
         }
         
-        filteredItems = recentlyAdded
+        Storage.shared.filteredItems = Storage.shared.recentlyAdded
     }
     
     // sort items in the array
     @objc func sort() {
         let ac = UIAlertController(title: "Sort items by", message: nil, preferredStyle: .actionSheet)
         ac.addAction(UIAlertAction(title: "Lowest price", style: .default) { [weak self] _ in
-            filteredItems.sort(by: {$0.price < $1.price})
+            Storage.shared.filteredItems.sort(by: {$0.price < $1.price})
             self?.currentFilters["Sort"] = "Lowest price"
             Utilities.saveFilters(self!.currentFilters)
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Highest price", style: .default) { [weak self] _ in
-            filteredItems.sort(by: {$0.price > $1.price})
+            Storage.shared.filteredItems.sort(by: {$0.price > $1.price})
             self?.currentFilters["Sort"] = "Highest price"
             Utilities.saveFilters(self!.currentFilters)
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Date added", style: .default) { [weak self] _ in
-            filteredItems.sort(by: {$0.date < $1.date})
+            Storage.shared.filteredItems.sort(by: {$0.date < $1.date})
             self?.currentFilters["Sort"] = "Date added"
             Utilities.saveFilters(self!.currentFilters)
             self?.collectionView.reloadData()
@@ -271,6 +267,18 @@ class ViewController: UICollectionViewController {
         }, completion: { (true) in
             tabBar.isHidden = hidden
         })
+    }
+    
+    // load all active items
+    func loadItems() {
+        let users = Storage.shared.users
+        
+        for user in users {
+            for item in user.items {
+                Storage.shared.items.append(item!)
+            }
+        }
+        print(Storage.shared.items.count)
     }
     
 }

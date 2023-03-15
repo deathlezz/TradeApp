@@ -19,8 +19,6 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     
     var delegate: ImagePicker?
     
-//    var images = [UIImage]()
-    
     override func awakeFromNib() {
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -31,7 +29,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         NotificationCenter.default.addObserver(self, selector: #selector(reloadView), name: NSNotification.Name("reload"), object: nil)
         
         for _ in 0...7 {
-            images.append(UIImage(systemName: "plus")!)
+            AddItemView.shared.images.append(UIImage(systemName: "plus")!)
         }
     }
     
@@ -45,7 +43,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? PhotosCell {
             
             cell.layer.cornerRadius = 10
-            cell.imageView.image = images[indexPath.item]
+            cell.imageView.image = AddItemView.shared.images[indexPath.item]
             return cell
         }
         
@@ -57,7 +55,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         
         delegate?.pushIndex(indexPath: indexPath.item)
         
-        if images[indexPath.item] == UIImage(systemName: "plus") {
+        if AddItemView.shared.images[indexPath.item] == UIImage(systemName: "plus") {
             delegate?.addNewPhoto()
         } else {
             delegate?.editPhoto()
@@ -66,8 +64,8 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     
     // item has been dragged
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        guard images.filter({$0 != UIImage(systemName: "plus")}).count > 1 else { return [] }
-        let item = images[indexPath.item]
+        guard AddItemView.shared.images.filter({$0 != UIImage(systemName: "plus")}).count > 1 else { return [] }
+        let item = AddItemView.shared.images[indexPath.item]
         guard item != UIImage(systemName: "plus") else { return [] }
         let itemProvider = NSItemProvider(object: item)
         let dragItem = UIDragItem(itemProvider: itemProvider)
@@ -87,7 +85,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     // item has been dropped
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
         var destinationIndexPath: IndexPath
-        let numberOfPhotos = images.filter {$0 != UIImage(systemName: "plus")}.count
+        let numberOfPhotos = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}.count
         
         if let indexPath = coordinator.destinationIndexPath {
             if indexPath.item < numberOfPhotos {
@@ -113,8 +111,8 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
            let sourceIndexPath = item.sourceIndexPath {
             
             collectionView.performBatchUpdates({
-                images.remove(at: sourceIndexPath.item)
-                images.insert(item.dragItem.localObject as! UIImage, at: destinationIndexPath.item)
+                AddItemView.shared.images.remove(at: sourceIndexPath.item)
+                AddItemView.shared.images.insert(item.dragItem.localObject as! UIImage, at: destinationIndexPath.item)
                 
                 collectionView.deleteItems(at: [sourceIndexPath])
                 collectionView.insertItems(at: [destinationIndexPath])

@@ -26,6 +26,9 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
     
+    static let shared = AddItemView()
+    var images = [UIImage]()
+    
     let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
     let sectionTitles = ["Photos", "Title", "Price", "Category", "Location", "Description", "Button"]
@@ -178,10 +181,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         textViewCell?.textView.text = nil
         
-        images.removeAll()
+        AddItemView.shared.images.removeAll()
         
         for _ in 0...7 {
-            images.append(UIImage(systemName: "plus")!)
+            AddItemView.shared.images.append(UIImage(systemName: "plus")!)
         }
 
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
@@ -225,22 +228,22 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for submit button
     @objc func submitTapped() {
-        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
+        let photos = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
         let title = textFieldCells[0].textField.text?.capitalized
         let price = textFieldCells[1].textField.text
         let category = textFieldCells[2].textField.text
         let location = textFieldCells[3].textField.text?.capitalized
         let description = textViewCell?.textView.text
         
-        Utilities().isCityValid(location!) { [weak self] valid in
+        Utilities.isCityValid(location!) { [weak self] valid in
             if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
                 
                 if valid {
-                    Utilities().forwardGeocoding(address: location!) { (lat, long) in
+                    Utilities.forwardGeocoding(address: location!) { (lat, long) in
                         let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0, saved: 0, lat: lat, long: long)
-                        items.append(newItem)
-                        recentlyAdded.append(newItem)
-                        filteredItems = recentlyAdded
+                        Storage.shared.items.append(newItem)
+                        Storage.shared.recentlyAdded.append(newItem)
+                        Storage.shared.filteredItems = Storage.shared.recentlyAdded
                         self?.showAlert(.success)
                     }
                     
@@ -314,11 +317,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         dismiss(animated: true)
         
         if action == .edit {
-            images[index] = image
+            AddItemView.shared.images[index] = image
         } else {
-            for i in 0...images.count {
-                if images[i] == UIImage(systemName: "plus") {
-                    images[i] = image
+            for i in 0...AddItemView.shared.images.count {
+                if AddItemView.shared.images[i] == UIImage(systemName: "plus") {
+                    AddItemView.shared.images[i] = image
                     break
                 }
             }
@@ -358,10 +361,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // remove photo
     func deletePhoto() {
-        images[index] = UIImage(systemName: "plus")!
-        let plusImages = images.filter {$0 == UIImage(systemName: "plus")}
-        images = images.filter {$0 != UIImage(systemName: "plus")}
-        images += plusImages
+        AddItemView.shared.images[index] = UIImage(systemName: "plus")!
+        let plusImages = AddItemView.shared.images.filter {$0 == UIImage(systemName: "plus")}
+        AddItemView.shared.images = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}
+        AddItemView.shared.images += plusImages
         action = nil
         index = nil
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
@@ -374,15 +377,15 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // rotate photo by 90 degrees using Core Image
     func rotatePhoto() {
-        let photo = images[index]
-        images[index] = photo.rotate(radians: -.pi / 2)!
+        let photo = AddItemView.shared.images[index]
+        AddItemView.shared.images[index] = photo.rotate(radians: -.pi / 2)!
         
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // swap current image with the first one
     func setAsFirst() {
-        (images[0], images[index]) = (images[index], images[0])
+        (AddItemView.shared.images[0], AddItemView.shared.images[index]) = (AddItemView.shared.images[index], AddItemView.shared.images[0])
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     

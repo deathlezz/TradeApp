@@ -134,8 +134,8 @@ class ActiveAdsView: UITableViewController {
     
     // load user's active ads
     func loadUserAds() {
-        guard let index = users.firstIndex(where: {$0.mail == mail}) else { return }
-        ads = users[index].items
+        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        ads = Storage.shared.users[index].items
     }
     
     // hide toolbar before view appears

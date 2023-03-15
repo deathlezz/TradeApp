@@ -176,25 +176,25 @@ class FilterView: UITableViewController {
         let radius = radiusStages[radiusCounter]
         
         if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
-            filteredItems = items.filter {$0.category == currentFilters["Category"]}
-            filteredItems = filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+            Storage.shared.filteredItems = Storage.shared.items.filter {$0.category == currentFilters["Category"]}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
         } else if currentFilters["Search"] != nil {
-            filteredItems = items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+            Storage.shared.filteredItems = Storage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
         } else if currentFilters["Category"] != nil {
-            filteredItems = items.filter {$0.category == currentFilters["Category"]}
+            Storage.shared.filteredItems = Storage.shared.items.filter {$0.category == currentFilters["Category"]}
         }
         
         // category filter
         if !categoryText.isEmpty {
             if categoryText == categories[0] && currentFilters["Search"] != nil {
-                filteredItems = items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+                Storage.shared.filteredItems = Storage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
             } else if categoryText == categories[0] && currentFilters["Search"] == nil {
-                filteredItems = items
+                Storage.shared.filteredItems = Storage.shared.items
             } else if categoryText != categories[0] && currentFilters["Search"] != nil {
-                filteredItems = items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-                filteredItems = filteredItems.filter {$0.category == categoryText}
+                Storage.shared.filteredItems = Storage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+                Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.category == categoryText}
             } else if categoryText != categories[0] && currentFilters["Search"] == nil {
-                filteredItems = items.filter {$0.category == categoryText}
+                Storage.shared.filteredItems = Storage.shared.items.filter {$0.category == categoryText}
             }
 
             currentFilters["Category"] = categoryText
@@ -209,15 +209,15 @@ class FilterView: UITableViewController {
                 (priceFrom, priceTo) = (priceTo, priceFrom)
             }
             
-            filteredItems = filteredItems.filter {$0.price >= Int(priceFrom)! && $0.price <= Int(priceTo)!}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(priceFrom)! && $0.price <= Int(priceTo)!}
             currentFilters["PriceFrom"] = priceFrom
             currentFilters["PriceTo"] = priceTo
         } else if !priceFrom.isEmpty {
-            filteredItems = filteredItems.filter {$0.price >= Int(priceFrom)!}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(priceFrom)!}
             currentFilters["PriceFrom"] = priceFrom
             currentFilters["PriceTo"] = nil
         } else if !priceTo.isEmpty {
-            filteredItems = filteredItems.filter {$0.price <= Int(priceTo)!}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price <= Int(priceTo)!}
             currentFilters["PriceTo"] = priceTo
             currentFilters["PriceFrom"] = nil
         } else {
@@ -228,11 +228,11 @@ class FilterView: UITableViewController {
         // sort filter
         if !sortText.isEmpty {
             if sortText == "Lowest price" {
-                filteredItems.sort(by: {$0.price < $1.price})
+                Storage.shared.filteredItems.sort(by: {$0.price < $1.price})
             } else if sortText == "Highest price" {
-                filteredItems.sort(by: {$0.price > $1.price})
+                Storage.shared.filteredItems.sort(by: {$0.price > $1.price})
             } else if sortText == "Date added" {
-                filteredItems.sort(by: {$0.date < $1.date})
+                Storage.shared.filteredItems.sort(by: {$0.date < $1.date})
             }
             
             currentFilters["Sort"] = sortText
@@ -242,7 +242,7 @@ class FilterView: UITableViewController {
         
         // reset filters
         if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
-            filteredItems = recentlyAdded
+            Storage.shared.filteredItems = Storage.shared.recentlyAdded
             currentFilters.removeAll()
             Utilities.saveFilters(currentFilters)
             navigationController?.popToRootViewController(animated: true)
@@ -256,9 +256,9 @@ class FilterView: UITableViewController {
             let dispatchGroup = DispatchGroup()
             dispatchGroup.enter()
             
-            Utilities().isCityValid(locationText) { [weak self] valid in
+            Utilities.isCityValid(locationText) { [weak self] valid in
                 if valid {
-                    Utilities().forwardGeocoding(address: locationText) { (lat, long) in
+                    Utilities.forwardGeocoding(address: locationText) { (lat, long) in
                         let cityLocation = CLLocation(latitude: lat, longitude: long)
                         
                         var unit: Double
@@ -269,7 +269,7 @@ class FilterView: UITableViewController {
                             unit = 1000
                         }
                         
-                        for item in filteredItems {
+                        for item in Storage.shared.filteredItems {
                             
                             let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
                             let distance = Int(cityLocation.distance(from: itemLocation) / unit)
@@ -290,7 +290,7 @@ class FilterView: UITableViewController {
             }
             
             dispatchGroup.notify(queue: .main) {
-                filteredItems = matched
+                Storage.shared.filteredItems = matched
                 self.currentFilters["Location"] = locationText
                 self.currentFilters["Radius"] = String(self.radiusCounter)
                 

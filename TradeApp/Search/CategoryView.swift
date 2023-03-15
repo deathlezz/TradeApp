@@ -43,10 +43,10 @@ class CategoryView: UITableViewController {
         let conf = UIImage.SymbolConfiguration(scale: .large)
         
         if indexPath.row == 0 {
-            cell.detailTextLabel?.text = "\(items.count) ads"
+            cell.detailTextLabel?.text = "\(Storage.shared.items.count) ads"
             cell.imageView?.image = UIImage(systemName: "cart", withConfiguration: conf)
         } else {
-            cell.detailTextLabel?.text = "\(items.filter {$0.category == "\(categories[indexPath.row])"}.count) ads"
+            cell.detailTextLabel?.text = "\(Storage.shared.items.filter {$0.category == "\(categories[indexPath.row])"}.count) ads"
             cell.imageView?.image = UIImage(systemName: categoryImages[indexPath.row - 1], withConfiguration: conf)
         }
         
@@ -61,13 +61,13 @@ class CategoryView: UITableViewController {
         let word = categories[indexPath.row]
         
         if word == categories[0] {
-            filteredItems = items
+            Storage.shared.filteredItems = Storage.shared.items
         } else if word != categories[0] {
-            filteredItems = items.filter {$0.category == word}
+            Storage.shared.filteredItems = Storage.shared.items.filter {$0.category == word}
         }
         
         if currentFilters["Search"] != nil {
-            filteredItems = filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
             Utilities.manageFilters(currentFilters)
         } else if currentFilters["Search"] == nil {
             Utilities.manageFilters(currentFilters)
