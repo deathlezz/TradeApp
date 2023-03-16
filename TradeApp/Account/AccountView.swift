@@ -14,16 +14,14 @@ class AccountView: UITableViewController {
     
     var mail: String!
     
-    var active = 0
-    var ended = 0
+    var active: Int!
+    var ended: Int!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         title = "Account"
         navigationController?.navigationBar.prefersLargeTitles = true
-        
-        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
         
         tableView.separatorStyle = .none
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AccountCell")
@@ -72,11 +70,11 @@ class AccountView: UITableViewController {
             
         case "Your ads":
             if indexPath.row == 0 {
-                cell.textLabel?.text = "Active: \(active)"
+                cell.textLabel?.text = "Active: \(active ?? 0)"
                 cell.accessoryType = .disclosureIndicator
                 cell.imageView?.image = UIImage(systemName: "checkmark")
             } else {
-                cell.textLabel?.text = "Ended: \(ended)"
+                cell.textLabel?.text = "Ended: \(ended ?? 0)"
                 cell.accessoryType = .disclosureIndicator
                 cell.imageView?.image = UIImage(systemName: "xmark")
             }
@@ -211,6 +209,26 @@ class AccountView: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
+        updateSection()
+    }
+    
+    // load number of active/ended items
+    func loadItemsNumber() {
+        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        active = Storage.shared.users[index].activeItems.count
+        ended = Storage.shared.users[index].endedItems.count
+    }
+    
+    // update user ads section
+    func updateSection() {
+        DispatchQueue.global().async { [weak self] in
+            self?.loadItemsNumber()
+            
+            DispatchQueue.main.async {
+                let indexSet = IndexSet(integer: 1)
+                self?.tableView.reloadSections(indexSet, with: .automatic)
+            }
+        }
     }
     
 }

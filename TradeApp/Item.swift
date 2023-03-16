@@ -19,5 +19,5 @@ struct Item: Codable {
     var saved: Int
     var lat: Double
     var long: Double
-//    var itemID: Int
+    var id: Int
 }

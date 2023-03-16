@@ -7,11 +7,13 @@
 
 import UIKit
 
-class ViewController: UICollectionViewController {
+class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
     var currentFilters = [String: String]()
+    
+    var delegate: UITabBarController!
     
     var categoriesButton: UIBarButtonItem!
     var searchButton: UIBarButtonItem!
@@ -27,6 +29,8 @@ class ViewController: UICollectionViewController {
         
         title = "Recently added"
         navigationController?.navigationBar.prefersLargeTitles = true
+        
+        tabBarController?.delegate = self
         
         categoriesButton = UIBarButtonItem(image: .init(systemName: "line.horizontal.3"), style: .plain, target: self, action: #selector(categoriesTapped))
         
@@ -163,6 +167,7 @@ class ViewController: UICollectionViewController {
     
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
+        loadItems()
         collectionView.reloadData()
         refreshControl.endRefreshing()
     }
@@ -188,13 +193,13 @@ class ViewController: UICollectionViewController {
         print("after index")
         
         for _ in 0...3 {
-            let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 0, saved: 0, lat: 51.50334660, long: -0.07939650)
-            let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date(), views: 0, saved: 0, lat: 56.116524, long: -3.936903)
-            let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date(), views: 0, saved: 0, lat: 55.864239, long: -4.251806)
+            let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 0, saved: 0, lat: 51.50334660, long: -0.07939650, id: itemID())
+            let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date(), views: 0, saved: 0, lat: 56.116524, long: -3.936903, id: itemID())
+            let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date(), views: 0, saved: 0, lat: 55.864239, long: -4.251806, id: itemID())
             
-            Storage.shared.users[index].items.append(tesla)
-            Storage.shared.users[index].items.append(bmw)
-            Storage.shared.users[index].items.append(fiat)
+            Storage.shared.users[index].activeItems.append(tesla)
+            Storage.shared.users[index].activeItems.append(bmw)
+            Storage.shared.users[index].activeItems.append(fiat)
             
             Storage.shared.recentlyAdded.append(fiat)
         }
@@ -271,14 +276,37 @@ class ViewController: UICollectionViewController {
     
     // load all active items
     func loadItems() {
+        Storage.shared.items.removeAll()
         let users = Storage.shared.users
         
         for user in users {
-            for item in user.items {
+            for item in user.activeItems {
                 Storage.shared.items.append(item!)
             }
         }
         print(Storage.shared.items.count)
+    }
+    
+    // stop double tap for all tab items
+    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        return viewController != tabBarController.selectedViewController
+    }
+    
+    // create unique item ID
+    func itemID() -> Int {
+        var uniqueID: Int!
+        let usedIDs = Storage.shared.items.map {$0.id}
+        let range = 10000000...99999999
+        
+        while uniqueID == nil {
+            let random = range.randomElement()
+            
+            if !usedIDs.contains(random!) {
+                uniqueID = random
+                break
+            }
+        }
+        return uniqueID
     }
     
 }

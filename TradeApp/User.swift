@@ -8,7 +8,8 @@
 import Foundation
 
 struct User: Codable {
-    var items = [Item?]()
+    var activeItems = [Item?]()
+    var endedItems = [Item?]()
     var mail: String?
     var password: String?
     var phoneNumber: Int?

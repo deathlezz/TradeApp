@@ -240,7 +240,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 
                 if valid {
                     Utilities.forwardGeocoding(address: location!) { (lat, long) in
-                        let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0, saved: 0, lat: lat, long: long)
+                        let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
                         Storage.shared.items.append(newItem)
                         Storage.shared.recentlyAdded.append(newItem)
                         Storage.shared.filteredItems = Storage.shared.recentlyAdded
@@ -387,6 +387,23 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     func setAsFirst() {
         (AddItemView.shared.images[0], AddItemView.shared.images[index]) = (AddItemView.shared.images[index], AddItemView.shared.images[0])
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+    }
+    
+    // create unique item ID
+    func itemID() -> Int {
+        var uniqueID: Int!
+        let usedIDs = Storage.shared.items.map {$0.id}
+        let range = 10000000...99999999
+        
+        while uniqueID == nil {
+            let random = range.randomElement()
+            
+            if !usedIDs.contains(random!) {
+                uniqueID = random
+                break
+            }
+        }
+        return uniqueID
     }
     
 }
