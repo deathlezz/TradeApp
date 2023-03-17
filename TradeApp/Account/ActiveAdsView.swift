@@ -103,9 +103,15 @@ class ActiveAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+            guard let itemID = activeAds[indexPath.row]?.id else { return }
+            
+            Storage.shared.items.removeAll(where: {$0.id == itemID})
+            Storage.shared.filteredItems.removeAll(where: {$0.id == itemID})
+            
             Storage.shared.users[index].activeItems.remove(at: indexPath.row)
             activeAds.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
+            
+            tableView.deleteRows(at: [indexPath], with: .fade)
             updateHeader()
         }
     }
@@ -168,13 +174,17 @@ class ActiveAdsView: UITableViewController {
     // finish the ad
     func finishAd(_ sender: UIButton) {
         guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        let item = activeAds[sender.tag]
-        Storage.shared.users[index].endedItems.append(item)
+        guard let itemID = activeAds[sender.tag]?.id else { return }
         
-        Storage.shared.users[index].activeItems.remove(at: sender.tag)
-        activeAds.remove(at: sender.tag)
+        Storage.shared.users[index].endedItems.append(activeAds[sender.tag])
         
-        let indexPath = IndexPath(row: index, section: 0)
+        Storage.shared.users[index].activeItems.removeAll(where: {$0?.id == itemID})
+        activeAds.removeAll(where: {$0?.id == itemID})
+        
+        Storage.shared.items.removeAll(where: {$0.id == itemID})
+        Storage.shared.filteredItems.removeAll(where: {$0.id == itemID})
+        
+        let indexPath = IndexPath(row: sender.tag, section: 0)
         tableView.deleteRows(at: [indexPath], with: .fade)
         updateHeader()
     }
