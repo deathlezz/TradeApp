@@ -16,6 +16,9 @@ class ChangeNumberView: UITableViewController {
     
     var sections = ["New number", "Button"]
     
+    var firstHeader: UILabel!
+    var secondHeader: UILabel!
+    
     var oldNumber: UITableViewCell!
     var newNumber: TextFieldCell!
     
@@ -29,6 +32,7 @@ class ChangeNumberView: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
 
         tableView.separatorStyle = .none
+        tableView.sectionHeaderTopPadding = 20
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CurrentNumberCell")
         
         DispatchQueue.global().async { [weak self] in
@@ -44,24 +48,48 @@ class ChangeNumberView: UITableViewController {
     override func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count
     }
-    
-    // set header title for each section
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch sections[section] {
-        case "New number":
-            if currentNumber != nil {
-                return sections[section]
-            } else {
-                return "Set number"
-            }
-        default:
-            return " "
-        }
-    }
-    
+        
     // set number of rows in each section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
+    }
+    
+    // set table view header
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
+        
+        let label = UILabel()
+        
+        if sections[section] == "Current number" {
+            label.frame = CGRect.init(x: 20, y: 11, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            firstHeader = label
+        } else if sections[section] == "New number" {
+            label.frame = CGRect.init(x: 20, y: 11, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            secondHeader = label
+        } else {
+            label.frame = CGRect.init(x: 20, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        }
+        
+        label.text = sections[section] == "New number" ? sections[section] : " "
+        label.font = .boldSystemFont(ofSize: 15)
+        label.textColor = .systemGray
+        
+        headerView.addSubview(label)
+        
+        return headerView
+    }
+    
+    // set section header height
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if sections[0] == "New number" {
+            if section == 0 {
+                return 45
+            } else {
+                return 15
+            }
+        } else {
+            return 15
+        }
     }
     
     // set table view cell
@@ -126,14 +154,6 @@ class ChangeNumberView: UITableViewController {
         }
     }
     
-    // set header height
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if sections[section] == "Current number" {
-            return 10
-        }
-        return 30
-    }
-    
     // add "done" button to numeric keyboard
     override func viewDidAppear(_ animated: Bool) {
         addDoneButtonToKeyboard()
@@ -177,12 +197,18 @@ class ChangeNumberView: UITableViewController {
         tableView.beginUpdates()
         
         if after == .add {
-            tableView.headerView(forSection: 1)?.textLabel?.text = "New number"
-            tableView.headerView(forSection: 1)?.textLabel?.sizeToFit()
+            UIView.transition(with: secondHeader!, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                self.secondHeader?.text = "Set number"
+                self.secondHeader?.frame = CGRect.init(x: 20, y: -20, width: self.secondHeader.frame.width, height: self.secondHeader.frame.height)
+            })
+            
         } else {
-            tableView.headerView(forSection: 0)?.textLabel?.text = "Set number"
+            UIView.transition(with: secondHeader!, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                self.secondHeader?.text = "New number"
+                self.secondHeader?.frame = CGRect.init(x: 20, y: 11, width: self.secondHeader.frame.width, height: self.secondHeader.frame.height)
+            })
         }
-        
+
         tableView.endUpdates()
     }
     

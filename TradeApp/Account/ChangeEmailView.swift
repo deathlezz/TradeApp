@@ -23,6 +23,7 @@ class ChangeEmailView: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
 
         tableView.separatorStyle = .none
+        tableView.sectionHeaderTopPadding = 20
     }
     
     // set number of sections
@@ -38,6 +39,32 @@ class ChangeEmailView: UITableViewController {
     // set number of rows in each section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
+    }
+    
+    // set table view header
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
+            
+        let label = UILabel()
+        
+        if section == 0 {
+            label.frame = CGRect.init(x: 20, y: 11, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        } else {
+            label.frame = CGRect.init(x: 20, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        }
+        
+        label.text = section == 2 ? " " : sections[section]
+        label.font = .boldSystemFont(ofSize: 15)
+        label.textColor = .systemGray
+        
+        headerView.addSubview(label)
+        
+        return headerView
+    }
+    
+    // set section header height
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        section == 0 ? 45 : 15
     }
     
     // set table view cell

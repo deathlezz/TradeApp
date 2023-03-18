@@ -30,6 +30,7 @@ class LoginView: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         tableView.separatorStyle = .none
+        tableView.sectionHeaderTopPadding = 10
         
         DispatchQueue.global().async { [weak self] in
             self?.loggedUser = Utilities.loadUser()
@@ -45,28 +46,38 @@ class LoginView: UITableViewController {
         return sections.count
     }
     
-    // set header title for each section
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if sections[section] == "Segment" || sections[section] == "Button" {
-            return " "
-        } else {
-            return sections[section]
-        }
-    }
-    
-    // set footer title for each section
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        section == 0 ? " " : nil
-    }
-    
-    // set section footer height
-    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 15
-    }
-    
     // set number of rows in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
+    }
+    
+    // set table view header
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
+            
+        let label = UILabel()
+        
+        if section == 0 {
+            label.frame = CGRect.init(x: 20, y: 1, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        } else if section == 1 {
+            label.frame = CGRect.init(x: 20, y: 7, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        } else {
+            label.frame = CGRect.init(x: 20, y: -8, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        }
+        
+        label.text = sections[section] == "Segment" || sections[section] == "Button" ? " " : sections[section]
+        label.font = .boldSystemFont(ofSize: 15)
+        label.textColor = .systemGray
+        
+        headerView.addSubview(label)
+        
+        return headerView
+    }
+    
+    // set section header height
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        section == 0 || section == 1 ? 40 : 25
+        
     }
     
     // set table view cell
@@ -133,11 +144,11 @@ class LoginView: UITableViewController {
         if sender.selectedSegmentIndex == 0 {
             sections = ["Segment", "Email", "Password", "Button"]
             let indexSet = IndexSet(integer: sections.count - 1)
-            tableView.deleteSections(indexSet, with: .automatic)
+            tableView.deleteSections(indexSet, with: .fade)
         } else {
             sections = ["Segment", "Email", "Password", "Repeat password", "Button"]
             let indexSet = IndexSet(integer: sections.count - 2)
-            tableView.insertSections(indexSet, with: .automatic)
+            tableView.insertSections(indexSet, with: .fade)
         }
     }
     
