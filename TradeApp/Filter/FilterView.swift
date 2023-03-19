@@ -22,7 +22,7 @@ class FilterView: UITableViewController {
     var priceCell: PriceCell!
     var radiusCell: RadiusCell!
     
-    let sectionTitles = ["Sort", "Category", "Location", "Price", "Button"]
+    let sections = ["Sort", "Category", "Location", "Price", "Button"]
     
     var applyButton: UIBarButtonItem!
     var clearButton: UIBarButtonItem!
@@ -31,6 +31,7 @@ class FilterView: UITableViewController {
         super.viewDidLoad()
         
         tableView.separatorStyle = .none
+        tableView.sectionHeaderTopPadding = 20
         
         title = "Filter"
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -49,12 +50,7 @@ class FilterView: UITableViewController {
 
     // set number of sections
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return sectionTitles.count
-    }
-    
-    // set title for every section
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        section == 4 ? " " : sectionTitles[section]
+        return sections.count
     }
 
     // set number of rows in section
@@ -62,10 +58,38 @@ class FilterView: UITableViewController {
         section == 2 ? 2 : 1
     }
     
+    // set table view header
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
+            
+        let label = UILabel()
+        
+        if section == 0 {
+            label.frame = CGRect.init(x: 20, y: 11, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        } else if section == 3 {
+            label.frame = CGRect.init(x: 20, y: -19, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        } else {
+            label.frame = CGRect.init(x: 20, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        }
+        
+        label.text = section == 4 ? " " : sections[section]
+        label.font = .boldSystemFont(ofSize: 15)
+        label.textColor = .systemGray
+        
+        headerView.addSubview(label)
+        
+        return headerView
+    }
+    
+    // set section header height
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        section == 0 ? 45 : 15
+    }
+    
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "filterCell", for: indexPath) as? FilterCell {
-            switch sectionTitles[indexPath.section] {
+            switch sections[indexPath.section] {
             case "Sort":
                 cell.filterTextField.placeholder = "None"
                 cell.filterTextField.text = currentFilters["Sort"]
@@ -96,7 +120,7 @@ class FilterView: UITableViewController {
         }
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "radiusCell", for: indexPath) as? RadiusCell {
-            if sectionTitles[indexPath.section] == "Location" {
+            if sections[indexPath.section] == "Location" {
                 if indexPath.row == 1 {
                     cell.radiusLabel.text = "+ \(radiusStages[radiusCounter]) \(currentUnit!)"
                     cell.minusButton.addTarget(self, action: #selector(minusTapped), for: .touchUpInside)
@@ -109,7 +133,7 @@ class FilterView: UITableViewController {
         }
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "priceCell", for: indexPath) as? PriceCell {
-            if sectionTitles[indexPath.section] == "Price"{
+            if sections[indexPath.section] == "Price"{
                 cell.firstTextField.placeholder = "From"
                 cell.firstTextField.text = currentFilters["PriceFrom"]
                 cell.firstTextField.clearButtonMode = .whileEditing
@@ -123,7 +147,7 @@ class FilterView: UITableViewController {
         }
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "buttonCell", for: indexPath) as? ButtonCell {
-            if sectionTitles[indexPath.section] == "Button" {
+            if sections[indexPath.section] == "Button" {
                 cell.selectionStyle = .none
                 cell.submitButton.setTitle("Apply", for: .normal)
                 cell.submitButton.addTarget(self, action: #selector(applyTapped), for: .touchUpInside)
@@ -136,7 +160,7 @@ class FilterView: UITableViewController {
     
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if sectionTitles[indexPath.section] == "Sort" {
+        if sections[indexPath.section] == "Sort" {
             let ac = UIAlertController(title: "Sort items by", message: nil, preferredStyle: .actionSheet)
             ac.addAction(UIAlertAction(title: "Lowest price", style: .default) { [weak self] _ in
                 self?.filterCells[0].filterTextField.text = "Lowest price"
@@ -150,7 +174,7 @@ class FilterView: UITableViewController {
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(ac, animated: true)
             
-        } else if sectionTitles[indexPath.section] == "Category" {
+        } else if sections[indexPath.section] == "Category" {
             let ac = UIAlertController(title: "Categories", message: nil, preferredStyle: .actionSheet)
             for category in categories {
                 ac.addAction(UIAlertAction(title: category, style: .default) { [weak self] _ in

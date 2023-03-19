@@ -31,12 +31,13 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
-    let sectionTitles = ["Photos", "Title", "Price", "Category", "Location", "Description", "Button"]
+    let sections = ["Photos", "Title", "Price", "Category", "Location", "Description", "Button"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.separatorStyle = .none
+        tableView.sectionHeaderTopPadding = 20
         
         title = "Add"
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -47,18 +48,13 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
 
     // set number of rows in section
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return sectionTitles.count
-    }
-    
-    // set section title
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        section == 6 ? " " : sectionTitles[section]
+        return sections.count
     }
     
     // set footer as number of available characters to use in description
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if section == 5 {
-            return "Characters left: 200"
+            return "Characters left: \(200 - (textViewCell?.textView.text.count ?? 0))"
         } else {
             return nil
         }
@@ -68,6 +64,13 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
         let footer: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         footer.textLabel?.textAlignment = .right
+        footer.textLabel?.font = .boldSystemFont(ofSize: 15)
+        footer.textLabel?.textColor = .systemGray
+    }
+    
+    // set section footer height
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        section == 5 ? 30 : 0
     }
 
     // set number of rows in section
@@ -75,11 +78,46 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         return 1
     }
     
+    // set table view header
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
+            
+        let label = UILabel()
+        
+        if section == 0 {
+            label.frame = CGRect.init(x: 20, y: 12, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        } else if section == 5 {
+            label.frame = CGRect.init(x: 20, y: -19, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        } else {
+            label.frame = CGRect.init(x: 20, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        }
+        
+        label.text = section == 6 ? " " : sections[section]
+        label.font = .boldSystemFont(ofSize: 15)
+        label.textColor = .systemGray
+        
+        headerView.addSubview(label)
+        
+        return headerView
+    }
+    
+    // set section header height
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        switch section {
+        case 0:
+            return 45
+        case 6:
+            return 5
+        default:
+            return 15
+        }
+    }
+    
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "CollectionTableViewCell", for: indexPath) as? CollectionTableViewCell {
-            if sectionTitles[indexPath.section] == "Photos" {
+            if sections[indexPath.section] == "Photos" {
                 cell.selectionStyle = .none
                 cell.delegate = self
                 return cell
@@ -88,7 +126,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
 
         if let cell = tableView.dequeueReusableCell(withIdentifier: "TextFieldCell", for: indexPath) as? TextFieldCell {
             
-            switch sectionTitles[indexPath.section] {
+            switch sections[indexPath.section] {
             case "Title":
                 cell.textField.placeholder = "e.g. iPhone 14 Pro"
                 cell.selectionStyle = .none
@@ -122,7 +160,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "TextViewCell", for: indexPath) as? TextViewCell {
-            if sectionTitles[indexPath.section] == "Description" {
+            if sections[indexPath.section] == "Description" {
                 cell.selectionStyle = .none
                 cell.textView.layer.cornerRadius = 5
                 cell.textView.layer.borderWidth = 0.1
@@ -134,7 +172,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "ButtonCell", for: indexPath) as? ButtonCell {
-            if sectionTitles[indexPath.section] == "Button" {
+            if sections[indexPath.section] == "Button" {
                 cell.selectionStyle = .none
                 cell.submitButton.setTitle("Submit", for: .normal)
                 cell.submitButton.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
@@ -147,7 +185,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if sectionTitles[indexPath.section] == "Category" {
+        if sections[indexPath.section] == "Category" {
             let ac = UIAlertController(title: "Categories", message: nil, preferredStyle: .actionSheet)
             for category in categories {
                 ac.addAction(UIAlertAction(title: category, style: .default) { [weak self] _ in
@@ -168,9 +206,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             return
         }
         
-        tableView.beginUpdates()
         tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: \(200 - charsUsed)"
-        tableView.endUpdates()
     }
     
     // set action for clear button
@@ -180,7 +216,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
         
         textViewCell?.textView.text = nil
-        
+        tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: 200"
         AddItemView.shared.images.removeAll()
         
         for _ in 0...7 {
