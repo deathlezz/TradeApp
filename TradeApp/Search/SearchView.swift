@@ -8,7 +8,8 @@
 import UIKit
 
 class SearchView: UITableViewController {
-    
+
+    var sections = [String]()
     var categories = [String]()
     
     var recentlySearched = [String]()
@@ -23,7 +24,7 @@ class SearchView: UITableViewController {
         navigationController?.hidesBarsOnSwipe = false
         
         setUpSearchBar()
-        
+        tableView.sectionHeaderTopPadding = 20
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
         
         DispatchQueue.global().async { [weak self] in
@@ -38,17 +39,29 @@ class SearchView: UITableViewController {
 
     // set number of sections
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    // set section title
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        recentlySearched.count == 0 ? nil : "Recently searched"
+        return sections.count
     }
 
     // set number of rows in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return recentlySearched.count
+    }
+    
+    // set table view header
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
+            
+        let label = UILabel()
+        
+        label.frame = CGRect.init(x: 20, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height)
+        
+        label.text = recentlySearched.count == 0 ? nil : sections[section]
+        label.font = .boldSystemFont(ofSize: 15)
+        label.textColor = .systemGray
+        
+        headerView.addSubview(label)
+        
+        return headerView
     }
     
     // set table view cell
@@ -111,9 +124,17 @@ class SearchView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            recentlySearched.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
-            saveHistory()
+            if recentlySearched.count > 1 {
+                recentlySearched.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+                saveHistory()
+            } else {
+                let indexSet = IndexSet(integer: 0)
+                recentlySearched.remove(at: indexPath.row)
+                sections.removeAll()
+                tableView.deleteSections(indexSet, with: .fade)
+                saveHistory()
+            }
         }
     }
     
@@ -138,9 +159,17 @@ class SearchView: UITableViewController {
     // add unique word to recently searched array
     func isUnique(_ word: String) {
         if !recentlySearched.contains(word) {
-            let indexPath = IndexPath(row: 0, section: 0)
-            recentlySearched.insert(word, at: 0)
-            tableView.insertRows(at: [indexPath], with: .automatic)
+            
+            if recentlySearched.count < 1 {
+                let indexSet = IndexSet(integer: 0)
+                recentlySearched.insert(word, at: 0)
+                sections.append("Recently searched")
+                tableView.insertSections(indexSet, with: .fade)
+            } else {
+                let indexPath = IndexPath(row: 0, section: 0)
+                recentlySearched.insert(word, at: 0)
+                tableView.insertRows(at: [indexPath], with: .automatic)
+            }
             
             if recentlySearched.count > 10 {
                 recentlySearched.removeLast()
@@ -160,6 +189,7 @@ class SearchView: UITableViewController {
     func loadHistory() {
         let defaults = UserDefaults.standard
         recentlySearched = defaults.object(forKey: "recentlySearched") as? [String] ?? [String]()
+        sections = recentlySearched.count > 0 ? ["Recently searched"] : []
     }
     
     // set up search bar
