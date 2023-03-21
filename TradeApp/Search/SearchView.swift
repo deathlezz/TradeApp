@@ -24,6 +24,8 @@ class SearchView: UITableViewController {
         navigationController?.hidesBarsOnSwipe = false
         
         setUpSearchBar()
+        
+        tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
         
@@ -69,7 +71,7 @@ class SearchView: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "historyCell", for: indexPath)
         cell.textLabel?.text = recentlySearched[indexPath.row]
         cell.imageView?.image = UIImage(systemName: "clock")
-        cell.imageView?.tintColor = .systemGray
+        cell.imageView?.tintColor = .systemBlue
         return cell
     }
     

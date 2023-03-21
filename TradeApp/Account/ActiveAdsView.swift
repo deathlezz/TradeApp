@@ -55,8 +55,8 @@ class ActiveAdsView: UITableViewController {
         let label = UILabel()
         label.frame = CGRect.init(x: 17, y: -13, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         label.text = "Found \(activeAds.count) ads"
-        label.font = .boldSystemFont(ofSize: 12)
-        label.textColor = .darkGray
+        label.font = .boldSystemFont(ofSize: 14)
+        label.textColor = .gray
         
         header = label
         headerView.addSubview(label)

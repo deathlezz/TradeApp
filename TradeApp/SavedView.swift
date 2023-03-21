@@ -127,8 +127,8 @@ class SavedView: UICollectionViewController {
         if kind == UICollectionView.elementKindSectionHeader {
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
                 headerView.textLabel.text = "Found \(savedItems.count) ads"
-                headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 12)
-                headerView.textLabel.textColor = .darkGray
+                headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 14)
+                headerView.textLabel.textColor = .gray
                 return headerView
             }
             
