@@ -55,56 +55,67 @@ class AccountView: UITableViewController {
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "AccountCell", for: indexPath)
+        let accountCell = tableView.dequeueReusableCell(withIdentifier: "AccountCell", for: indexPath)
+        
+        let userItemsCell = tableView.dequeueReusableCell(withIdentifier: "UserItemsCell", for: indexPath)
 
         switch sections[indexPath.section] {
         case "User":
-            cell.textLabel?.text = mail
-            cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 16)
-            cell.backgroundColor = .systemGray6
-            cell.textLabel?.textColor = .darkGray
-            cell.isUserInteractionEnabled = false
-            cell.selectionStyle = .none
-            cell.accessoryType = .none
-            return cell
+            accountCell.textLabel?.text = mail
+            accountCell.textLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+            accountCell.backgroundColor = .systemGray6
+            accountCell.textLabel?.textColor = .darkGray
+            accountCell.isUserInteractionEnabled = false
+            accountCell.selectionStyle = .none
+            accountCell.accessoryType = .none
+            return accountCell
             
         case "Your ads":
             if indexPath.row == 0 {
-                cell.textLabel?.text = "Active: \(active ?? 0)"
-                cell.accessoryType = .disclosureIndicator
-                cell.imageView?.image = UIImage(systemName: "checkmark")
+                userItemsCell.detailTextLabel?.text = "\(active ?? 0)"
+                userItemsCell.detailTextLabel?.font = .systemFont(ofSize: 17)
+                userItemsCell.detailTextLabel?.textColor = .systemGray
+                userItemsCell.textLabel?.text = "Active"
+                userItemsCell.textLabel?.font = .systemFont(ofSize: 17)
+                userItemsCell.accessoryType = .disclosureIndicator
+                userItemsCell.imageView?.image = UIImage(systemName: "checkmark")
             } else {
-                cell.textLabel?.text = "Ended: \(ended ?? 0)"
-                cell.accessoryType = .disclosureIndicator
-                cell.imageView?.image = UIImage(systemName: "xmark")
+                userItemsCell.detailTextLabel?.text = "\(ended ?? 0)"
+                userItemsCell.detailTextLabel?.font = .systemFont(ofSize: 17)
+                userItemsCell.detailTextLabel?.textColor = .systemGray
+                userItemsCell.textLabel?.text = "Ended"
+                userItemsCell.textLabel?.font = .systemFont(ofSize: 17)
+                userItemsCell.accessoryType = .disclosureIndicator
+                userItemsCell.imageView?.image = UIImage(systemName: "xmark")
             }
-            return cell
+            return userItemsCell
             
         case "Settings":
             switch indexPath.row {
             case 0:
-                cell.imageView?.image = UIImage(systemName: "lines.measurement.horizontal")
+                accountCell.imageView?.image = UIImage(systemName: "lines.measurement.horizontal")
             case 1:
-                cell.imageView?.image = UIImage(systemName: "phone")
+                accountCell.imageView?.image = UIImage(systemName: "phone")
             case 2:
-                cell.imageView?.image = UIImage(systemName: "at")
+                accountCell.imageView?.image = UIImage(systemName: "at")
             case 3:
-                cell.imageView?.image = UIImage(systemName: "lock")
+                accountCell.imageView?.image = UIImage(systemName: "lock")
             default:
-                cell.imageView?.image = UIImage(systemName: "trash")
+                accountCell.imageView?.image = UIImage(systemName: "trash")
             }
-            
-            cell.textLabel?.text = settingsSection[indexPath.row]
-            cell.accessoryType = .disclosureIndicator
-            return cell
+
+            accountCell.textLabel?.text = settingsSection[indexPath.row]
+            accountCell.accessoryType = .disclosureIndicator
+            return accountCell
             
         default:
-            cell.textLabel?.text = "Sign out"
-            cell.textLabel?.textAlignment = .center
-            cell.textLabel?.textColor = .systemRed
-            cell.accessoryType = .none
-            return cell
+            accountCell.textLabel?.text = "Sign out"
+            accountCell.textLabel?.textAlignment = .center
+            accountCell.textLabel?.textColor = .systemRed
+            accountCell.accessoryType = .none
+            return accountCell
         }
+        
     }
     
     // set action for selected cell

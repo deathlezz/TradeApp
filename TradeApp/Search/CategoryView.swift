@@ -39,7 +39,7 @@ class CategoryView: UITableViewController {
 
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "categoriesCell", for: indexPath)
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "categoryCell")
         let conf = UIImage.SymbolConfiguration(scale: .large)
         
         if indexPath.row == 0 {
@@ -51,8 +51,10 @@ class CategoryView: UITableViewController {
         }
         
         cell.textLabel?.text = categories[indexPath.row]
+        cell.accessoryType = .disclosureIndicator
         cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
         cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 12)
+        cell.detailTextLabel?.textColor = .systemGray
         return cell
     }
     
