@@ -77,7 +77,6 @@ class LoginView: UITableViewController {
     // set section header height
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         section == 0 || section == 1 ? 40 : 25
-        
     }
     
     // set table view cell
@@ -168,11 +167,7 @@ class LoginView: UITableViewController {
                 resetView(.login)
                 Utilities.setUser(mail)
 
-                if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
-                    vc.mail = mail
-                    vc.navigationItem.hidesBackButton = true
-                    navigationController?.pushViewController(vc, animated: true)
-                }
+                loginPush()
                 
             } else {
                 showAlert(title: "Error", message: "Wrong email address")
@@ -247,13 +242,27 @@ class LoginView: UITableViewController {
         print(loggedUser ?? "nil")
     }
     
+    // set tab bar item title after view appeared
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        changeTitle()
+    }
+    
     // push vc if user is signed in
     func loginPush() {
         guard loggedUser != nil else { return }
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
-            vc.mail = loggedUser
-            vc.navigationItem.hidesBackButton = true
-            navigationController?.pushViewController(vc, animated: true)
+        
+        if tabBarController?.selectedIndex == 2 {
+            if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
+                vc.navigationItem.hidesBackButton = true
+                navigationController?.pushViewController(vc, animated: true)
+            }
+        } else if tabBarController?.selectedIndex == 3 {
+            if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
+                vc.mail = loggedUser
+                vc.navigationItem.hidesBackButton = true
+                navigationController?.pushViewController(vc, animated: true)
+            }
         }
     }
     
@@ -264,6 +273,15 @@ class LoginView: UITableViewController {
             self?.resetView(.register)
         })
         present(ac, animated: true)
+    }
+    
+    // set tab bar item title
+    func changeTitle() {
+        if tabBarController?.selectedIndex == 2 {
+            navigationController?.tabBarItem.title = "Add"
+        } else if tabBarController?.selectedIndex == 3 {
+            navigationController?.tabBarItem.title = "Account"
+        }
     }
 
 }

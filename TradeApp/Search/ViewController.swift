@@ -241,7 +241,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         }
     }
     
-    // set view title
+    // set view and tab bar item title
     func changeTitle() {
         if currentFilters["Category"] != nil {
             title = currentFilters["Category"]

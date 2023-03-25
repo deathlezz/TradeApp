@@ -23,6 +23,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var index: Int!
     var action: ActionType!
     
+    var loggedUser: String!
+    
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
     
@@ -207,6 +209,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
         
         tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: \(200 - charsUsed)"
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
     }
     
     // set action for clear button
