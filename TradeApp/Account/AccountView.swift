@@ -143,6 +143,7 @@ class AccountView: UITableViewController {
             
         default:
             Utilities.setUser(nil)
+            NotificationCenter.default.post(name: NSNotification.Name("signOut"), object: nil)
             navigationController?.popToRootViewController(animated: true)
         }
     }

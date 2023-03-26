@@ -12,6 +12,11 @@ enum AccountAction {
     case register
 }
 
+enum LoginPushType {
+    case load
+    case signIn
+}
+
 class LoginView: UITableViewController {
     
     var sections = ["Segment", "Email", "Password", "Button"]
@@ -36,7 +41,7 @@ class LoginView: UITableViewController {
             self?.loggedUser = Utilities.loadUser()
             
             DispatchQueue.main.async {
-                self?.loginPush()
+                self?.loginPush(after: .load, mail: self?.loggedUser)
             }
         }
     }
@@ -167,7 +172,7 @@ class LoginView: UITableViewController {
                 resetView(.login)
                 Utilities.setUser(mail)
 
-                loginPush()
+                loginPush(after: .signIn, mail: mail)
                 
             } else {
                 showAlert(title: "Error", message: "Wrong email address")
@@ -249,8 +254,10 @@ class LoginView: UITableViewController {
     }
     
     // push vc if user is signed in
-    func loginPush() {
-        guard loggedUser != nil else { return }
+    func loginPush(after: LoginPushType, mail: String?) {
+        if after == .load {
+            guard mail != nil else { return }
+        }
         
         if tabBarController?.selectedIndex == 2 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
@@ -259,7 +266,7 @@ class LoginView: UITableViewController {
             }
         } else if tabBarController?.selectedIndex == 3 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
-                vc.mail = loggedUser
+                vc.mail = mail
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }
@@ -283,5 +290,5 @@ class LoginView: UITableViewController {
             navigationController?.tabBarItem.title = "Account"
         }
     }
-
+    
 }

@@ -23,6 +23,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var index: Int!
     var action: ActionType!
     
+    var isLoggedOut: Bool!
     var loggedUser: String!
     
     var textFieldCells = [TextFieldCell]()
@@ -46,6 +47,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         navigationController?.hidesBarsOnSwipe = false
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearTapped))
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
     }
 
     // set number of rows in section
@@ -211,10 +214,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: \(200 - charsUsed)"
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-    }
+    // check if user is still logged in
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+////        checkUser()
+//    }
     
     // set action for clear button
     @objc func clearTapped() {
@@ -447,6 +451,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             }
         }
         return uniqueID
+    }
+    
+    // sign out current user
+    @objc func signOut() {
+        navigationController?.popViewController(animated: true)
     }
     
 }
