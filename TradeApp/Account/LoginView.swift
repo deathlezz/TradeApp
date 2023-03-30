@@ -36,14 +36,6 @@ class LoginView: UITableViewController {
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 10
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.loggedUser = Utilities.loadUser()
-            
-            DispatchQueue.main.async {
-                self?.loginPush(after: .load, mail: self?.loggedUser)
-            }
-        }
     }
     
     // set number of sections
@@ -171,8 +163,8 @@ class LoginView: UITableViewController {
                 
                 resetView(.login)
                 Utilities.setUser(mail)
-
-                loginPush(after: .signIn, mail: mail)
+                loggedUser = mail
+                loginPush(after: .signIn)
                 
             } else {
                 showAlert(title: "Error", message: "Wrong email address")
@@ -243,8 +235,15 @@ class LoginView: UITableViewController {
     // load login status before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loggedUser = Utilities.loadUser()
-        print(loggedUser ?? "nil")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.loggedUser = Utilities.loadUser()
+            
+            DispatchQueue.main.async {
+                print(self?.loggedUser ?? "nil")
+                self?.loginPush(after: .load)
+            }
+        }
     }
     
     // set tab bar item title after view appeared
@@ -254,9 +253,9 @@ class LoginView: UITableViewController {
     }
     
     // push vc if user is signed in
-    func loginPush(after: LoginPushType, mail: String?) {
+    func loginPush(after: LoginPushType) {
         if after == .load {
-            guard mail != nil else { return }
+            guard loggedUser != nil else { return }
         }
         
         if tabBarController?.selectedIndex == 2 {
@@ -266,7 +265,7 @@ class LoginView: UITableViewController {
             }
         } else if tabBarController?.selectedIndex == 3 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
-                vc.mail = mail
+                vc.mail = loggedUser
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }

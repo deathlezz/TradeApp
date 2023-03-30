@@ -189,7 +189,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         let plus = UIImage(systemName: "plus")?.pngData()
         
         print("before index")
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
         print("after index")
         
         for _ in 0...3 {

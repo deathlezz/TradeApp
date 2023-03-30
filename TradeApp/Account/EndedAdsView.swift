@@ -1,23 +1,25 @@
 //
-//  ActiveAdsView.swift
+//  EndedAdsView.swift
 //  TradeApp
 //
-//  Created by deathlezz on 04/03/2023.
+//  Created by deathlezz on 30/03/2023.
 //
 
 import UIKit
 
-class ActiveAdsView: UITableViewController {
+import UIKit
+
+class EndedAdsView: UITableViewController {
     
     var header: UILabel!
     
     var mail: String!
-    var activeAds = [Item?]()
+    var endedAds = [Item?]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Active"
+        title = "Ended"
         navigationController?.navigationBar.prefersLargeTitles = true
         
         tableView.separatorStyle = .singleLine
@@ -45,7 +47,7 @@ class ActiveAdsView: UITableViewController {
     
     // set number of rows
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return activeAds.count
+        return endedAds.count
     }
     
     // set table view header
@@ -54,7 +56,7 @@ class ActiveAdsView: UITableViewController {
             
         let label = UILabel()
         label.frame = CGRect.init(x: 17, y: -13, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
-        label.text = "Found \(activeAds.count) ads"
+        label.text = "Found \(endedAds.count) ads"
         label.font = .boldSystemFont(ofSize: 14)
         label.textColor = .gray
         
@@ -66,23 +68,24 @@ class ActiveAdsView: UITableViewController {
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "activeAdCell", for: indexPath) as? AdCell {
-            let thumbnail = activeAds[indexPath.row]?.photos[0] ?? Data()
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "endedAdCell", for: indexPath) as? AdCell {
+            let thumbnail = endedAds[indexPath.row]?.photos[0] ?? Data()
             cell.thumbnail.image = UIImage(data: thumbnail)
-            cell.title.text = activeAds[indexPath.row]?.title
-            cell.price.text = "£\(activeAds[indexPath.row]?.price ?? 0)"
-            cell.availability.text = setExpiryDate(activeAds[indexPath.row]?.date ?? Date())
-            cell.views.setTitle(activeAds[indexPath.row]?.views.description, for: .normal)
+            cell.title.text = endedAds[indexPath.row]?.title
+            cell.price.text = "£\(endedAds[indexPath.row]?.price ?? 0)"
+            cell.availability.text = setExpiryDate(endedAds[indexPath.row]?.date ?? Date())
+            cell.views.setTitle(endedAds[indexPath.row]?.views.description, for: .normal)
             cell.views.isUserInteractionEnabled = false
-            cell.saved.setTitle(activeAds[indexPath.row]?.saved.description, for: .normal)
+            cell.saved.setTitle(endedAds[indexPath.row]?.saved.description, for: .normal)
             cell.saved.isUserInteractionEnabled = false
             cell.stateButton.layer.borderWidth = 1.5
-            cell.stateButton.layer.borderColor = UIColor.systemRed.cgColor
+            cell.stateButton.layer.borderColor = UIColor.darkGray.cgColor
+            cell.stateButton.titleLabel?.textColor = .darkGray
             cell.stateButton.layer.cornerRadius = 7
-            cell.stateButton.tag = activeAds[indexPath.row]!.id
+            cell.stateButton.tag = endedAds[indexPath.row]!.id
             cell.stateButton.addTarget(self, action: #selector(stateTapped), for: .touchUpInside)
             cell.editButton.addTarget(self, action: #selector(editTapped), for: .touchUpInside)
-            cell.editButton.tag = activeAds[indexPath.row]!.id
+            cell.editButton.tag = endedAds[indexPath.row]!.id
             cell.separatorInset = .zero
             return cell
         }
@@ -92,7 +95,7 @@ class ActiveAdsView: UITableViewController {
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-            vc.item = activeAds[indexPath.row]
+            vc.item = endedAds[indexPath.row]
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []
             navigationController?.pushViewController(vc, animated: true)
@@ -103,13 +106,13 @@ class ActiveAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-            guard let itemID = activeAds[indexPath.row]?.id else { return }
+            guard let itemID = endedAds[indexPath.row]?.id else { return }
             
             Storage.shared.items.removeAll(where: {$0.id == itemID})
             Storage.shared.filteredItems.removeAll(where: {$0.id == itemID})
             
-            Storage.shared.users[index].activeItems.remove(at: indexPath.row)
-            activeAds.remove(at: indexPath.row)
+            Storage.shared.users[index].endedItems.remove(at: indexPath.row)
+            endedAds.remove(at: indexPath.row)
             
             tableView.deleteRows(at: [indexPath], with: .fade)
             updateHeader()
@@ -133,14 +136,14 @@ class ActiveAdsView: UITableViewController {
     // update table view header
     func updateHeader() {
         tableView.beginUpdates()
-        header.text = "Found \(activeAds.count) ads"
+        header.text = "Found \(endedAds.count) ads"
         tableView.endUpdates()
     }
     
     // load user's active ads
     func loadUserAds() {
         guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        activeAds = Storage.shared.users[index].activeItems
+        endedAds = Storage.shared.users[index].endedItems
     }
     
     // hide toolbar before view appears
@@ -151,35 +154,33 @@ class ActiveAdsView: UITableViewController {
     }
     
     // set item expiry date
-    func setExpiryDate(_ startDate: Date) -> String {
-        let userCalendar = Calendar.current
-        let expiryDate = userCalendar.date(byAdding: .day, value: 30, to: startDate)!
+    func setExpiryDate(_ expiryDate: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en")
         dateFormatter.dateFormat = "MMMM d"
         let formattedExpiryDate = dateFormatter.string(from: expiryDate)
-        return "expires \(formattedExpiryDate)"
+        return "expired \(formattedExpiryDate)"
     }
     
     // set action for tapped state button
     @objc func stateTapped(_ sender: UIButton) {
-        let ac = UIAlertController(title: "Finish ad", message: "Are you sure, you want to finish this ad", preferredStyle: .alert)
+        let ac = UIAlertController(title: "Activate ad", message: "Are you sure, you want to activate this ad", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        ac.addAction(UIAlertAction(title: "Finish", style: .destructive) { [weak self] _ in
-            self?.finishAd(sender)
+        ac.addAction(UIAlertAction(title: "Activate", style: .default) { [weak self] _ in
+            self?.activateAd(sender)
         })
         present(ac, animated: true)
     }
     
     // finish the ad
-    func finishAd(_ sender: UIButton) {
+    func activateAd(_ sender: UIButton) {
         guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        guard let itemIndex = activeAds.firstIndex(where: {$0?.id == sender.tag}) else { return }
+        guard let itemIndex = endedAds.firstIndex(where: {$0?.id == sender.tag}) else { return }
         
-        Storage.shared.users[index].endedItems.append(activeAds[itemIndex])
+        Storage.shared.users[index].activeItems.append(endedAds[itemIndex])
         
-        Storage.shared.users[index].activeItems.removeAll(where: {$0?.id == sender.tag})
-        activeAds.removeAll(where: {$0?.id == sender.tag})
+        Storage.shared.users[index].endedItems.removeAll(where: {$0?.id == sender.tag})
+        endedAds.removeAll(where: {$0?.id == sender.tag})
         
         Storage.shared.items.removeAll(where: {$0.id == sender.tag})
         Storage.shared.filteredItems.removeAll(where: {$0.id == sender.tag})

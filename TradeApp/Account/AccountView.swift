@@ -125,7 +125,7 @@ class AccountView: UITableViewController {
             if indexPath.row == 0 {
                 pushToActiveAdsView()
             } else {
-                
+                pushToEndedAdsView()
             }
         case "Settings":
             switch indexPath.row {
@@ -144,7 +144,7 @@ class AccountView: UITableViewController {
         default:
             Utilities.setUser(nil)
             NotificationCenter.default.post(name: NSNotification.Name("signOut"), object: nil)
-            navigationController?.popToRootViewController(animated: true)
+            navigationController?.popViewController(animated: true)
         }
     }
     
@@ -169,6 +169,15 @@ class AccountView: UITableViewController {
     // push vc to ActiveAdsView
     func pushToActiveAdsView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ActiveAdsView") as? ActiveAdsView {
+            vc.mail = mail
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    // push vc to EndedAdsView
+    func pushToEndedAdsView() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "EndedAdsView") as? EndedAdsView {
             vc.mail = mail
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
@@ -221,6 +230,7 @@ class AccountView: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
+        print(mail)
         updateSection()
     }
     

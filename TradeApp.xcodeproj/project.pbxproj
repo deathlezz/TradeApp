@@ -33,6 +33,7 @@
 		BC67B219298C6245000E45D1 /* RadiusCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC67B218298C6245000E45D1 /* RadiusCell.swift */; };
 		BC69075B2939247F005D1EAB /* PhotosCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC69075A2939247F005D1EAB /* PhotosCell.swift */; };
 		BC69ED652938F37A00A63A79 /* AddItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC69ED642938F37A00A63A79 /* AddItemView.swift */; };
+		BC6FDA7529D612A000AFA4E9 /* EndedAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6FDA7429D612A000AFA4E9 /* EndedAdsView.swift */; };
 		BC6FF4902957841100F1D772 /* ItemViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6FF48F2957841100F1D772 /* ItemViewCell.swift */; };
 		BC72B09429B0C92E00703FF4 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC72B09329B0C92E00703FF4 /* ChangePasswordView.swift */; };
 		BC78F72B295EED4F0006DDB6 /* MapViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */; };
@@ -75,6 +76,7 @@
 		BC67B218298C6245000E45D1 /* RadiusCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusCell.swift; sourceTree = "<group>"; };
 		BC69075A2939247F005D1EAB /* PhotosCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosCell.swift; sourceTree = "<group>"; };
 		BC69ED642938F37A00A63A79 /* AddItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemView.swift; sourceTree = "<group>"; };
+		BC6FDA7429D612A000AFA4E9 /* EndedAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndedAdsView.swift; sourceTree = "<group>"; };
 		BC6FF48F2957841100F1D772 /* ItemViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewCell.swift; sourceTree = "<group>"; };
 		BC72B09329B0C92E00703FF4 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
 		BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewCell.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 				BC16850129AF625A002ED0C5 /* ChangeEmailView.swift */,
 				BC72B09329B0C92E00703FF4 /* ChangePasswordView.swift */,
 				BC54D04229B3DEDB00E6F45F /* ActiveAdsView.swift */,
+				BC6FDA7429D612A000AFA4E9 /* EndedAdsView.swift */,
 				BC54D04429B3EDDD00E6F45F /* AdCell.swift */,
 			);
 			path = Account;
@@ -310,6 +313,7 @@
 				BC17416F292D33680055A0B8 /* ItemView.swift in Sources */,
 				BC66A6EB29296D8900F33E7D /* Storage.swift in Sources */,
 				BC16850229AF625A002ED0C5 /* ChangeEmailView.swift in Sources */,
+				BC6FDA7529D612A000AFA4E9 /* EndedAdsView.swift in Sources */,
 				BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */,
 				BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */,
 				BC54D04529B3EDDD00E6F45F /* AdCell.swift in Sources */,
