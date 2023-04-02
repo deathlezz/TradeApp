@@ -22,8 +22,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     var index: Int!
     var action: ActionType!
-    
-    var isLoggedOut: Bool!
+
     var loggedUser: String!
     
     var textFieldCells = [TextFieldCell]()

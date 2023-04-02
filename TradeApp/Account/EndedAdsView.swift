@@ -108,10 +108,7 @@ class EndedAdsView: UITableViewController {
             guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
             guard let itemID = endedAds[indexPath.row]?.id else { return }
             
-            Storage.shared.items.removeAll(where: {$0.id == itemID})
-            Storage.shared.filteredItems.removeAll(where: {$0.id == itemID})
-            
-            Storage.shared.users[index].endedItems.remove(at: indexPath.row)
+            Storage.shared.users[index].endedItems.removeAll(where: {$0?.id == itemID})
             endedAds.remove(at: indexPath.row)
             
             tableView.deleteRows(at: [indexPath], with: .fade)
@@ -130,7 +127,9 @@ class EndedAdsView: UITableViewController {
     
     // set action for tapped edit button
     @objc func editTapped() {
-        
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // update table view header
@@ -172,18 +171,17 @@ class EndedAdsView: UITableViewController {
         present(ac, animated: true)
     }
     
-    // finish the ad
+    // activate the ad
     func activateAd(_ sender: UIButton) {
         guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         guard let itemIndex = endedAds.firstIndex(where: {$0?.id == sender.tag}) else { return }
         
+        endedAds[itemIndex]?.date = Date()
         Storage.shared.users[index].activeItems.append(endedAds[itemIndex])
-        
-        Storage.shared.users[index].endedItems.removeAll(where: {$0?.id == sender.tag})
-        endedAds.removeAll(where: {$0?.id == sender.tag})
-        
-        Storage.shared.items.removeAll(where: {$0.id == sender.tag})
-        Storage.shared.filteredItems.removeAll(where: {$0.id == sender.tag})
+        Storage.shared.items.append(endedAds[itemIndex]!)
+
+        Storage.shared.users[index].endedItems.remove(at: itemIndex)
+        endedAds.remove(at: itemIndex)
         
         let indexPath = IndexPath(row: itemIndex, section: 0)
         tableView.deleteRows(at: [indexPath], with: .fade)

@@ -127,7 +127,9 @@ class ActiveAdsView: UITableViewController {
     
     // set action for tapped edit button
     @objc func editTapped() {
-        
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // update table view header
@@ -176,10 +178,11 @@ class ActiveAdsView: UITableViewController {
         guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         guard let itemIndex = activeAds.firstIndex(where: {$0?.id == sender.tag}) else { return }
         
+        activeAds[itemIndex]?.date = Date()
         Storage.shared.users[index].endedItems.append(activeAds[itemIndex])
         
         Storage.shared.users[index].activeItems.removeAll(where: {$0?.id == sender.tag})
-        activeAds.removeAll(where: {$0?.id == sender.tag})
+        activeAds.remove(at: itemIndex)
         
         Storage.shared.items.removeAll(where: {$0.id == sender.tag})
         Storage.shared.filteredItems.removeAll(where: {$0.id == sender.tag})

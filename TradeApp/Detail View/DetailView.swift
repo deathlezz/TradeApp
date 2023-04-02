@@ -11,13 +11,11 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     var savedItems = [Item]()
     
-//    var imgs = [UIImage?]()
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
     var isPushed: Bool!
     
-//    var distance: String!
     var latitude: Double!
     var longitude: Double!
     
@@ -66,8 +64,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 83, right: 0)
         
         navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
-        
-        item.views += 1
         
         DispatchQueue.global().async { [weak self] in
             self?.savedItems = Utilities.loadItems()
@@ -220,6 +216,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        item.views += 1
         navigationController?.isNavigationBarHidden = false
         navigationController?.isToolbarHidden = false
     }
