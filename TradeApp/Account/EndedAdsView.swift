@@ -126,8 +126,13 @@ class EndedAdsView: UITableViewController {
     }
     
     // set action for tapped edit button
-    @objc func editTapped() {
+    @objc func editTapped(_ sender: UIButton) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
+            guard let item = endedAds.first(where: {$0?.id == sender.tag}) else { return }
+            let images = item?.photos.map {UIImage(data: $0!)!}
+            AddItemView.shared.images = images!
+            vc.isEditMode = true
+            vc.textFieldCells[0].textField.text = item?.title
             navigationController?.pushViewController(vc, animated: true)
         }
     }

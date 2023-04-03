@@ -24,6 +24,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var action: ActionType!
 
     var loggedUser: String!
+    var isEditMode: Bool!
     
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
@@ -41,7 +42,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
         
-        title = "Add"
+        if isEditMode != nil {
+            title = "Edit"
+        } else {
+            title = "Add"
+        }
+        
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.hidesBarsOnSwipe = false
         
@@ -212,12 +218,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: \(200 - charsUsed)"
     }
-    
-    // check if user is still logged in
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-////        checkUser()
-//    }
     
     // set action for clear button
     @objc func clearTapped() {
