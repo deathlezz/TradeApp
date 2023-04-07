@@ -26,6 +26,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var loggedUser: String!
     var isEditMode: Bool!
     
+    var itemTitle: String!
+    var itemPrice: String!
+    var itemCategory: String!
+    var itemLocation: String!
+    var itemDescription: String!
+    
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
     
@@ -46,6 +52,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             title = "Edit"
         } else {
             title = "Add"
+            clearTapped()
         }
         
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -138,6 +145,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             
             switch sections[indexPath.section] {
             case "Title":
+                cell.textField.text = itemTitle ?? ""
                 cell.textField.placeholder = "e.g. iPhone 14 Pro"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
@@ -145,6 +153,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 textFieldCells.append(cell)
                 return cell
             case "Price":
+                cell.textField.text = itemPrice ?? ""
                 cell.textField.placeholder = "£"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
@@ -152,12 +161,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 textFieldCells.append(cell)
                 return cell
             case "Category":
+                cell.textField.text = itemCategory ?? ""
                 cell.textField.placeholder = "e.g. Electronics"
                 cell.textField.isUserInteractionEnabled = false
                 cell.selectionStyle = .none
                 textFieldCells.append(cell)
                 return cell
             case "Location":
+                cell.textField.text = itemLocation ?? ""
                 cell.textField.placeholder = "e.g. City"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
@@ -172,6 +183,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         if let cell = tableView.dequeueReusableCell(withIdentifier: "TextViewCell", for: indexPath) as? TextViewCell {
             if sections[indexPath.section] == "Description" {
                 cell.selectionStyle = .none
+                cell.textView.text = itemDescription ?? ""
                 cell.textView.layer.cornerRadius = 5
                 cell.textView.layer.borderWidth = 0.1
                 cell.textView.layer.borderColor = UIColor.darkGray.cgColor

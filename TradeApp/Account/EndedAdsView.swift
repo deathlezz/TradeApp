@@ -56,7 +56,7 @@ class EndedAdsView: UITableViewController {
             
         let label = UILabel()
         label.frame = CGRect.init(x: 17, y: -13, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
-        label.text = "Found \(endedAds.count) ads"
+        label.text = endedAds.count == 1 ? "Found 1 ad" : "Found \(endedAds.count) ads"
         label.font = .boldSystemFont(ofSize: 14)
         label.textColor = .gray
         
@@ -132,7 +132,11 @@ class EndedAdsView: UITableViewController {
             let images = item?.photos.map {UIImage(data: $0!)!}
             AddItemView.shared.images = images!
             vc.isEditMode = true
-            vc.textFieldCells[0].textField.text = item?.title
+            vc.itemTitle = item?.title
+            vc.itemPrice = "\(item!.price)"
+            vc.itemCategory = item?.category
+            vc.itemLocation = item?.location
+            vc.itemDescription = item?.description
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -140,7 +144,7 @@ class EndedAdsView: UITableViewController {
     // update table view header
     func updateHeader() {
         tableView.beginUpdates()
-        header.text = "Found \(endedAds.count) ads"
+        header.text = endedAds.count == 1 ? "Found 1 ad" : "Found \(endedAds.count) ads"
         tableView.endUpdates()
     }
     

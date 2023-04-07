@@ -43,10 +43,10 @@ class CategoryView: UITableViewController {
         let conf = UIImage.SymbolConfiguration(scale: .large)
         
         if indexPath.row == 0 {
-            cell.detailTextLabel?.text = "\(Storage.shared.items.count) ads"
+            cell.detailTextLabel?.text = Storage.shared.items.count == 1 ? "1 ad" : "\(Storage.shared.items.count) ads"
             cell.imageView?.image = UIImage(systemName: "cart", withConfiguration: conf)
         } else {
-            cell.detailTextLabel?.text = "\(Storage.shared.items.filter {$0.category == "\(categories[indexPath.row])"}.count) ads"
+            cell.detailTextLabel?.text = Storage.shared.items.filter {$0.category == "\(categories[indexPath.row])"}.count == 1 ? "1 ad" : "\(Storage.shared.items.filter {$0.category == "\(categories[indexPath.row])"}.count) ads"
             cell.imageView?.image = UIImage(systemName: categoryImages[indexPath.row - 1], withConfiguration: conf)
         }
         
