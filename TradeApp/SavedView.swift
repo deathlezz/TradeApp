@@ -126,7 +126,8 @@ class SavedView: UICollectionViewController {
         
         if kind == UICollectionView.elementKindSectionHeader {
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
-                headerView.textLabel.text = "Found \(savedItems.count) ads"
+                headerView.textLabel.text = savedItems.count == 1 ? "Found 1 ad" : "Found \(savedItems.count) ads"
+//                headerView.textLabel.text = "Found \(savedItems.count) ads"
                 headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 14)
                 headerView.textLabel.textColor = .gray
                 return headerView
@@ -245,10 +246,10 @@ class SavedView: UICollectionViewController {
         
         if navigationItem.rightBarButtonItems != [selectButton] {
             guard let selected = collectionView.indexPathsForSelectedItems else { return }
-            label?.text = "Selected \(selected.count) ads"
+            label?.text = selected.count == 1 ? "Selected 1 ad" : "Selected \(selected.count) ads"
             
         } else {
-            label?.text = "Found \(savedItems.count) ads"
+            label?.text = savedItems.count == 1 ? "Found 1 ad" : "Found \(savedItems.count) ads"
         }
     }
     

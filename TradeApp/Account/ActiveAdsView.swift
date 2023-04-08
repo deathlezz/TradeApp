@@ -132,11 +132,8 @@ class ActiveAdsView: UITableViewController {
             let images = item?.photos.map {UIImage(data: $0!)!}
             AddItemView.shared.images = images!
             vc.isEditMode = true
-            vc.itemTitle = item?.title
-            vc.itemPrice = "\(item!.price)"
-            vc.itemCategory = item?.category
-            vc.itemLocation = item?.location
-            vc.itemDescription = item?.description
+            vc.isAdActive = true
+            vc.item = item
             navigationController?.pushViewController(vc, animated: true)
         }
     }

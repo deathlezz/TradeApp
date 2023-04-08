@@ -25,12 +25,9 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
 
     var loggedUser: String!
     var isEditMode: Bool!
+    var isAdActive: Bool!
     
-    var itemTitle: String!
-    var itemPrice: String!
-    var itemCategory: String!
-    var itemLocation: String!
-    var itemDescription: String!
+    var item: Item?
     
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
@@ -145,7 +142,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             
             switch sections[indexPath.section] {
             case "Title":
-                cell.textField.text = itemTitle ?? ""
+                cell.textField.text = item?.title ?? ""
                 cell.textField.placeholder = "e.g. iPhone 14 Pro"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
@@ -153,7 +150,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 textFieldCells.append(cell)
                 return cell
             case "Price":
-                cell.textField.text = itemPrice ?? ""
+                cell.textField.text = item?.price.description ?? ""
                 cell.textField.placeholder = "£"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
@@ -161,14 +158,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 textFieldCells.append(cell)
                 return cell
             case "Category":
-                cell.textField.text = itemCategory ?? ""
+                cell.textField.text = item?.category ?? ""
                 cell.textField.placeholder = "e.g. Electronics"
                 cell.textField.isUserInteractionEnabled = false
                 cell.selectionStyle = .none
                 textFieldCells.append(cell)
                 return cell
             case "Location":
-                cell.textField.text = itemLocation ?? ""
+                cell.textField.text = item?.location ?? ""
                 cell.textField.placeholder = "e.g. City"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
@@ -183,7 +180,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         if let cell = tableView.dequeueReusableCell(withIdentifier: "TextViewCell", for: indexPath) as? TextViewCell {
             if sections[indexPath.section] == "Description" {
                 cell.selectionStyle = .none
-                cell.textView.text = itemDescription ?? ""
+                cell.textView.text = item?.description ?? ""
                 cell.textView.layer.cornerRadius = 5
                 cell.textView.layer.borderWidth = 0.1
                 cell.textView.layer.borderColor = UIColor.darkGray.cgColor
@@ -287,22 +284,45 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // set action for submit button
     @objc func submitTapped() {
         let photos = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
-        let title = textFieldCells[0].textField.text?.capitalized
-        let price = textFieldCells[1].textField.text
-        let category = textFieldCells[2].textField.text
-        let location = textFieldCells[3].textField.text?.capitalized
-        let description = textViewCell?.textView.text
+        guard let title = textFieldCells[0].textField.text?.capitalized else { return }
+        guard let price = textFieldCells[1].textField.text else { return }
+        guard let category = textFieldCells[2].textField.text else { return }
+        guard let location = textFieldCells[3].textField.text?.capitalized else { return }
+        guard let description = textViewCell?.textView.text else { return }
         
-        Utilities.isCityValid(location!) { [weak self] valid in
-            if !photos.isEmpty && !title!.isEmpty && !price!.isEmpty && !category!.isEmpty && !location!.isEmpty && !description!.isEmpty {
+        Utilities.isCityValid(location) { [weak self] valid in
+            if !photos.isEmpty && !title.isEmpty && !price.isEmpty && !category.isEmpty && !location.isEmpty && !description.isEmpty {
                 
                 if valid {
-                    Utilities.forwardGeocoding(address: location!) { (lat, long) in
-                        let newItem = Item(photos: photos, title: title!, price: Int(price!)!, category: category!, location: location!, description: description!, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
-                        Storage.shared.items.append(newItem)
-                        Storage.shared.recentlyAdded.append(newItem)
-                        Storage.shared.filteredItems = Storage.shared.recentlyAdded
-                        self?.showAlert(.success)
+                    Utilities.forwardGeocoding(address: location) { (lat, long) in
+                        
+                        if self?.isEditMode != nil {
+                            print("ok")
+                            guard let userIndex = Storage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
+                            
+                            if self?.isAdActive == true {
+                                print("ok")
+                                guard let itemIndex = Storage.shared.users[userIndex].activeItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
+                                print(Storage.shared.users[userIndex].activeItems[itemIndex]?.title)
+                                Storage.shared.users[userIndex].activeItems[itemIndex]?.photos = photos
+                                Storage.shared.users[userIndex].activeItems[itemIndex]?.title = title
+                                Storage.shared.users[userIndex].activeItems[itemIndex]?.price = Int(price)!
+                                Storage.shared.users[userIndex].activeItems[itemIndex]?.category = category
+                                Storage.shared.users[userIndex].activeItems[itemIndex]?.location = location
+                                Storage.shared.users[userIndex].activeItems[itemIndex]?.description = description
+                                print(Storage.shared.users[userIndex].activeItems[itemIndex]?.title)
+                            } else {
+                                guard let itemIndex = Storage.shared.users[userIndex].endedItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
+                            }
+                            
+                            
+                        } else {
+                            let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
+                            Storage.shared.items.append(newItem)
+                            Storage.shared.recentlyAdded.append(newItem)
+                            Storage.shared.filteredItems = Storage.shared.recentlyAdded
+                            self?.showAlert(.success)
+                        }
                     }
                     
                 } else {
