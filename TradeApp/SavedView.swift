@@ -165,6 +165,12 @@ class SavedView: UICollectionViewController {
         savedItems = Utilities.loadItems()
         collectionView.reloadData()
     }
+    
+    // cancel selection after view disappeared
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancelTapped()
+    }
 
     // set action for select button
     @objc func selectTapped() {

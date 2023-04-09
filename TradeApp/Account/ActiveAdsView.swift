@@ -24,13 +24,9 @@ class ActiveAdsView: UITableViewController {
         tableView.sectionHeaderTopPadding = 0
         tableView.separatorInset.left = 17
         
-        DispatchQueue.global().async { [weak self] in
-            self?.loadUserAds()
-            
-            DispatchQueue.main.async {
-                self?.tableView.reloadData()
-            }
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name("reloadActiveAds"), object: nil)
+        
+        loadData()
     }
     
     // set number of sections
@@ -133,6 +129,7 @@ class ActiveAdsView: UITableViewController {
             AddItemView.shared.images = images!
             vc.isEditMode = true
             vc.isAdActive = true
+            vc.loggedUser = mail
             vc.item = item
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -196,6 +193,17 @@ class ActiveAdsView: UITableViewController {
         let indexPath = IndexPath(row: itemIndex, section: 0)
         tableView.deleteRows(at: [indexPath], with: .fade)
         updateHeader()
+    }
+    
+    // load user active ads
+    @objc func loadData() {
+        DispatchQueue.global().async { [weak self] in
+            self?.loadUserAds()
+            
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
+            }
+        }
     }
     
 }

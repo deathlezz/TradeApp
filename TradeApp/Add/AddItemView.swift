@@ -12,6 +12,7 @@ enum AlertType {
     case emptyField
     case cityError
     case success
+    case edit
 }
 
 enum ActionType {
@@ -297,27 +298,35 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                     Utilities.forwardGeocoding(address: location) { (lat, long) in
                         
                         if self?.isEditMode != nil {
-                            print("ok")
                             guard let userIndex = Storage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
                             
                             if self?.isAdActive == true {
-                                print("ok")
                                 guard let itemIndex = Storage.shared.users[userIndex].activeItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
-                                print(Storage.shared.users[userIndex].activeItems[itemIndex]?.title)
                                 Storage.shared.users[userIndex].activeItems[itemIndex]?.photos = photos
                                 Storage.shared.users[userIndex].activeItems[itemIndex]?.title = title
                                 Storage.shared.users[userIndex].activeItems[itemIndex]?.price = Int(price)!
                                 Storage.shared.users[userIndex].activeItems[itemIndex]?.category = category
                                 Storage.shared.users[userIndex].activeItems[itemIndex]?.location = location
                                 Storage.shared.users[userIndex].activeItems[itemIndex]?.description = description
-                                print(Storage.shared.users[userIndex].activeItems[itemIndex]?.title)
+                                NotificationCenter.default.post(name: NSNotification.Name("reloadActiveAds"), object: nil)
+                                self?.showAlert(.edit)
                             } else {
                                 guard let itemIndex = Storage.shared.users[userIndex].endedItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
+                                Storage.shared.users[userIndex].endedItems[itemIndex]?.photos = photos
+                                Storage.shared.users[userIndex].endedItems[itemIndex]?.title = title
+                                Storage.shared.users[userIndex].endedItems[itemIndex]?.price = Int(price)!
+                                Storage.shared.users[userIndex].endedItems[itemIndex]?.category = category
+                                Storage.shared.users[userIndex].endedItems[itemIndex]?.location = location
+                                Storage.shared.users[userIndex].endedItems[itemIndex]?.description = description
+                                NotificationCenter.default.post(name: NSNotification.Name("reloadEndedAds"), object: nil)
+                                self?.showAlert(.edit)
                             }
                             
-                            
                         } else {
+                            guard let userIndex = Storage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
+                            
                             let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
+                            Storage.shared.users[userIndex].activeItems.append(newItem)
                             Storage.shared.items.append(newItem)
                             Storage.shared.recentlyAdded.append(newItem)
                             Storage.shared.filteredItems = Storage.shared.recentlyAdded
@@ -345,13 +354,19 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             let ac = UIAlertController(title: "Invalid city name", message: "Enter valid city name to continue.", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .cancel))
             present(ac, animated: true)
+        } else if type == .edit {
+            let ac = UIAlertController(title: "Item edited successfully", message: "Changes will be visible soon", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+                self?.clearTapped()
+                self?.navigationController?.popViewController(animated: true)
+            })
+            present(ac, animated: true)
         } else {
             let ac = UIAlertController(title: "Item added successfully", message: "Your item will be visible soon", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .cancel) { [weak self] _ in
                 self?.clearTapped()
                 self?.tabBarController?.selectedIndex = 0
             })
-            
             present(ac, animated: true)
         }
     }

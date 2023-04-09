@@ -7,8 +7,6 @@
 
 import UIKit
 
-import UIKit
-
 class EndedAdsView: UITableViewController {
     
     var header: UILabel!
@@ -26,13 +24,9 @@ class EndedAdsView: UITableViewController {
         tableView.sectionHeaderTopPadding = 0
         tableView.separatorInset.left = 17
         
-        DispatchQueue.global().async { [weak self] in
-            self?.loadUserAds()
-            
-            DispatchQueue.main.async {
-                self?.tableView.reloadData()
-            }
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name("reloadEndedAds"), object: nil)
+        
+        loadData()
     }
     
     // set number of sections
@@ -133,6 +127,7 @@ class EndedAdsView: UITableViewController {
             AddItemView.shared.images = images!
             vc.isEditMode = true
             vc.isAdActive = false
+            vc.loggedUser = mail
             vc.item = item
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -192,6 +187,17 @@ class EndedAdsView: UITableViewController {
         let indexPath = IndexPath(row: itemIndex, section: 0)
         tableView.deleteRows(at: [indexPath], with: .fade)
         updateHeader()
+    }
+    
+    // load user ended ads
+    @objc func loadData() {
+        DispatchQueue.global().async { [weak self] in
+            self?.loadUserAds()
+            
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
+            }
+        }
     }
     
 }
