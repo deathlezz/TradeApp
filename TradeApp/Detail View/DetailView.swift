@@ -230,8 +230,19 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set action for call button
     @objc func callTapped() {
-        let phoneNumber = 123456789
-        guard let url = URL(string: "telprompt://\(phoneNumber)"), UIApplication.shared.canOpenURL(url) else { return }
+        
+        var phoneNumber: Int?
+        let users = Storage.shared.users
+        
+        for user in users {
+            for activeItem in user.activeItems {
+                if activeItem?.id == item?.id {
+                    phoneNumber = user.phoneNumber ?? 0
+                }
+            }
+        }
+
+        guard let url = URL(string: "telprompt://\(phoneNumber!)"), UIApplication.shared.canOpenURL(url) else { return }
         UIApplication.shared.open(url)
     }
     
@@ -257,11 +268,6 @@ class DetailView: UITableViewController, Index, Coordinates {
             NotificationCenter.default.post(name: NSNotification.Name("removeMap"), object: nil)
         }
     }
-    
-    // push distance between user and item
-//    func pushDistance(_ string: String) {
-//        distance = string
-//    }
     
     // push item coordinates
     func pushCoords(_ lat: Double, _ long: Double) {

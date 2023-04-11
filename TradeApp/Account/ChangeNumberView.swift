@@ -70,7 +70,7 @@ class ChangeNumberView: UITableViewController {
             label.frame = CGRect.init(x: 20, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         }
         
-        label.text = sections[section] == "New number" ? sections[section] : " "
+        label.text = sections[section] == "New number" ? "Set number" : " "
         label.font = .boldSystemFont(ofSize: 15)
         label.textColor = .systemGray
         
@@ -183,11 +183,11 @@ class ChangeNumberView: UITableViewController {
         
         if currentNumber != nil {
             sections = ["Current number", "New number", "Button"]
-            tableView.insertSections(indexSet, with: .automatic)
+            tableView.insertSections(indexSet, with: .fade)
             updateHeader(after: .add)
         } else {
             sections = ["New number", "Button"]
-            tableView.deleteSections(indexSet, with: .automatic)
+            tableView.deleteSections(indexSet, with: .fade)
             updateHeader(after: .delete)
         }
     }
@@ -198,13 +198,13 @@ class ChangeNumberView: UITableViewController {
         
         if after == .add {
             UIView.transition(with: secondHeader!, duration: 0.3, options: .transitionCrossDissolve, animations: {
-                self.secondHeader?.text = "Set number"
+                self.secondHeader?.text = "New number"
                 self.secondHeader?.frame = CGRect.init(x: 20, y: -20, width: self.secondHeader.frame.width, height: self.secondHeader.frame.height)
             })
             
         } else {
             UIView.transition(with: secondHeader!, duration: 0.3, options: .transitionCrossDissolve, animations: {
-                self.secondHeader?.text = "New number"
+                self.secondHeader?.text = "Set number"
                 self.secondHeader?.frame = CGRect.init(x: 20, y: 11, width: self.secondHeader.frame.width, height: self.secondHeader.frame.height)
             })
         }
@@ -252,7 +252,7 @@ class ChangeNumberView: UITableViewController {
         
         if currentNumber != nil {
             sections = ["Current number", "New number", "Button"]
-            tableView.insertSections(indexSet, with: .automatic)
+            tableView.insertSections(indexSet, with: .fade)
             updateHeader(after: .add)
         }
     }

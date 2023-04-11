@@ -6,11 +6,13 @@
 //
 
 import UIKit
+import CoreLocation
 
 class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
+    var currentUnit: String!
     var currentFilters = [String: String]()
     
     var delegate: UITabBarController!
@@ -54,9 +56,10 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         DispatchQueue.global().async { [weak self] in
             self?.resetFilters()
-            let newUser = User(mail: "mail@wp.pl", password: "passWord123")
+            let newUser = User(mail: "mail@wp.pl", password: "passWord123", phoneNumber: 998978778)
             Storage.shared.users.append(newUser)
             self?.mail = Utilities.loadUser()
+            self?.currentUnit = Utilities.loadDistanceUnit()
             self?.loadData()
             self?.loadItems()
             
@@ -160,6 +163,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         navigationController?.isToolbarHidden = true
         navigationController?.isNavigationBarHidden = false
         currentFilters = Utilities.loadFilters()
+        currentUnit = Utilities.loadDistanceUnit()
         changeTitle()
         hideButtons()
         collectionView.reloadData()
@@ -167,7 +171,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
+        refreshControl.beginRefreshing()
         loadItems()
+        applyFilters()
         collectionView.reloadData()
         refreshControl.endRefreshing()
     }
@@ -285,6 +291,14 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         print(Storage.shared.items.count)
     }
     
+    // apply all filters
+    func applyFilters() {
+        checkMainFilters()
+        checkPriceFilter()
+        checkLocationFilter()
+        checkSortFilter()
+    }
+    
     // stop double tap for all tab items
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         return viewController != tabBarController.selectedViewController
@@ -305,6 +319,99 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             }
         }
         return uniqueID
+    }
+    
+    // check search and category filter
+    func checkMainFilters() {
+        if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
+            if currentFilters["Category"] == categories[0] {
+                Storage.shared.filteredItems = Storage.shared.items
+                Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+            } else {
+                Storage.shared.filteredItems = Storage.shared.items.filter {$0.category == currentFilters["Category"]}
+                Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+            }
+        } else if currentFilters["Search"] != nil {
+            Storage.shared.filteredItems = Storage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+        } else if currentFilters["Category"] != nil {
+            if currentFilters["Category"] == categories[0] {
+                Storage.shared.filteredItems = Storage.shared.items
+            } else {
+                Storage.shared.filteredItems = Storage.shared.items.filter {$0.category == currentFilters["Category"]}
+            }
+        }
+    }
+    
+    // check price filter
+    func checkPriceFilter() {
+        if currentFilters["PriceFrom"] != nil && currentFilters["PriceTo"] != nil {
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(currentFilters["PriceFrom"]!)! && $0.price <= Int(currentFilters["PriceTo"]!)!}
+        } else if currentFilters["PriceFrom"] != nil {
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(currentFilters["PriceFrom"]!)!}
+        } else if currentFilters["PriceTo"] != nil {
+            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price <= Int(currentFilters["PriceTo"]!)!}
+        }
+    }
+    
+    // check sort filter
+    func checkSortFilter() {
+        if currentFilters["Sort"] != nil {
+            if currentFilters["Sort"] == "Lowest price" {
+                Storage.shared.filteredItems.sort(by: {$0.price < $1.price})
+            } else if currentFilters["Sort"] == "Highest price" {
+                Storage.shared.filteredItems.sort(by: {$0.price > $1.price})
+            } else if currentFilters["Sort"] == "Date added" {
+                Storage.shared.filteredItems.sort(by: {$0.date < $1.date})
+            }
+        }
+    }
+    
+    // check location filter
+    func checkLocationFilter() {
+        var matched = [Item]()
+        
+//        let dispatchGroup = DispatchGroup()
+//        dispatchGroup.enter()
+        
+        print(currentFilters["Location"])
+        if currentFilters["Location"] != nil {
+            print("location has value")
+            
+            Utilities.forwardGeocoding(address: currentFilters["Location"]!) { [weak self] (lat, long) in
+                print("closure beginning")
+                let cityLocation = CLLocation(latitude: lat, longitude: long)
+                
+                var unit: Double
+                
+                if self?.currentUnit == "mi" {
+                    unit = 1609
+                } else {
+                    unit = 1000
+                }
+                
+                for item in Storage.shared.filteredItems {
+                    
+                    let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
+                    let distance = Int(cityLocation.distance(from: itemLocation) / unit)
+                    
+                    if Int(distance) <= Int((self?.currentFilters["Radius"]!)!)! {
+                        matched.append(item)
+                    }
+                }
+                
+                Storage.shared.filteredItems = matched
+                print("notified")
+                print(Storage.shared.filteredItems.count)
+                
+//                dispatchGroup.leave()
+            }
+            
+//            dispatchGroup.notify(queue: .main) {
+//                Storage.shared.filteredItems = matched
+//                print("notified")
+//                print(Storage.shared.filteredItems.count)
+//            }
+        }
     }
     
 }
