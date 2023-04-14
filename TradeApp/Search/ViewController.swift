@@ -7,10 +7,15 @@
 
 import UIKit
 import CoreLocation
+import Network
 
 class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
+    
+    var radiusStages = [0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 175, 200]
+    
+    let monitor = NWPathMonitor()
     
     var currentUnit: String!
     var currentFilters = [String: String]()
@@ -31,6 +36,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         title = "Recently added"
         navigationController?.navigationBar.prefersLargeTitles = true
+        
+        checkConnection()
         
         tabBarController?.delegate = self
         
@@ -174,7 +181,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         refreshControl.beginRefreshing()
         loadItems()
         applyFilters()
-        collectionView.reloadData()
         refreshControl.endRefreshing()
     }
     
@@ -288,15 +294,18 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                 Storage.shared.items.append(item!)
             }
         }
-        print(Storage.shared.items.count)
     }
     
     // apply all filters
     func applyFilters() {
         checkMainFilters()
         checkPriceFilter()
-        checkLocationFilter()
         checkSortFilter()
+        checkLocationFilter()
+        
+        if currentFilters["Location"] == nil {
+            collectionView.reloadData()
+        }
     }
     
     // stop double tap for all tab items
@@ -368,17 +377,17 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // check location filter
     func checkLocationFilter() {
+        guard let radiusCounter = Int(currentFilters["Radius"] ?? "0") else { return }
+        let radius = radiusStages[radiusCounter]
+        
         var matched = [Item]()
         
-//        let dispatchGroup = DispatchGroup()
-//        dispatchGroup.enter()
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
         
-        print(currentFilters["Location"])
         if currentFilters["Location"] != nil {
-            print("location has value")
             
             Utilities.forwardGeocoding(address: currentFilters["Location"]!) { [weak self] (lat, long) in
-                print("closure beginning")
                 let cityLocation = CLLocation(latitude: lat, longitude: long)
                 
                 var unit: Double
@@ -394,24 +403,35 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                     let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
                     let distance = Int(cityLocation.distance(from: itemLocation) / unit)
                     
-                    if Int(distance) <= Int((self?.currentFilters["Radius"]!)!)! {
+                    if Int(distance) <= radius {
                         matched.append(item)
                     }
                 }
                 
-                Storage.shared.filteredItems = matched
-                print("notified")
-                print(Storage.shared.filteredItems.count)
-                
-//                dispatchGroup.leave()
+                dispatchGroup.leave()
             }
             
-//            dispatchGroup.notify(queue: .main) {
-//                Storage.shared.filteredItems = matched
-//                print("notified")
-//                print(Storage.shared.filteredItems.count)
-//            }
+            dispatchGroup.notify(queue: .main) {
+                Storage.shared.filteredItems = matched
+                self.collectionView.reloadData()
+            }
         }
+    }
+    
+    // check for internet connection
+    func checkConnection() {
+        monitor.pathUpdateHandler = { path in
+            if path.status == .satisfied {
+                print("We're connected!")
+            } else {
+                print("No connection.")
+            }
+
+            print(path.isExpensive)
+        }
+        
+        let queue = DispatchQueue(label: "Monitor")
+        monitor.start(queue: queue)
     }
     
 }
