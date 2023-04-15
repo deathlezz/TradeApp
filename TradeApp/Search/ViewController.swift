@@ -16,6 +16,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     var radiusStages = [0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 175, 200]
     
     let monitor = NWPathMonitor()
+    var connectedOnLoad: Bool!
+    var connected: Bool!
     
     var currentUnit: String!
     var currentFilters = [String: String]()
@@ -421,17 +423,43 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     // check for internet connection
     func checkConnection() {
         monitor.pathUpdateHandler = { path in
-            if path.status == .satisfied {
-                print("We're connected!")
-            } else {
-                print("No connection.")
+            
+            if self.connectedOnLoad != nil {
+                self.connected = !self.connected
+                self.pushToNoConnectionView()
+                print("Connected: \(self.connected!)")
             }
-
-            print(path.isExpensive)
+            
+            guard self.connectedOnLoad == nil else { return }
+            
+            if path.status == .satisfied {
+                self.connectedOnLoad = true
+                self.connected = true
+            } else {
+                self.connectedOnLoad = false
+                self.connected = false
+            }
+            
+            self.pushToNoConnectionView()
+            print("Connected: \(self.connected!)")
         }
         
         let queue = DispatchQueue(label: "Monitor")
         monitor.start(queue: queue)
+    }
+    
+    // show no connection view
+    func pushToNoConnectionView() {
+        DispatchQueue.main.async {
+            if self.connected == false {
+                if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
+                    vc.navigationItem.hidesBackButton = true
+                    self.navigationController?.pushViewController(vc, animated: false)
+                }
+            } else {
+                self.navigationController?.popToRootViewController(animated: false)
+            }
+        }
     }
     
 }
