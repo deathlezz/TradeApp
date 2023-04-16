@@ -457,7 +457,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                     self.navigationController?.pushViewController(vc, animated: false)
                 }
             } else {
-                self.navigationController?.popToRootViewController(animated: false)
+                self.navigationController?.popViewController(animated: false)
             }
         }
     }

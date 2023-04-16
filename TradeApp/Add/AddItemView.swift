@@ -50,7 +50,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             title = "Edit"
         } else {
             title = "Add"
-            clearTapped()
         }
         
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -214,6 +213,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             }
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(ac, animated: true)
+        }
+    }
+    
+    // reset view before it disappear
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if title == "Edit" {
+            clearTapped()
         }
     }
     

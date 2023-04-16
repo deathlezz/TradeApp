@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Network
 
 enum AccountAction {
     case login
@@ -23,6 +24,10 @@ class LoginView: UITableViewController {
     
     var loggedUser: String!
     
+    let monitor = NWPathMonitor()
+    var connectedOnLoad: Bool!
+    var connected: Bool!
+    
     var segment: SegmentedControlCell!
     var email: TextFieldCell!
     var password: TextFieldCell!
@@ -33,6 +38,8 @@ class LoginView: UITableViewController {
 
         title = "Account"
         navigationController?.navigationBar.prefersLargeTitles = true
+        
+        checkConnection()
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 10
@@ -258,6 +265,8 @@ class LoginView: UITableViewController {
             guard loggedUser != nil else { return }
         }
         
+        guard connected else { return }
+        
         if tabBarController?.selectedIndex == 2 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
                 vc.loggedUser = loggedUser
@@ -288,6 +297,48 @@ class LoginView: UITableViewController {
             navigationController?.tabBarItem.title = "Add"
         } else if tabBarController?.selectedIndex == 3 {
             navigationController?.tabBarItem.title = "Account"
+        }
+    }
+    
+    // check for internet connection
+    func checkConnection() {
+        monitor.pathUpdateHandler = { path in
+            
+            if self.connectedOnLoad != nil {
+                self.connected = !self.connected
+                self.pushToNoConnectionView()
+                print("Connected: \(self.connected!)")
+            }
+            
+            guard self.connectedOnLoad == nil else { return }
+            
+            if path.status == .satisfied {
+                self.connectedOnLoad = true
+                self.connected = true
+            } else {
+                self.connectedOnLoad = false
+                self.connected = false
+            }
+            
+            self.pushToNoConnectionView()
+            print("Connected: \(self.connected!)")
+        }
+        
+        let queue = DispatchQueue(label: "Monitor")
+        monitor.start(queue: queue)
+    }
+    
+    // show no connection view
+    func pushToNoConnectionView() {
+        DispatchQueue.main.async {
+            if self.connected == false {
+                if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
+                    vc.navigationItem.hidesBackButton = true
+                    self.navigationController?.pushViewController(vc, animated: false)
+                }
+            } else {
+                self.navigationController?.popViewController(animated: false)
+            }
         }
     }
     
