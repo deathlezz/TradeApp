@@ -14,7 +14,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
-    var isPushed: Bool!
+//    var isPushed: Bool!
     
     var latitude: Double!
     var longitude: Double!
@@ -205,7 +205,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        isPushed = false
+//        isPushed = false
         
         NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
         
@@ -256,7 +256,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ItemView") as? ItemView {
             vc.currentImage = index
             vc.imgs = item.photos.map {UIImage(data: $0!)}
-            isPushed = true
+//            isPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -264,7 +264,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     // remove mapView after view disappeared
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        if !isPushed {
+        if self.isMovingFromParent {
             NotificationCenter.default.post(name: NSNotification.Name("removeMap"), object: nil)
         }
     }

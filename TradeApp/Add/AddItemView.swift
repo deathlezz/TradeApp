@@ -217,12 +217,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // reset view before it disappear
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if title == "Edit" {
-            clearTapped()
-        }
-    }
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//        if title == "Edit" {
+//            clearTapped()
+//        }
+//    }
     
     // detect textView's text changes
     func textViewDidChange(_ textView: UITextView) {
