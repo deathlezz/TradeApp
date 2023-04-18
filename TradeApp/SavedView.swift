@@ -6,14 +6,21 @@
 //
 
 import UIKit
+import Network
 
 class SavedView: UICollectionViewController {
     
     var savedItems = [Item]()
     
+    var isPushed: Bool!
+    
     var selectButton: UIBarButtonItem!
     var cancelButton: UIBarButtonItem!
     var deleteButton: UIBarButtonItem!
+    
+    let monitor = NWPathMonitor()
+    var connectedOnLoad: Bool!
+    var connected: Bool!
     
     var selectedCells = [UICollectionViewCell]()
     
@@ -22,6 +29,8 @@ class SavedView: UICollectionViewController {
         
         title = "Saved"
         navigationController?.navigationBar.prefersLargeTitles = true
+        
+        checkConnection()
         
         selectButton = UIBarButtonItem(title: "Select", style: .plain, target: self, action: #selector(selectTapped))
         cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelTapped))
@@ -77,15 +86,16 @@ class SavedView: UICollectionViewController {
     
     // set action for selected cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if navigationItem.rightBarButtonItems == [selectButton] {
+        if navigationItem.rightBarButtonItems == [selectButton] && connected {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
 //                vc.imgs = savedItems[indexPath.item].photos.map {UIImage(data: $0!)}
                 vc.item = savedItems[indexPath.item]
                 vc.hidesBottomBarWhenPushed = true
+                isPushed = true
                 navigationController?.pushViewController(vc, animated: true)
             }
             
-        } else {
+        } else if navigationItem.rightBarButtonItems != [selectButton] && !connected {
             guard let cell = collectionView.cellForItem(at: indexPath) else { return }
             
             if cell.isSelected {
@@ -99,6 +109,8 @@ class SavedView: UICollectionViewController {
                     self.updateHeader()
                 }
             }
+        } else {
+            connectionAlert()
         }
     }
     
@@ -163,6 +175,7 @@ class SavedView: UICollectionViewController {
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
         navigationController?.isToolbarHidden = true
         savedItems = Utilities.loadItems()
+        isPushed = false
         collectionView.reloadData()
     }
     
@@ -273,6 +286,55 @@ class SavedView: UICollectionViewController {
         }, completion: { (true) in
             tabBar.isHidden = hidden
         })
+    }
+    
+    // check for internet connection
+    func checkConnection() {
+        monitor.pathUpdateHandler = { path in
+            
+            if self.connectedOnLoad != nil {
+                self.connected = !self.connected
+                self.pushToNoConnectionView()
+                print("Connected: \(self.connected!)")
+            }
+            
+            guard self.connectedOnLoad == nil else { return }
+            
+            if path.status == .satisfied {
+                self.connectedOnLoad = true
+                self.connected = true
+            } else {
+                self.connectedOnLoad = false
+                self.connected = false
+            }
+            
+            self.pushToNoConnectionView()
+            print("Connected: \(self.connected!)")
+        }
+        
+        let queue = DispatchQueue(label: "Monitor")
+        monitor.start(queue: queue)
+    }
+    
+    // show no connection view
+    func pushToNoConnectionView() {
+        DispatchQueue.main.async {
+            if self.connected == false && self.isPushed {
+                if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
+                    vc.navigationItem.hidesBackButton = true
+                    self.navigationController?.pushViewController(vc, animated: false)
+                }
+            } else {
+                self.navigationController?.popViewController(animated: false)
+            }
+        }
+    }
+    
+    // show no connection alert
+    func connectionAlert() {
+        let ac = UIAlertController(title: "No Connection", message: "Restore internet and try again", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
     }
     
 }
