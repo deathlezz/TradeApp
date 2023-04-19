@@ -33,7 +33,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
     
-    static let shared = AddItemView()
+//    static let shared = AddItemView()
     var images = [UIImage]()
     
     let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
@@ -43,14 +43,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.dataSource = self
+        tableView.delegate = self
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
-        
-        if isEditMode != nil {
-            title = "Edit"
-        } else {
-            title = "Add"
-        }
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.hidesBarsOnSwipe = false
@@ -58,6 +54,13 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearTapped))
         
         NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
+        
+        if isEditMode != nil {
+            title = "Edit"
+            loadImages()
+        } else {
+            title = "Add"
+        }
     }
 
     // set number of rows in section
@@ -216,10 +219,23 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
     }
     
+    // load images and push them into CollectionView
+    func loadImages() {
+        DispatchQueue.global().async { [weak self] in
+            self?.images = self?.item?.photos.map {UIImage(data: $0!)!} ?? [UIImage]()
+            
+            DispatchQueue.main.async {
+                
+            }
+        }
+    }
+    
     // reset view before it disappear
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        clearTapped()
+        if title == "Edit" {
+            clearTapped()
+        }
     }
     
     // detect textView's text changes
@@ -242,10 +258,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         textViewCell?.textView.text = nil
         tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: 200"
-        AddItemView.shared.images.removeAll()
+//        AddItemView.shared.images.removeAll()
+        images.removeAll()
         
         for _ in 0...7 {
-            AddItemView.shared.images.append(UIImage(systemName: "plus")!)
+//            AddItemView.shared.images.append(UIImage(systemName: "plus")!)
+            images.append(UIImage(systemName: "plus")!)
         }
 
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
@@ -289,7 +307,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for submit button
     @objc func submitTapped() {
-        let photos = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
+//        let photos = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
+        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
         guard let title = textFieldCells[0].textField.text?.capitalized else { return }
         guard let price = textFieldCells[1].textField.text else { return }
         guard let category = textFieldCells[2].textField.text else { return }
@@ -415,11 +434,18 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         dismiss(animated: true)
         
         if action == .edit {
-            AddItemView.shared.images[index] = image
+//            AddItemView.shared.images[index] = image
+            images[index] = image
         } else {
-            for i in 0...AddItemView.shared.images.count {
-                if AddItemView.shared.images[i] == UIImage(systemName: "plus") {
-                    AddItemView.shared.images[i] = image
+//            for i in 0...AddItemView.shared.images.count {
+//                if AddItemView.shared.images[i] == UIImage(systemName: "plus") {
+//                    AddItemView.shared.images[i] = image
+//                    break
+//                }
+//            }
+            for i in 0...images.count {
+                if images[i] == UIImage(systemName: "plus") {
+                    images[i] = image
                     break
                 }
             }
@@ -459,10 +485,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // remove photo
     func deletePhoto() {
-        AddItemView.shared.images[index] = UIImage(systemName: "plus")!
-        let plusImages = AddItemView.shared.images.filter {$0 == UIImage(systemName: "plus")}
-        AddItemView.shared.images = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}
-        AddItemView.shared.images += plusImages
+//        AddItemView.shared.images[index] = UIImage(systemName: "plus")!
+        images[index] = UIImage(systemName: "plus")!
+//        let plusImages = AddItemView.shared.images.filter {$0 == UIImage(systemName: "plus")}
+//        AddItemView.shared.images = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}
+//        AddItemView.shared.images += plusImages
+        let plusImages = images.filter {$0 == UIImage(systemName: "plus")}
+        images = images.filter {$0 != UIImage(systemName: "plus")}
+        images += plusImages
         action = nil
         index = nil
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
@@ -475,15 +505,18 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // rotate photo by 90 degrees using Core Image
     func rotatePhoto() {
-        let photo = AddItemView.shared.images[index]
-        AddItemView.shared.images[index] = photo.rotate(radians: -.pi / 2)!
+//        let photo = AddItemView.shared.images[index]
+//        AddItemView.shared.images[index] = photo.rotate(radians: -.pi / 2)!
+        let photo = images[index]
+        images[index] = photo.rotate(radians: -.pi / 2)!
         
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // swap current image with the first one
     func setAsFirst() {
-        (AddItemView.shared.images[0], AddItemView.shared.images[index]) = (AddItemView.shared.images[index], AddItemView.shared.images[0])
+//        (AddItemView.shared.images[0], AddItemView.shared.images[index]) = (AddItemView.shared.images[index], AddItemView.shared.images[0])
+        (images[0], images[index]) = (images[index], images[0])
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
