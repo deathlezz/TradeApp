@@ -33,7 +33,6 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         NotificationCenter.default.addObserver(self, selector: #selector(reloadView), name: NSNotification.Name("reload"), object: nil)
         
         for _ in 0...7 {
-//            AddItemView.shared.images.append(UIImage(systemName: "plus")!)
             images.append(UIImage(systemName: "plus")!)
         }
     }
@@ -112,6 +111,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         if coordinator.proposal.operation == .move {
             reorderItems(coordinator: coordinator, destinationIndexPath: destinationIndexPath, collectionView: collectionView)
             reloadView()
+            NotificationCenter.default.post(name: NSNotification.Name("reorderImages"), object: nil, userInfo: ["images": images])
         }
     }
     
@@ -143,8 +143,11 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         }
     }
     
+    // load item images on load
     @objc func loadImages(_ notification: NSNotification) {
-        images = notification.userInfo?[0] as! [UIImage]
+        let itemPhotos = notification.userInfo?["images"] as! [UIImage]
+        images = itemPhotos
+        collectionView.reloadData()
     }
     
 }
