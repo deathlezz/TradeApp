@@ -35,7 +35,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
     
-//    static let shared = AddItemView()
     var images = [UIImage]()
     
     let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
@@ -272,12 +271,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         textViewCell?.textView.text = nil
         tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: 200"
-//        AddItemView.shared.images.removeAll()
         images.removeAll()
         uploadedPhotos.removeAll()
         
         for _ in 0...7 {
-//            AddItemView.shared.images.append(UIImage(systemName: "plus")!)
             images.append(UIImage(systemName: "plus")!)
         }
 
@@ -323,7 +320,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for submit button
     @objc func submitTapped() {
-//        let photos = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
         let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
         guard let title = textFieldCells[0].textField.text else { return }
         guard let price = textFieldCells[1].textField.text else { return }
@@ -368,8 +364,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
                             Storage.shared.users[userIndex].activeItems.append(newItem)
                             Storage.shared.items.append(newItem)
-                            Storage.shared.recentlyAdded.append(newItem)
-                            Storage.shared.filteredItems = Storage.shared.recentlyAdded
+//                            Storage.shared.recentlyAdded.append(newItem)
+//                            Storage.shared.filteredItems = Storage.shared.recentlyAdded
                             self?.showAlert(.success)
                         }
                     }
@@ -450,15 +446,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         dismiss(animated: true)
         
         if action == .edit {
-//            AddItemView.shared.images[index] = image
             images[index] = image
         } else {
-//            for i in 0...AddItemView.shared.images.count {
-//                if AddItemView.shared.images[i] == UIImage(systemName: "plus") {
-//                    AddItemView.shared.images[i] = image
-//                    break
-//                }
-//            }
             for i in 0..<images.count {
                 if images[i] == UIImage(systemName: "plus") {
                     images[i] = image
@@ -506,11 +495,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // remove photo
     func deletePhoto() {
-//        AddItemView.shared.images[index] = UIImage(systemName: "plus")!
         images[index] = UIImage(systemName: "plus")!
-//        let plusImages = AddItemView.shared.images.filter {$0 == UIImage(systemName: "plus")}
-//        AddItemView.shared.images = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}
-//        AddItemView.shared.images += plusImages
         let plusImages = images.filter {$0 == UIImage(systemName: "plus")}
         images = images.filter {$0 != UIImage(systemName: "plus")}
         images += plusImages
@@ -528,8 +513,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // rotate photo by 90 degrees using Core Image
     func rotatePhoto() {
-//        let photo = AddItemView.shared.images[index]
-//        AddItemView.shared.images[index] = photo.rotate(radians: -.pi / 2)!
         let photo = images[index]
         images[index] = photo.rotate(radians: -.pi / 2)!
         
@@ -539,7 +522,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // swap current image with the first one
     func setAsFirst() {
-//        (AddItemView.shared.images[0], AddItemView.shared.images[index]) = (AddItemView.shared.images[index], AddItemView.shared.images[0])
         (images[0], images[index]) = (images[index], images[0])
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)

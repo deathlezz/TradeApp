@@ -71,6 +71,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             self?.currentUnit = Utilities.loadDistanceUnit()
             self?.loadData()
             self?.loadItems()
+            self?.loadRecentItems()
             
             DispatchQueue.main.async {
                 self?.collectionView.reloadData()
@@ -183,6 +184,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         refreshControl.beginRefreshing()
         loadItems()
         applyFilters()
+        loadRecentItems()
         refreshControl.endRefreshing()
     }
     
@@ -212,11 +214,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             Storage.shared.users[index].activeItems.append(tesla)
             Storage.shared.users[index].activeItems.append(bmw)
             Storage.shared.users[index].activeItems.append(fiat)
-            
-            Storage.shared.recentlyAdded.append(fiat)
         }
         
-        Storage.shared.filteredItems = Storage.shared.recentlyAdded
+//        Storage.shared.filteredItems = Storage.shared.recentlyAdded
     }
     
     // sort items in the array
@@ -460,6 +460,31 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                 self.navigationController?.popViewController(animated: false)
             }
         }
+    }
+    
+    // load recently added items
+    func loadRecentItems() {
+        Storage.shared.recentlyAdded.removeAll()
+        
+        for user in Storage.shared.users {
+            for item in user.activeItems {
+                guard let item = item else { return }
+                
+                if isItemRecent(item.date) {
+                    Storage.shared.recentlyAdded.append(item)
+                }
+            }
+        }
+        
+        Storage.shared.filteredItems = Storage.shared.recentlyAdded
+    }
+    
+    // check if item was added in the last 24h
+    func isItemRecent(_ itemDate: Date) -> Bool {
+        let now = Date.now
+        let soon = itemDate.addingTimeInterval(86400)
+        
+        return soon >= now
     }
     
 }
