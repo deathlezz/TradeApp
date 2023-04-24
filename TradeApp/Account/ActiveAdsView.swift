@@ -125,8 +125,6 @@ class ActiveAdsView: UITableViewController {
     @objc func editTapped(_ sender: UIButton) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
             guard let item = activeAds.first(where: {$0?.id == sender.tag}) else { return }
-            let images = item?.photos.map {UIImage(data: $0!)!}
-//            AddItemView.shared.images = images!
             vc.isEditMode = true
             vc.isAdActive = true
             vc.loggedUser = mail

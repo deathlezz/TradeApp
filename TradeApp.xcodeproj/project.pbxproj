@@ -40,6 +40,10 @@
 		BC78F72B295EED4F0006DDB6 /* MapViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */; };
 		BCCE154B293BE14F00C256E4 /* ButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCE154A293BE14F00C256E4 /* ButtonCell.swift */; };
 		BCE805D929324670009CB632 /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE805D829324670009CB632 /* SavedView.swift */; };
+		BCEFEE1B29F69D6F005D5776 /* KeychainItemAccessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEFEE1A29F69D6F005D5776 /* KeychainItemAccessibility.swift */; };
+		BCEFEE1C29F69D6F005D5776 /* KeychainWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEFEE1929F69D6F005D5776 /* KeychainWrapper.swift */; };
+		BCEFEE1F29F6A864005D5776 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BCEFEE1D29F6A864005D5776 /* DataModel.xcdatamodeld */; };
+		BCEFEE2229F6A973005D5776 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEFEE2129F6A973005D5776 /* CoreDataStack.swift */; };
 		BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2F94529266D2400930252 /* AppDelegate.swift */; };
 		BCF2F94829266D2400930252 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2F94729266D2400930252 /* SceneDelegate.swift */; };
 		BCF2F94A29266D2400930252 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2F94929266D2400930252 /* ViewController.swift */; };
@@ -84,6 +88,10 @@
 		BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewCell.swift; sourceTree = "<group>"; };
 		BCCE154A293BE14F00C256E4 /* ButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCell.swift; sourceTree = "<group>"; };
 		BCE805D829324670009CB632 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
+		BCEFEE1929F69D6F005D5776 /* KeychainWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainWrapper.swift; sourceTree = "<group>"; };
+		BCEFEE1A29F69D6F005D5776 /* KeychainItemAccessibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainItemAccessibility.swift; sourceTree = "<group>"; };
+		BCEFEE1E29F6A864005D5776 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		BCEFEE2129F6A973005D5776 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		BCF2F94229266D2400930252 /* TradeApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TradeApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCF2F94529266D2400930252 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BCF2F94729266D2400930252 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -179,6 +187,15 @@
 			path = Add;
 			sourceTree = "<group>";
 		};
+		BCEFEE2029F6A8EB005D5776 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				BCEFEE1D29F6A864005D5776 /* DataModel.xcdatamodeld */,
+				BCEFEE2129F6A973005D5776 /* CoreDataStack.swift */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
 		BCF2F93929266D2400930252 = {
 			isa = PBXGroup;
 			children = (
@@ -208,10 +225,13 @@
 				BC56DC852997B706002790B8 /* Account */,
 				BCE805D829324670009CB632 /* SavedView.swift */,
 				BC2FD2D629EAD30200CAC8BA /* NoConnectionView.swift */,
+				BCEFEE1A29F69D6F005D5776 /* KeychainItemAccessibility.swift */,
+				BCEFEE1929F69D6F005D5776 /* KeychainWrapper.swift */,
 				BC5A4EEC292C1754003A20B7 /* Utilities.swift */,
 				BC66A6EA29296D8900F33E7D /* Storage.swift */,
 				BC66A6E82929154B00F33E7D /* Item.swift */,
 				BC42D98B29B8BB99003B6476 /* User.swift */,
+				BCEFEE2029F6A8EB005D5776 /* CoreData */,
 				BCF2F94B29266D2400930252 /* Main.storyboard */,
 				BCF2F94E29266D2600930252 /* Assets.xcassets */,
 				BCF2F95029266D2600930252 /* LaunchScreen.storyboard */,
@@ -304,6 +324,7 @@
 				BC611B9D29AA9C2C00F259FD /* ChangeUnitView.swift in Sources */,
 				BC019D292958A85C00EB04F8 /* DetailViewCell.swift in Sources */,
 				BC5A4EED292C1754003A20B7 /* Utilities.swift in Sources */,
+				BCEFEE1F29F6A864005D5776 /* DataModel.xcdatamodeld in Sources */,
 				BC6FF4902957841100F1D772 /* ItemViewCell.swift in Sources */,
 				BCF2F95C2926D71E00930252 /* CategoryView.swift in Sources */,
 				BCF2F95A2926CFEB00930252 /* ItemCell.swift in Sources */,
@@ -311,14 +332,17 @@
 				BC174175292D55760055A0B8 /* FilterCell.swift in Sources */,
 				BCE805D929324670009CB632 /* SavedView.swift in Sources */,
 				BC5CB87E293B7D870017AE69 /* TextFieldCell.swift in Sources */,
+				BCEFEE2229F6A973005D5776 /* CoreDataStack.swift in Sources */,
 				BC42D98A29B8919A003B6476 /* ChangeNumberView.swift in Sources */,
 				BC66A6E92929154B00F33E7D /* Item.swift in Sources */,
 				BC325C442986A0AD00EF83AB /* HeaderView.swift in Sources */,
+				BCEFEE1B29F69D6F005D5776 /* KeychainItemAccessibility.swift in Sources */,
 				BC17416F292D33680055A0B8 /* ItemView.swift in Sources */,
 				BC66A6EB29296D8900F33E7D /* Storage.swift in Sources */,
 				BC16850229AF625A002ED0C5 /* ChangeEmailView.swift in Sources */,
 				BC6FDA7529D612A000AFA4E9 /* EndedAdsView.swift in Sources */,
 				BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */,
+				BCEFEE1C29F69D6F005D5776 /* KeychainWrapper.swift in Sources */,
 				BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */,
 				BC54D04529B3EDDD00E6F45F /* AdCell.swift in Sources */,
 				BC56DC822997B678002790B8 /* LoginView.swift in Sources */,
@@ -544,6 +568,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		BCEFEE1D29F6A864005D5776 /* DataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				BCEFEE1E29F6A864005D5776 /* DataModel.xcdatamodel */,
+			);
+			currentVersion = BCEFEE1E29F6A864005D5776 /* DataModel.xcdatamodel */;
+			path = DataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = BCF2F93A29266D2400930252 /* Project object */;
 }

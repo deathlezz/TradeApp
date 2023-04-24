@@ -216,7 +216,13 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         super.viewWillAppear(animated)
         if title == "Add" && uploadedPhotos.count > 0 {
             NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": uploadedPhotos])
-        } else if title == "Add" && uploadedPhotos.count == 0 {
+        }
+    }
+    
+    // clear view before it disappear
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if title == "Edit" {
             clearTapped()
         }
     }

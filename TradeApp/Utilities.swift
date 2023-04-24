@@ -95,18 +95,16 @@ class Utilities {
     
     // set logged user
     static func setUser(_ user: String?) {
-        let defaults = UserDefaults.standard
         if user != nil {
-            defaults.set(user, forKey: "loggedUser")
+            KeychainWrapper.standard.set(user!, forKey: "loggedUser")
         } else {
-            defaults.removeObject(forKey: "loggedUser")
+            KeychainWrapper.standard.removeObject(forKey: "loggedUser")
         }
     }
     
     // load logged user
     static func loadUser() -> String? {
-        let defaults = UserDefaults.standard
-        if let user = defaults.object(forKey: "loggedUser") as? String {
+        if let user = KeychainWrapper.standard.string(forKey: "loggedUser") {
             return user
         } else {
             return nil
