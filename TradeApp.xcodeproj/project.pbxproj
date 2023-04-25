@@ -14,6 +14,8 @@
 		BC174175292D55760055A0B8 /* FilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174174292D55760055A0B8 /* FilterCell.swift */; };
 		BC174177292D59FF0055A0B8 /* PriceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174176292D59FF0055A0B8 /* PriceCell.swift */; };
 		BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2626612944CDEA0049E7A9 /* CollectionTableViewCell.swift */; };
+		BC28FB5F29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC28FB5D29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift */; };
+		BC28FB6029F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC28FB5E29F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift */; };
 		BC2FD2D729EAD30200CAC8BA /* NoConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2FD2D629EAD30200CAC8BA /* NoConnectionView.swift */; };
 		BC325C442986A0AD00EF83AB /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC325C432986A0AD00EF83AB /* HeaderView.swift */; };
 		BC42D98A29B8919A003B6476 /* ChangeNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC42D98929B8919A003B6476 /* ChangeNumberView.swift */; };
@@ -62,6 +64,8 @@
 		BC174174292D55760055A0B8 /* FilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCell.swift; sourceTree = "<group>"; };
 		BC174176292D59FF0055A0B8 /* PriceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceCell.swift; sourceTree = "<group>"; };
 		BC2626612944CDEA0049E7A9 /* CollectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionTableViewCell.swift; sourceTree = "<group>"; };
+		BC28FB5D29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedAd+CoreDataClass.swift"; sourceTree = "<group>"; };
+		BC28FB5E29F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedAd+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		BC2FD2D629EAD30200CAC8BA /* NoConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoConnectionView.swift; sourceTree = "<group>"; };
 		BC325C432986A0AD00EF83AB /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		BC42D98929B8919A003B6476 /* ChangeNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNumberView.swift; sourceTree = "<group>"; };
@@ -190,7 +194,8 @@
 		BCEFEE2029F6A8EB005D5776 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				BCEFEE1D29F6A864005D5776 /* DataModel.xcdatamodeld */,
+				BC28FB5D29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift */,
+				BC28FB5E29F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift */,
 				BCEFEE2129F6A973005D5776 /* CoreDataStack.swift */,
 			);
 			path = CoreData;
@@ -230,6 +235,7 @@
 				BC5A4EEC292C1754003A20B7 /* Utilities.swift */,
 				BC66A6EA29296D8900F33E7D /* Storage.swift */,
 				BC66A6E82929154B00F33E7D /* Item.swift */,
+				BCEFEE1D29F6A864005D5776 /* DataModel.xcdatamodeld */,
 				BC42D98B29B8BB99003B6476 /* User.swift */,
 				BCEFEE2029F6A8EB005D5776 /* CoreData */,
 				BCF2F94B29266D2400930252 /* Main.storyboard */,
@@ -327,6 +333,7 @@
 				BCEFEE1F29F6A864005D5776 /* DataModel.xcdatamodeld in Sources */,
 				BC6FF4902957841100F1D772 /* ItemViewCell.swift in Sources */,
 				BCF2F95C2926D71E00930252 /* CategoryView.swift in Sources */,
+				BC28FB5F29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift in Sources */,
 				BCF2F95A2926CFEB00930252 /* ItemCell.swift in Sources */,
 				BCF2F94A29266D2400930252 /* ViewController.swift in Sources */,
 				BC174175292D55760055A0B8 /* FilterCell.swift in Sources */,
@@ -342,6 +349,7 @@
 				BC16850229AF625A002ED0C5 /* ChangeEmailView.swift in Sources */,
 				BC6FDA7529D612A000AFA4E9 /* EndedAdsView.swift in Sources */,
 				BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */,
+				BC28FB6029F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift in Sources */,
 				BCEFEE1C29F69D6F005D5776 /* KeychainWrapper.swift in Sources */,
 				BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */,
 				BC54D04529B3EDDD00E6F45F /* AdCell.swift in Sources */,

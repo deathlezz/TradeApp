@@ -122,15 +122,31 @@ class Utilities {
     }
     
     // save saved items
-    static func saveItems(_ items: [Item]) {
-        let jsonEncoder = JSONEncoder()
+    static func saveItems(_ item: Item) {
+//        let jsonEncoder = JSONEncoder()
+//
+//        if let savedItems = try? jsonEncoder.encode(items) {
+//            let defaults = UserDefaults.standard
+//            defaults.set(savedItems, forKey: "savedItems")
+//        } else {
+//            print("Failed to save items.")
+//        }
         
-        if let savedItems = try? jsonEncoder.encode(items) {
-            let defaults = UserDefaults.standard
-            defaults.set(savedItems, forKey: "savedItems")
-        } else {
-            print("Failed to save items.")
-        }
+        let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
+        let newAd = SavedAd(context: managedContext)
+        newAd.setValue(item.photos, forKey: "\(item.photos)")
+        newAd.setValue(item.title, forKey: "\(item.title)")
+        newAd.setValue(item.price, forKey: "\(item.price)")
+        newAd.setValue(item.category, forKey: "\(item.category)")
+        newAd.setValue(item.location, forKey: "\(item.location)")
+        newAd.setValue(item.description, forKey: "\(item.description)")
+        newAd.setValue(item.date, forKey: "\(item.date)")
+        newAd.setValue(item.views, forKey: "\(item.views)")
+        newAd.setValue(item.saved, forKey: "\(item.saved)")
+        newAd.setValue(item.lat, forKey: "\(item.lat)")
+        newAd.setValue(item.long, forKey: "\(item.long)")
+        newAd.setValue(item.id, forKey: "\(item.id)")
+        AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
     }
     
     // load saved items

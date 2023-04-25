@@ -10,7 +10,8 @@ import Network
 
 class SavedView: UICollectionViewController {
     
-    var savedItems = [Item]()
+//    var savedItems = [Item]()
+    var savedItems = [SavedAd]()
     
     var isPushed: Bool!
     
