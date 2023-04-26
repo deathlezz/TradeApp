@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import CoreLocation
+import CoreData
 
 // date formatter extension
 extension Date {
@@ -122,7 +123,7 @@ class Utilities {
     }
     
     // save saved items
-    static func saveItems(_ item: Item) {
+    static func saveItems(_ items: [SavedAd]) {
 //        let jsonEncoder = JSONEncoder()
 //
 //        if let savedItems = try? jsonEncoder.encode(items) {
@@ -133,35 +134,48 @@ class Utilities {
 //        }
         
         let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
-        let newAd = SavedAd(context: managedContext)
-        newAd.setValue(item.photos, forKey: "\(item.photos)")
-        newAd.setValue(item.title, forKey: "\(item.title)")
-        newAd.setValue(item.price, forKey: "\(item.price)")
-        newAd.setValue(item.category, forKey: "\(item.category)")
-        newAd.setValue(item.location, forKey: "\(item.location)")
-        newAd.setValue(item.description, forKey: "\(item.description)")
-        newAd.setValue(item.date, forKey: "\(item.date)")
-        newAd.setValue(item.views, forKey: "\(item.views)")
-        newAd.setValue(item.saved, forKey: "\(item.saved)")
-        newAd.setValue(item.lat, forKey: "\(item.lat)")
-        newAd.setValue(item.long, forKey: "\(item.long)")
-        newAd.setValue(item.id, forKey: "\(item.id)")
+//        let newAd = SavedAd(context: managedContext)
+        
+        for item in items {
+            let newAd = NSEntityDescription.insertNewObject(forEntityName: "SavedAd", into: managedContext)
+            newAd.setValue(item.image, forKey: "image")
+            newAd.setValue(item.title, forKey: "title")
+            newAd.setValue(item.price, forKey: "price")
+            newAd.setValue(item.location, forKey: "location")
+            newAd.setValue(item.date, forKey: "date")
+        }
+
         AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
     }
     
     // load saved items
-    static func loadItems() -> [Item] {
-        let defaults = UserDefaults.standard
-        if let savedItems = defaults.object(forKey: "savedItems") as? Data {
-            let jsonDecoder = JSONDecoder()
-            
-            if let decodedItems = try? jsonDecoder.decode([Item].self, from: savedItems) {
-                return decodedItems
-            } else {
-                print("Failed to load items.")
-            }
+    static func loadItems() -> [SavedAd] {
+        let adsFetch: NSFetchRequest<SavedAd> = SavedAd.fetchRequest()
+        let sortByDate = NSSortDescriptor(key: "date", ascending: false)
+        adsFetch.sortDescriptors = [sortByDate]
+        
+        do {
+            let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
+            let results = try managedContext.fetch(adsFetch)
+            return results
+        } catch let error as NSError {
+            print("Fetch error: \(error) description: \(error.userInfo)")
         }
-        return [Item]()
+        
+//        let defaults = UserDefaults.standard
+//        if let savedItems = defaults.object(forKey: "savedItems") as? Data {
+//            let jsonDecoder = JSONDecoder()
+//
+//            if let decodedItems = try? jsonDecoder.decode([Item].self, from: savedItems) {
+//                return decodedItems
+//            } else {
+//                print("Failed to load items.")
+//            }
+//        }
+//        return [Item]()
+        
+        return [SavedAd]()
+        
     }
     
     // save applied filters

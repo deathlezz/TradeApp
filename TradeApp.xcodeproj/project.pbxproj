@@ -14,12 +14,12 @@
 		BC174175292D55760055A0B8 /* FilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174174292D55760055A0B8 /* FilterCell.swift */; };
 		BC174177292D59FF0055A0B8 /* PriceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174176292D59FF0055A0B8 /* PriceCell.swift */; };
 		BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2626612944CDEA0049E7A9 /* CollectionTableViewCell.swift */; };
-		BC28FB5F29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC28FB5D29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift */; };
-		BC28FB6029F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC28FB5E29F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift */; };
 		BC2FD2D729EAD30200CAC8BA /* NoConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2FD2D629EAD30200CAC8BA /* NoConnectionView.swift */; };
 		BC325C442986A0AD00EF83AB /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC325C432986A0AD00EF83AB /* HeaderView.swift */; };
 		BC42D98A29B8919A003B6476 /* ChangeNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC42D98929B8919A003B6476 /* ChangeNumberView.swift */; };
 		BC42D98C29B8BB99003B6476 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC42D98B29B8BB99003B6476 /* User.swift */; };
+		BC453A2929F93857001986D7 /* SavedAd+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC453A2729F93857001986D7 /* SavedAd+CoreDataClass.swift */; };
+		BC453A2A29F93857001986D7 /* SavedAd+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC453A2829F93857001986D7 /* SavedAd+CoreDataProperties.swift */; };
 		BC54D04329B3DEDB00E6F45F /* ActiveAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC54D04229B3DEDB00E6F45F /* ActiveAdsView.swift */; };
 		BC54D04529B3EDDD00E6F45F /* AdCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC54D04429B3EDDD00E6F45F /* AdCell.swift */; };
 		BC56DC822997B678002790B8 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC56DC812997B678002790B8 /* LoginView.swift */; };
@@ -64,12 +64,12 @@
 		BC174174292D55760055A0B8 /* FilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCell.swift; sourceTree = "<group>"; };
 		BC174176292D59FF0055A0B8 /* PriceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceCell.swift; sourceTree = "<group>"; };
 		BC2626612944CDEA0049E7A9 /* CollectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionTableViewCell.swift; sourceTree = "<group>"; };
-		BC28FB5D29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedAd+CoreDataClass.swift"; sourceTree = "<group>"; };
-		BC28FB5E29F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedAd+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		BC2FD2D629EAD30200CAC8BA /* NoConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoConnectionView.swift; sourceTree = "<group>"; };
 		BC325C432986A0AD00EF83AB /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		BC42D98929B8919A003B6476 /* ChangeNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNumberView.swift; sourceTree = "<group>"; };
 		BC42D98B29B8BB99003B6476 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		BC453A2729F93857001986D7 /* SavedAd+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedAd+CoreDataClass.swift"; sourceTree = "<group>"; };
+		BC453A2829F93857001986D7 /* SavedAd+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedAd+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		BC54D04229B3DEDB00E6F45F /* ActiveAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveAdsView.swift; sourceTree = "<group>"; };
 		BC54D04429B3EDDD00E6F45F /* AdCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdCell.swift; sourceTree = "<group>"; };
 		BC56DC812997B678002790B8 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -150,6 +150,15 @@
 			path = Search;
 			sourceTree = "<group>";
 		};
+		BC453A2B29F938F8001986D7 /* Keychain */ = {
+			isa = PBXGroup;
+			children = (
+				BCEFEE1A29F69D6F005D5776 /* KeychainItemAccessibility.swift */,
+				BCEFEE1929F69D6F005D5776 /* KeychainWrapper.swift */,
+			);
+			path = Keychain;
+			sourceTree = "<group>";
+		};
 		BC56DC852997B706002790B8 /* Account */ = {
 			isa = PBXGroup;
 			children = (
@@ -194,8 +203,8 @@
 		BCEFEE2029F6A8EB005D5776 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				BC28FB5D29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift */,
-				BC28FB5E29F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift */,
+				BC453A2729F93857001986D7 /* SavedAd+CoreDataClass.swift */,
+				BC453A2829F93857001986D7 /* SavedAd+CoreDataProperties.swift */,
 				BCEFEE2129F6A973005D5776 /* CoreDataStack.swift */,
 			);
 			path = CoreData;
@@ -225,13 +234,12 @@
 				BC019D272958A7B400EB04F8 /* Search */,
 				BC019D252958A76F00EB04F8 /* Detail View */,
 				BC019D242958A72700EB04F8 /* Item View */,
+				BC453A2B29F938F8001986D7 /* Keychain */,
 				BC5CB87B293B74380017AE69 /* Filter */,
 				BC5CB87C293B7A090017AE69 /* Add */,
 				BC56DC852997B706002790B8 /* Account */,
 				BCE805D829324670009CB632 /* SavedView.swift */,
 				BC2FD2D629EAD30200CAC8BA /* NoConnectionView.swift */,
-				BCEFEE1A29F69D6F005D5776 /* KeychainItemAccessibility.swift */,
-				BCEFEE1929F69D6F005D5776 /* KeychainWrapper.swift */,
 				BC5A4EEC292C1754003A20B7 /* Utilities.swift */,
 				BC66A6EA29296D8900F33E7D /* Storage.swift */,
 				BC66A6E82929154B00F33E7D /* Item.swift */,
@@ -333,7 +341,7 @@
 				BCEFEE1F29F6A864005D5776 /* DataModel.xcdatamodeld in Sources */,
 				BC6FF4902957841100F1D772 /* ItemViewCell.swift in Sources */,
 				BCF2F95C2926D71E00930252 /* CategoryView.swift in Sources */,
-				BC28FB5F29F7FD0200E26C8D /* SavedAd+CoreDataClass.swift in Sources */,
+				BC453A2929F93857001986D7 /* SavedAd+CoreDataClass.swift in Sources */,
 				BCF2F95A2926CFEB00930252 /* ItemCell.swift in Sources */,
 				BCF2F94A29266D2400930252 /* ViewController.swift in Sources */,
 				BC174175292D55760055A0B8 /* FilterCell.swift in Sources */,
@@ -349,7 +357,7 @@
 				BC16850229AF625A002ED0C5 /* ChangeEmailView.swift in Sources */,
 				BC6FDA7529D612A000AFA4E9 /* EndedAdsView.swift in Sources */,
 				BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */,
-				BC28FB6029F7FD0200E26C8D /* SavedAd+CoreDataProperties.swift in Sources */,
+				BC453A2A29F93857001986D7 /* SavedAd+CoreDataProperties.swift in Sources */,
 				BCEFEE1C29F69D6F005D5776 /* KeychainWrapper.swift in Sources */,
 				BC2626622944CDEA0049E7A9 /* CollectionTableViewCell.swift in Sources */,
 				BC54D04529B3EDDD00E6F45F /* AdCell.swift in Sources */,

@@ -6,10 +6,11 @@
 //
 
 import UIKit
+import CoreData
 
 class DetailView: UITableViewController, Index, Coordinates {
     
-    var savedItems = [Item]()
+    var savedItems = [SavedAd]()
     
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
@@ -172,7 +173,16 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set action for save item button
     @objc func saveTapped() {
-        savedItems.insert(item, at: 0)
+        let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
+        let newAd = NSEntityDescription.insertNewObject(forEntityName: "SavedAd", into: managedContext)
+        
+//        let newAd = SavedAd(context: managedContext)
+        newAd.setValue(item.photos[0], forKey: "image")
+        newAd.setValue(item.title, forKey: "title")
+        newAd.setValue(item.price, forKey: "price")
+        newAd.setValue(item.location, forKey: "location")
+        newAd.setValue(item.date, forKey: "date")
+//        savedItems.insert(newAd, at: 0)
         
         if savedItems.count > 50 {
             showAlert()

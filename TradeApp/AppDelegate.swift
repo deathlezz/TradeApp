@@ -11,7 +11,7 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDelegate {
 
     // core data initialization
-    lazy var coreDataStack: CoreDataStack = .init(modelName: "Notes")
+    lazy var coreDataStack: CoreDataStack = .init(modelName: "SavedAd")
 
         static let sharedAppDelegate: AppDelegate = {
             guard let delegate = UIApplication.shared.delegate as? AppDelegate else {
