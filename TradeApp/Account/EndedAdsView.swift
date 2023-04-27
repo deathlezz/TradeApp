@@ -68,9 +68,9 @@ class EndedAdsView: UITableViewController {
             cell.title.text = endedAds[indexPath.row]?.title
             cell.price.text = "£\(endedAds[indexPath.row]?.price ?? 0)"
             cell.availability.text = setExpiryDate(endedAds[indexPath.row]?.date ?? Date())
-            cell.views.setTitle(endedAds[indexPath.row]?.views.description, for: .normal)
+            cell.views.setTitle(endedAds[indexPath.row]?.views?.description, for: .normal)
             cell.views.isUserInteractionEnabled = false
-            cell.saved.setTitle(endedAds[indexPath.row]?.saved.description, for: .normal)
+            cell.saved.setTitle(endedAds[indexPath.row]?.saved?.description, for: .normal)
             cell.saved.isUserInteractionEnabled = false
             cell.stateButton.layer.borderWidth = 1.5
             cell.stateButton.layer.borderColor = UIColor.darkGray.cgColor

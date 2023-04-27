@@ -123,7 +123,7 @@ class Utilities {
     }
     
     // save saved items
-    static func saveItems(_ items: [SavedAd]) {
+    static func saveItems(_ items: [Item]) {
 //        let jsonEncoder = JSONEncoder()
 //
 //        if let savedItems = try? jsonEncoder.encode(items) {
@@ -138,7 +138,7 @@ class Utilities {
         
         for item in items {
             let newAd = NSEntityDescription.insertNewObject(forEntityName: "SavedAd", into: managedContext)
-            newAd.setValue(item.image, forKey: "image")
+            newAd.setValue(item.photos[0], forKey: "image")
             newAd.setValue(item.title, forKey: "title")
             newAd.setValue(item.price, forKey: "price")
             newAd.setValue(item.location, forKey: "location")
@@ -146,10 +146,11 @@ class Utilities {
         }
 
         AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
+        print("Items saved")
     }
     
     // load saved items
-    static func loadItems() -> [SavedAd] {
+    static func loadItems() -> [Item] {
         let adsFetch: NSFetchRequest<SavedAd> = SavedAd.fetchRequest()
         let sortByDate = NSSortDescriptor(key: "date", ascending: false)
         adsFetch.sortDescriptors = [sortByDate]
@@ -157,7 +158,16 @@ class Utilities {
         do {
             let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
             let results = try managedContext.fetch(adsFetch)
-            return results
+            
+            var items = [Item]()
+            
+            for result in results {
+                let item = Item(photos: [result.image], title: result.title!, price: Int(result.price), location: result.location!, date: result.date!, id: Int(result.id))
+                items.append(item)
+            }
+            
+            return items
+//            return results!
         } catch let error as NSError {
             print("Fetch error: \(error) description: \(error.userInfo)")
         }
@@ -174,7 +184,7 @@ class Utilities {
 //        }
 //        return [Item]()
         
-        return [SavedAd]()
+        return [Item]()
         
     }
     

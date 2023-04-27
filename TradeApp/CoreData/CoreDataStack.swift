@@ -5,6 +5,7 @@
 //  Created by deathlezz on 24/04/2023.
 //
 
+import Foundation
 import CoreData
 
 class CoreDataStack {
@@ -15,7 +16,7 @@ class CoreDataStack {
     }
 
     private lazy var storeContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: self.modelName)
+        let container = NSPersistentContainer(name: "DataModel")
         container.loadPersistentStores { _, error in
             if let error = error as NSError? {
                 print("Unresolved error \(error), \(error.userInfo)")

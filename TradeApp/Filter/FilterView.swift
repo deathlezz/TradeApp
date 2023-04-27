@@ -295,7 +295,7 @@ class FilterView: UITableViewController {
                         
                         for item in Storage.shared.filteredItems {
                             
-                            let itemLocation = CLLocation(latitude: item.lat, longitude: item.long)
+                            let itemLocation = CLLocation(latitude: item.lat!, longitude: item.long!)
                             let distance = Int(cityLocation.distance(from: itemLocation) / unit)
                             
                             if Int(distance) <= radius {

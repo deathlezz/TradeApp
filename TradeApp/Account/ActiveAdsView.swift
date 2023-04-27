@@ -68,9 +68,9 @@ class ActiveAdsView: UITableViewController {
             cell.title.text = activeAds[indexPath.row]?.title
             cell.price.text = "£\(activeAds[indexPath.row]?.price ?? 0)"
             cell.availability.text = setExpiryDate(activeAds[indexPath.row]?.date ?? Date())
-            cell.views.setTitle(activeAds[indexPath.row]?.views.description, for: .normal)
+            cell.views.setTitle(activeAds[indexPath.row]?.views?.description, for: .normal)
             cell.views.isUserInteractionEnabled = false
-            cell.saved.setTitle(activeAds[indexPath.row]?.saved.description, for: .normal)
+            cell.saved.setTitle(activeAds[indexPath.row]?.saved?.description, for: .normal)
             cell.saved.isUserInteractionEnabled = false
             cell.stateButton.layer.borderWidth = 1.5
             cell.stateButton.layer.borderColor = UIColor.systemRed.cgColor

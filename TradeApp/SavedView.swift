@@ -10,7 +10,7 @@ import Network
 
 class SavedView: UICollectionViewController {
     
-    var savedItems = [SavedAd]()
+    var savedItems = [Item]()
     
     var isPushed: Bool!
     
@@ -69,13 +69,13 @@ class SavedView: UICollectionViewController {
             fatalError("Unable to dequeue itemCell")
         }
         
-        let img = UIImage(data: savedItems[indexPath.item].image!)
+        let img = UIImage(data: savedItems[indexPath.item].photos[0]!)
         
         cell.image.image = img
         cell.title.text = savedItems[indexPath.item].title
         cell.price.text = "£\(savedItems[indexPath.item].price)"
         cell.location.text = savedItems[indexPath.item].location
-        cell.date.text = savedItems[indexPath.item].date?.formatDate()
+        cell.date.text = savedItems[indexPath.item].date.formatDate()
         cell.layer.cornerRadius = 10
         cell.layer.borderWidth = 0.2
         cell.layer.borderColor = UIColor.lightGray.cgColor
