@@ -173,15 +173,6 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set action for save item button
     @objc func saveTapped() {
-//        let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
-//        let newAd = NSEntityDescription.insertNewObject(forEntityName: "SavedAd", into: managedContext)
-        
-//        let newAd = SavedAd(context: managedContext)
-//        newAd.setValue(item.photos[0], forKey: "image")
-//        newAd.setValue(item.title, forKey: "title")
-//        newAd.setValue(item.price, forKey: "price")
-//        newAd.setValue(item.location, forKey: "location")
-//        newAd.setValue(item.date, forKey: "date")
         savedItems.insert(item, at: 0)
         
         if savedItems.count > 50 {
@@ -191,14 +182,15 @@ class DetailView: UITableViewController, Index, Coordinates {
             navigationItem.rightBarButtonItems = [removeButton, actionButton]
         }
         
-        Utilities.saveItems(savedItems)
+        Utilities.saveItem(item)
     }
     
     // set action for remove item button
     @objc func removeTapped() {
-        guard let index = savedItems.firstIndex(where: {$0.title == item.title}) else { return }
+        guard let index = savedItems.firstIndex(where: {$0.id == item.id}) else { return }
+        Utilities.removeItems([savedItems[index]])
         savedItems.remove(at: index)
-        Utilities.saveItems(savedItems)
+//        Utilities.saveItem(item)
         navigationItem.rightBarButtonItems = [saveButton, actionButton]
     }
     
@@ -220,6 +212,12 @@ class DetailView: UITableViewController, Index, Coordinates {
         NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
         
         NotificationCenter.default.post(name: NSNotification.Name("pushLocation"), object: nil, userInfo: ["location": item.location])
+        
+        print(item.id)
+        
+        for savedItem in savedItems {
+            print(savedItem.id)
+        }
     }
     
     // show tab bar and navigation bar before view appeared

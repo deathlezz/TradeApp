@@ -123,30 +123,41 @@ class Utilities {
     }
     
     // save saved items
-    static func saveItems(_ items: [Item]) {
-//        let jsonEncoder = JSONEncoder()
-//
-//        if let savedItems = try? jsonEncoder.encode(items) {
-//            let defaults = UserDefaults.standard
-//            defaults.set(savedItems, forKey: "savedItems")
-//        } else {
-//            print("Failed to save items.")
-//        }
-        
+    static func saveItem(_ item: Item) {
         let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
 //        let newAd = SavedAd(context: managedContext)
         
-        for item in items {
-            let newAd = NSEntityDescription.insertNewObject(forEntityName: "SavedAd", into: managedContext)
-            newAd.setValue(item.photos[0], forKey: "image")
-            newAd.setValue(item.title, forKey: "title")
-            newAd.setValue(item.price, forKey: "price")
-            newAd.setValue(item.location, forKey: "location")
-            newAd.setValue(item.date, forKey: "date")
+        let newAd = NSEntityDescription.insertNewObject(forEntityName: "SavedAd", into: managedContext)
+        newAd.setValue(item.photos[0], forKey: "image")
+        newAd.setValue(item.title, forKey: "title")
+        newAd.setValue(item.price, forKey: "price")
+        newAd.setValue(item.location, forKey: "location")
+        newAd.setValue(item.date, forKey: "date")
+        newAd.setValue(item.id, forKey: "id")
+
+        AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
+        print("Item saved")
+    }
+    
+    // remove saved items
+    static func removeItems(_ items: [Item]) {
+        let adsFetch: NSFetchRequest<SavedAd> = SavedAd.fetchRequest()
+        let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
+        
+        do {
+            let results = try managedContext.fetch(adsFetch)
+            
+            for (index, item) in items.enumerated() {
+                if results[index].id == item.id {
+                    managedContext.delete(results[index])
+                }
+            }
+            
+        } catch let error as NSError {
+            print("Delete error: \(error) description: \(error.userInfo)")
         }
 
         AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
-        print("Items saved")
     }
     
     // load saved items

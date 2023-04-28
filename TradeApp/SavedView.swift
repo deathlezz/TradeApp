@@ -95,7 +95,7 @@ class SavedView: UICollectionViewController {
                 navigationController?.pushViewController(vc, animated: true)
             }
             
-        } else if navigationItem.rightBarButtonItems != [selectButton] && !connected {
+        } else if navigationItem.rightBarButtonItems != [selectButton] {
             guard let cell = collectionView.cellForItem(at: indexPath) else { return }
             
             if cell.isSelected {
@@ -109,7 +109,7 @@ class SavedView: UICollectionViewController {
                     self.updateHeader()
                 }
             }
-        } else {
+        } else if navigationItem.rightBarButtonItems == [selectButton] && !connected {
             connectionAlert()
         }
     }
@@ -241,7 +241,7 @@ class SavedView: UICollectionViewController {
                 cell.transform = .identity
             }) { finished in
                 self.selectedCells.removeAll()
-                Utilities.saveItems(self.savedItems)
+//                Utilities.saveItems(self.savedItems)
                 self.updateHeader()
             }
         }
