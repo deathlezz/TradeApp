@@ -122,6 +122,7 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
     
     // remove map before view disappeared to avoid memory leak
     @objc func removeMap() {
+        mapView.removeAnnotations(mapView.annotations)
         mapView.removeFromSuperview()
         mapView = nil
     }

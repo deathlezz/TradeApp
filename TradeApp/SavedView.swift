@@ -23,6 +23,7 @@ class SavedView: UICollectionViewController {
     var connected: Bool!
     
     var selectedCells = [UICollectionViewCell]()
+    var selectedItems = [Item]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -105,6 +106,7 @@ class SavedView: UICollectionViewController {
                     cell.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
                 }) { finished in
                     self.selectedCells.append(cell)
+                    self.selectedItems.append(self.savedItems[indexPath.item])
                     self.showButton()
                     self.updateHeader()
                 }
@@ -127,6 +129,7 @@ class SavedView: UICollectionViewController {
             }) { finished in
                 guard let index = self.selectedCells.firstIndex(of: cell) else { return }
                 self.selectedCells.remove(at: index)
+                self.selectedItems.remove(at: indexPath.item)
                 self.showButton()
                 self.updateHeader()
             }
@@ -241,7 +244,7 @@ class SavedView: UICollectionViewController {
                 cell.transform = .identity
             }) { finished in
                 self.selectedCells.removeAll()
-//                Utilities.saveItems(self.savedItems)
+                Utilities.removeItems(self.selectedItems)
                 self.updateHeader()
             }
         }

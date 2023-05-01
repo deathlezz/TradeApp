@@ -147,9 +147,12 @@ class Utilities {
         do {
             let results = try managedContext.fetch(adsFetch)
             
-            for (index, item) in items.enumerated() {
-                if results[index].id == item.id {
-                    managedContext.delete(results[index])
+            for result in results {
+                for item in items {
+                    if result.id == item.id {
+                        managedContext.delete(result)
+                        break
+                    }
                 }
             }
             
