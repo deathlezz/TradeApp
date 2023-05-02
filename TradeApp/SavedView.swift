@@ -8,7 +8,7 @@
 import UIKit
 import Network
 
-class SavedView: UICollectionViewController {
+class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     
     var savedItems = [Item]()
     
@@ -32,6 +32,8 @@ class SavedView: UICollectionViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         checkConnection()
+        
+        self.tabBarController?.delegate = self
         
         selectButton = UIBarButtonItem(title: "Select", style: .plain, target: self, action: #selector(selectTapped))
         cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelTapped))
@@ -89,8 +91,8 @@ class SavedView: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if navigationItem.rightBarButtonItems == [selectButton] && connected {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-//                vc.imgs = savedItems[indexPath.item].photos.map {UIImage(data: $0!)}
-//                vc.item = savedItems[indexPath.item]
+                let item = savedItems[indexPath.item]
+                vc.item = Storage.shared.items.first(where: {$0.id == item.id})
                 vc.hidesBottomBarWhenPushed = true
                 isPushed = true
                 navigationController?.pushViewController(vc, animated: true)
@@ -168,6 +170,9 @@ class SavedView: UICollectionViewController {
     
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
+        refreshControl.beginRefreshing()
+        loadItems()
+        updateSavedItems()
         collectionView.reloadData()
         refreshControl.endRefreshing()
     }
@@ -179,6 +184,7 @@ class SavedView: UICollectionViewController {
         navigationController?.isToolbarHidden = true
         savedItems = Utilities.loadItems()
         isPushed = false
+        updateSavedItems()
         collectionView.reloadData()
     }
     
@@ -339,5 +345,49 @@ class SavedView: UICollectionViewController {
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
     }
+    
+    // update items on load
+    func updateSavedItems() {
+        for item in savedItems {
+            if let first = Storage.shared.items.first(where: {$0.id == item.id}) {
+                // check if these items are equal
+                if first.photos[0] != item.photos[0] || first.title != item.title || first.price != item.price ||
+                    first.date != item.date || first.location != item.location {
+                    
+                    guard let index = savedItems.firstIndex(where: {$0.id == item.id}) else { return }
+                    Utilities.removeItems([item])
+                    savedItems.remove(at: index)
+                    Utilities.saveItem(first)
+                    savedItems.insert(first, at: index)
+                }
+            } else {
+                // remove that item from Core Data
+                Utilities.removeItems([item])
+                savedItems.removeAll(where: {$0.id == item.id})
+//                let indexPath = IndexPath(index: 0)
+//                collectionView.deleteItems(at: [indexPath])
+            }
+        }
+    }
+    
+    // load all active items
+    func loadItems() {
+        Storage.shared.items.removeAll()
+        let users = Storage.shared.users
+        
+        for user in users {
+            for item in user.activeItems {
+                Storage.shared.items.append(item!)
+            }
+        }
+    }
+    
+    // update saved items on every load
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+            let tabBarIndex = tabBarController.selectedIndex
+            if tabBarIndex == 1 {
+                updateSavedItems()
+            }
+       }
     
 }

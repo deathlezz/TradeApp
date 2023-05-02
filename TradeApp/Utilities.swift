@@ -125,7 +125,6 @@ class Utilities {
     // save saved items
     static func saveItem(_ item: Item) {
         let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
-//        let newAd = SavedAd(context: managedContext)
         
         let newAd = NSEntityDescription.insertNewObject(forEntityName: "SavedAd", into: managedContext)
         newAd.setValue(item.photos[0], forKey: "image")
@@ -150,6 +149,7 @@ class Utilities {
             for result in results {
                 for item in items {
                     if result.id == item.id {
+                        print("Removed: \(result.id)")
                         managedContext.delete(result)
                         break
                     }
@@ -179,27 +179,12 @@ class Utilities {
                 let item = Item(photos: [result.image], title: result.title!, price: Int(result.price), location: result.location!, date: result.date!, id: Int(result.id))
                 items.append(item)
             }
-            
             return items
-//            return results!
+
         } catch let error as NSError {
             print("Fetch error: \(error) description: \(error.userInfo)")
         }
-        
-//        let defaults = UserDefaults.standard
-//        if let savedItems = defaults.object(forKey: "savedItems") as? Data {
-//            let jsonDecoder = JSONDecoder()
-//
-//            if let decodedItems = try? jsonDecoder.decode([Item].self, from: savedItems) {
-//                return decodedItems
-//            } else {
-//                print("Failed to load items.")
-//            }
-//        }
-//        return [Item]()
-        
         return [Item]()
-        
     }
     
     // save applied filters
