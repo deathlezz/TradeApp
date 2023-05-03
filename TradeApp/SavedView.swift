@@ -43,17 +43,10 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         
         // pull to refresh
         let refreshControl = UIRefreshControl()
-        refreshControl.tintColor = .red
+        refreshControl.tintColor = .lightGray
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
         
-        DispatchQueue.global().async { [weak self] in
-            self?.savedItems = Utilities.loadItems()
-            
-            DispatchQueue.main.async {
-                self?.collectionView.reloadData()
-            }
-        }
     }
     
     // number of sections
@@ -144,7 +137,6 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         if kind == UICollectionView.elementKindSectionHeader {
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
                 headerView.textLabel.text = savedItems.count == 1 ? "Found 1 ad" : "Found \(savedItems.count) ads"
-//                headerView.textLabel.text = "Found \(savedItems.count) ads"
                 headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 14)
                 headerView.textLabel.textColor = .gray
                 return headerView
@@ -171,9 +163,16 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
         refreshControl.beginRefreshing()
-        loadItems()
-        updateSavedItems()
-        collectionView.reloadData()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.loadItems()
+            self?.updateSavedItems()
+            
+            DispatchQueue.main.async {
+                self?.collectionView.reloadData()
+            }
+        }
+
         refreshControl.endRefreshing()
     }
     
@@ -182,10 +181,17 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
         navigationController?.isToolbarHidden = true
-        savedItems = Utilities.loadItems()
         isPushed = false
-        updateSavedItems()
-        collectionView.reloadData()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.savedItems = Utilities.loadItems()
+            self?.loadItems()
+            self?.updateSavedItems()
+
+            DispatchQueue.main.async {
+                self?.collectionView.reloadData()
+            }
+        }
     }
     
     // cancel selection after view disappeared
@@ -353,7 +359,6 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
                 // check if these items are equal
                 if first.photos[0] != item.photos[0] || first.title != item.title || first.price != item.price ||
                     first.date != item.date || first.location != item.location {
-                    
                     guard let index = savedItems.firstIndex(where: {$0.id == item.id}) else { return }
                     Utilities.removeItems([item])
                     savedItems.remove(at: index)
@@ -364,8 +369,6 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
                 // remove that item from Core Data
                 Utilities.removeItems([item])
                 savedItems.removeAll(where: {$0.id == item.id})
-//                let indexPath = IndexPath(index: 0)
-//                collectionView.deleteItems(at: [indexPath])
             }
         }
     }
@@ -381,13 +384,5 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
             }
         }
     }
-    
-    // update saved items on every load
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-            let tabBarIndex = tabBarController.selectedIndex
-            if tabBarIndex == 1 {
-                updateSavedItems()
-            }
-       }
     
 }

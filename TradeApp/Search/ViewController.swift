@@ -59,7 +59,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         // pull to refresh
         let refreshControl = UIRefreshControl()
-        refreshControl.tintColor = .red
+        refreshControl.tintColor = .lightGray
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
         
