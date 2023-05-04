@@ -185,7 +185,6 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         
         DispatchQueue.global().async { [weak self] in
             self?.savedItems = Utilities.loadItems()
-            self?.loadItems()
             self?.updateSavedItems()
 
             DispatchQueue.main.async {

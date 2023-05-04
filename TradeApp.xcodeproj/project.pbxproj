@@ -40,6 +40,9 @@
 		BC6FF4902957841100F1D772 /* ItemViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6FF48F2957841100F1D772 /* ItemViewCell.swift */; };
 		BC72B09429B0C92E00703FF4 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC72B09329B0C92E00703FF4 /* ChangePasswordView.swift */; };
 		BC78F72B295EED4F0006DDB6 /* MapViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */; };
+		BCB234B62A03D252000106EE /* MessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB234B52A03D252000106EE /* MessagesView.swift */; };
+		BCB234B92A03DBF7000106EE /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB234B82A03DBF7000106EE /* ChatView.swift */; };
+		BCB234BB2A03E380000106EE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB234BA2A03E380000106EE /* Message.swift */; };
 		BCCE154B293BE14F00C256E4 /* ButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCE154A293BE14F00C256E4 /* ButtonCell.swift */; };
 		BCE805D929324670009CB632 /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE805D829324670009CB632 /* SavedView.swift */; };
 		BCEFEE1B29F69D6F005D5776 /* KeychainItemAccessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEFEE1A29F69D6F005D5776 /* KeychainItemAccessibility.swift */; };
@@ -90,6 +93,9 @@
 		BC6FF48F2957841100F1D772 /* ItemViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewCell.swift; sourceTree = "<group>"; };
 		BC72B09329B0C92E00703FF4 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
 		BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewCell.swift; sourceTree = "<group>"; };
+		BCB234B52A03D252000106EE /* MessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesView.swift; sourceTree = "<group>"; };
+		BCB234B82A03DBF7000106EE /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		BCB234BA2A03E380000106EE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		BCCE154A293BE14F00C256E4 /* ButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCell.swift; sourceTree = "<group>"; };
 		BCE805D829324670009CB632 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
 		BCEFEE1929F69D6F005D5776 /* KeychainWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainWrapper.swift; sourceTree = "<group>"; };
@@ -200,6 +206,16 @@
 			path = Add;
 			sourceTree = "<group>";
 		};
+		BCB234B72A03D25F000106EE /* Messages */ = {
+			isa = PBXGroup;
+			children = (
+				BCB234B52A03D252000106EE /* MessagesView.swift */,
+				BCB234B82A03DBF7000106EE /* ChatView.swift */,
+				BCB234BA2A03E380000106EE /* Message.swift */,
+			);
+			path = Messages;
+			sourceTree = "<group>";
+		};
 		BCEFEE2029F6A8EB005D5776 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
@@ -237,14 +253,15 @@
 				BC453A2B29F938F8001986D7 /* Keychain */,
 				BC5CB87B293B74380017AE69 /* Filter */,
 				BC5CB87C293B7A090017AE69 /* Add */,
+				BCB234B72A03D25F000106EE /* Messages */,
 				BC56DC852997B706002790B8 /* Account */,
 				BCE805D829324670009CB632 /* SavedView.swift */,
 				BC2FD2D629EAD30200CAC8BA /* NoConnectionView.swift */,
 				BC5A4EEC292C1754003A20B7 /* Utilities.swift */,
 				BC66A6EA29296D8900F33E7D /* Storage.swift */,
 				BC66A6E82929154B00F33E7D /* Item.swift */,
-				BCEFEE1D29F6A864005D5776 /* DataModel.xcdatamodeld */,
 				BC42D98B29B8BB99003B6476 /* User.swift */,
+				BCEFEE1D29F6A864005D5776 /* DataModel.xcdatamodeld */,
 				BCEFEE2029F6A8EB005D5776 /* CoreData */,
 				BCF2F94B29266D2400930252 /* Main.storyboard */,
 				BCF2F94E29266D2600930252 /* Assets.xcassets */,
@@ -327,6 +344,7 @@
 			files = (
 				BC69ED652938F37A00A63A79 /* AddItemView.swift in Sources */,
 				BC174171292D46B30055A0B8 /* FilterView.swift in Sources */,
+				BCB234B92A03DBF7000106EE /* ChatView.swift in Sources */,
 				BC5A4EE9292BAC3A003A20B7 /* DetailView.swift in Sources */,
 				BC69075B2939247F005D1EAB /* PhotosCell.swift in Sources */,
 				BC54D04329B3DEDB00E6F45F /* ActiveAdsView.swift in Sources */,
@@ -345,6 +363,7 @@
 				BCF2F95A2926CFEB00930252 /* ItemCell.swift in Sources */,
 				BCF2F94A29266D2400930252 /* ViewController.swift in Sources */,
 				BC174175292D55760055A0B8 /* FilterCell.swift in Sources */,
+				BCB234B62A03D252000106EE /* MessagesView.swift in Sources */,
 				BCE805D929324670009CB632 /* SavedView.swift in Sources */,
 				BC5CB87E293B7D870017AE69 /* TextFieldCell.swift in Sources */,
 				BCEFEE2229F6A973005D5776 /* CoreDataStack.swift in Sources */,
@@ -367,6 +386,7 @@
 				BC56DC872997C20C002790B8 /* SegmentedControlCell.swift in Sources */,
 				BC42D98C29B8BB99003B6476 /* User.swift in Sources */,
 				BC78F72B295EED4F0006DDB6 /* MapViewCell.swift in Sources */,
+				BCB234BB2A03E380000106EE /* Message.swift in Sources */,
 				BCF2F94829266D2400930252 /* SceneDelegate.swift in Sources */,
 				BCCE154B293BE14F00C256E4 /* ButtonCell.swift in Sources */,
 			);

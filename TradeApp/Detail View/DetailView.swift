@@ -15,7 +15,6 @@ class DetailView: UITableViewController, Index, Coordinates {
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
-//    var isPushed: Bool!
     
     var latitude: Double!
     var longitude: Double!
@@ -190,7 +189,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         guard let index = savedItems.firstIndex(where: {$0.id == item.id}) else { return }
         Utilities.removeItems([savedItems[index]])
         savedItems.remove(at: index)
-//        Utilities.saveItem(item)
         navigationItem.rightBarButtonItems = [saveButton, actionButton]
     }
     
@@ -206,8 +204,6 @@ class DetailView: UITableViewController, Index, Coordinates {
     // set location and map after view appeared
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-//        isPushed = false
         
         NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
         
@@ -264,7 +260,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ItemView") as? ItemView {
             vc.currentImage = index
             vc.imgs = item.photos.map {UIImage(data: $0!)}
-//            isPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
     }
