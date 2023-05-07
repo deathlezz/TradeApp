@@ -33,7 +33,7 @@ class MessagesView: UITableViewController {
         return cell
     }
     
-    // set action or tapped cell
+    // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
             navigationController?.pushViewController(vc, animated: true)
