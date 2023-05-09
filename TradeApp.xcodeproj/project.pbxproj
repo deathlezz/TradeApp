@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC00F5D4C405108402329A4C /* Pods_TradeApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA885478CC76ACEB3C03AEF3 /* Pods_TradeApp.framework */; };
 		BC019D292958A85C00EB04F8 /* DetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC019D282958A85C00EB04F8 /* DetailViewCell.swift */; };
 		BC16850229AF625A002ED0C5 /* ChangeEmailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC16850129AF625A002ED0C5 /* ChangeEmailView.swift */; };
 		BC17416F292D33680055A0B8 /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC17416E292D33680055A0B8 /* ItemView.swift */; };
@@ -42,7 +43,6 @@
 		BC78F72B295EED4F0006DDB6 /* MapViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */; };
 		BCB234B62A03D252000106EE /* MessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB234B52A03D252000106EE /* MessagesView.swift */; };
 		BCB234B92A03DBF7000106EE /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB234B82A03DBF7000106EE /* ChatView.swift */; };
-		BCB234BB2A03E380000106EE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB234BA2A03E380000106EE /* Message.swift */; };
 		BCCE154B293BE14F00C256E4 /* ButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCE154A293BE14F00C256E4 /* ButtonCell.swift */; };
 		BCE805D929324670009CB632 /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE805D829324670009CB632 /* SavedView.swift */; };
 		BCEFEE1B29F69D6F005D5776 /* KeychainItemAccessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEFEE1A29F69D6F005D5776 /* KeychainItemAccessibility.swift */; };
@@ -60,6 +60,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9FAFE5942B45952937146DF2 /* Pods-TradeApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TradeApp.debug.xcconfig"; path = "Target Support Files/Pods-TradeApp/Pods-TradeApp.debug.xcconfig"; sourceTree = "<group>"; };
+		BA885478CC76ACEB3C03AEF3 /* Pods_TradeApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TradeApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC019D282958A85C00EB04F8 /* DetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewCell.swift; sourceTree = "<group>"; };
 		BC16850129AF625A002ED0C5 /* ChangeEmailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeEmailView.swift; sourceTree = "<group>"; };
 		BC17416E292D33680055A0B8 /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
@@ -95,7 +97,6 @@
 		BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewCell.swift; sourceTree = "<group>"; };
 		BCB234B52A03D252000106EE /* MessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesView.swift; sourceTree = "<group>"; };
 		BCB234B82A03DBF7000106EE /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
-		BCB234BA2A03E380000106EE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		BCCE154A293BE14F00C256E4 /* ButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCell.swift; sourceTree = "<group>"; };
 		BCE805D829324670009CB632 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
 		BCEFEE1929F69D6F005D5776 /* KeychainWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainWrapper.swift; sourceTree = "<group>"; };
@@ -112,6 +113,7 @@
 		BCF2F95329266D2600930252 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BCF2F9592926CFEB00930252 /* ItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCell.swift; sourceTree = "<group>"; };
 		BCF2F95B2926D71E00930252 /* CategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryView.swift; sourceTree = "<group>"; };
+		F63F9FE1D8580DCCDA1CB6C2 /* Pods-TradeApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TradeApp.release.xcconfig"; path = "Target Support Files/Pods-TradeApp/Pods-TradeApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,12 +121,30 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC00F5D4C405108402329A4C /* Pods_TradeApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7D322458405AC4BA7E1E82A9 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9FAFE5942B45952937146DF2 /* Pods-TradeApp.debug.xcconfig */,
+				F63F9FE1D8580DCCDA1CB6C2 /* Pods-TradeApp.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		99D1060FAC2C15D8AF3261D6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BA885478CC76ACEB3C03AEF3 /* Pods_TradeApp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		BC019D242958A72700EB04F8 /* Item View */ = {
 			isa = PBXGroup;
 			children = (
@@ -211,7 +231,6 @@
 			children = (
 				BCB234B52A03D252000106EE /* MessagesView.swift */,
 				BCB234B82A03DBF7000106EE /* ChatView.swift */,
-				BCB234BA2A03E380000106EE /* Message.swift */,
 			);
 			path = Messages;
 			sourceTree = "<group>";
@@ -231,6 +250,8 @@
 			children = (
 				BCF2F94429266D2400930252 /* TradeApp */,
 				BCF2F94329266D2400930252 /* Products */,
+				7D322458405AC4BA7E1E82A9 /* Pods */,
+				99D1060FAC2C15D8AF3261D6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -278,9 +299,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BCF2F95629266D2600930252 /* Build configuration list for PBXNativeTarget "TradeApp" */;
 			buildPhases = (
+				298755D01285815A20D07882 /* [CP] Check Pods Manifest.lock */,
 				BCF2F93E29266D2400930252 /* Sources */,
 				BCF2F93F29266D2400930252 /* Frameworks */,
 				BCF2F94029266D2400930252 /* Resources */,
+				2068995F60E74A475ACEE7DA /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -337,6 +360,48 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2068995F60E74A475ACEE7DA /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TradeApp/Pods-TradeApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TradeApp/Pods-TradeApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TradeApp/Pods-TradeApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		298755D01285815A20D07882 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-TradeApp-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		BCF2F93E29266D2400930252 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -386,7 +451,6 @@
 				BC56DC872997C20C002790B8 /* SegmentedControlCell.swift in Sources */,
 				BC42D98C29B8BB99003B6476 /* User.swift in Sources */,
 				BC78F72B295EED4F0006DDB6 /* MapViewCell.swift in Sources */,
-				BCB234BB2A03E380000106EE /* Message.swift in Sources */,
 				BCF2F94829266D2400930252 /* SceneDelegate.swift in Sources */,
 				BCCE154B293BE14F00C256E4 /* ButtonCell.swift in Sources */,
 			);
@@ -530,6 +594,7 @@
 		};
 		BCF2F95729266D2600930252 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9FAFE5942B45952937146DF2 /* Pods-TradeApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -557,6 +622,7 @@
 		};
 		BCF2F95829266D2600930252 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F63F9FE1D8580DCCDA1CB6C2 /* Pods-TradeApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct User: Codable {
+struct User {
     var activeItems = [Item?]()
     var endedItems = [Item?]()
     var messages = [Message?]()

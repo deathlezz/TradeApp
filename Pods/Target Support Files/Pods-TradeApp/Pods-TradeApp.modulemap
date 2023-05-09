@@ -1,0 +1,6 @@
+framework module Pods_TradeApp {
+  umbrella header "Pods-TradeApp-umbrella.h"
+
+  export *
+  module * { export * }
+}
