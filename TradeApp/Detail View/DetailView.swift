@@ -10,6 +10,8 @@ import CoreData
 
 class DetailView: UITableViewController, Index, Coordinates {
     
+    var loggedUser: String!
+    
     var savedItems = [Item]()
     
     var actionButton: UIBarButtonItem!
@@ -25,31 +27,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // set toolbar "call" button
-        let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
-        let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
-        callFrame.setImage(image, for: .normal)
-        callFrame.addTarget(self, action: #selector(callTapped), for: .touchUpInside)
-        callFrame.backgroundColor = .white
-        callFrame.layer.cornerRadius = 7
-        callFrame.layer.borderColor = UIColor.lightGray.cgColor
-        callFrame.layer.borderWidth = 0.2
-        let callButton = UIBarButtonItem(customView: callFrame)
-        
-        // set toolbar "message" button
-        let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
-        let message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
-        messageFrame.setImage(message, for: .normal)
-        messageFrame.addTarget(self, action: #selector(messageTapped), for: .touchUpInside)
-        messageFrame.backgroundColor = .white
-        messageFrame.layer.cornerRadius = 7
-        messageFrame.layer.borderColor = UIColor.lightGray.cgColor
-        messageFrame.layer.borderWidth = 0.2
-        let messageButton = UIBarButtonItem(customView: messageFrame)
-        
-        toolbarItems = [callButton, messageButton]
         navigationController?.isToolbarHidden = false
-        
         navigationItem.backButtonTitle = " "
         navigationController?.hidesBarsOnSwipe = false
         
@@ -65,14 +43,11 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
         
-        DispatchQueue.global().async { [weak self] in
-            self?.savedItems = Utilities.loadItems()
-            
-            DispatchQueue.main.async {
-                self?.isSaved()
-                self?.tableView.reloadData()
-            }
-        }
+        loggedUser = Utilities.loadUser()
+        savedItems = Utilities.loadItems()
+        isSaved()
+        setToolbar()
+        tableView.reloadData()
     }
     
     // set number of sections
@@ -316,6 +291,35 @@ class DetailView: UITableViewController, Index, Coordinates {
         } else {
             navigationItem.rightBarButtonItems = [saveButton, actionButton]
         }
+    }
+    
+    // set toolbar
+    func setToolbar() {
+        let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+        let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+        callFrame.setImage(image, for: .normal)
+        callFrame.addTarget(self, action: #selector(callTapped), for: .touchUpInside)
+        callFrame.backgroundColor = .white
+        callFrame.layer.cornerRadius = 7
+        callFrame.layer.borderColor = UIColor.lightGray.cgColor
+        callFrame.layer.borderWidth = 0.2
+        let callButton = UIBarButtonItem(customView: callFrame)
+        
+        let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+        let message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+        messageFrame.setImage(message, for: .normal)
+        messageFrame.addTarget(self, action: #selector(messageTapped), for: .touchUpInside)
+        messageFrame.backgroundColor = .white
+        messageFrame.layer.cornerRadius = 7
+        messageFrame.layer.borderColor = UIColor.lightGray.cgColor
+        messageFrame.layer.borderWidth = 0.2
+        let messageButton = UIBarButtonItem(customView: messageFrame)
+        
+        if loggedUser == nil {
+            messageButton.isEnabled = false
+        }
+        
+        toolbarItems = [callButton, messageButton]
     }
     
 }

@@ -112,7 +112,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-//            vc.imgs = filteredItems[indexPath.item].photos.map {UIImage(data: $0!)}
             vc.item = Storage.shared.filteredItems[indexPath.item]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
@@ -216,7 +215,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             Storage.shared.users[index].activeItems.append(fiat)
         }
         
-//        Storage.shared.filteredItems = Storage.shared.recentlyAdded
     }
     
     // sort items in the array

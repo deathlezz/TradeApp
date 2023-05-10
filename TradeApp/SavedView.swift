@@ -46,7 +46,6 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         refreshControl.tintColor = .lightGray
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
-        
     }
     
     // number of sections
@@ -163,16 +162,9 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
         refreshControl.beginRefreshing()
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.loadItems()
-            self?.updateSavedItems()
-            
-            DispatchQueue.main.async {
-                self?.collectionView.reloadData()
-            }
-        }
-
+        loadItems()
+        updateSavedItems()
+        collectionView.reloadData()
         refreshControl.endRefreshing()
     }
     
@@ -182,15 +174,9 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
         navigationController?.isToolbarHidden = true
         isPushed = false
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.savedItems = Utilities.loadItems()
-            self?.updateSavedItems()
-
-            DispatchQueue.main.async {
-                self?.collectionView.reloadData()
-            }
-        }
+        savedItems = Utilities.loadItems()
+        updateSavedItems()
+        collectionView.reloadData()
     }
     
     // cancel selection after view disappeared

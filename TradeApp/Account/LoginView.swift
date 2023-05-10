@@ -273,9 +273,9 @@ class LoginView: UITableViewController {
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }
-        } else if tabBarController?.selectedIndex == 3 {
+        } else if tabBarController?.selectedIndex == 4 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
-                vc.mail = loggedUser
+                vc.loggedUser = loggedUser
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }

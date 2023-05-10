@@ -12,7 +12,7 @@ class AccountView: UITableViewController {
     let sections = ["User", "Your ads", "Settings", "Sign out"]
     let settingsSection = ["Change distance unit", "Change phone number", "Change email", "Change password", "Delete account"]
     
-    var mail: String!
+    var loggedUser: String!
     
     var active: Int!
     var ended: Int!
@@ -61,7 +61,7 @@ class AccountView: UITableViewController {
 
         switch sections[indexPath.section] {
         case "User":
-            accountCell.textLabel?.text = mail
+            accountCell.textLabel?.text = loggedUser
             accountCell.textLabel?.font = UIFont.boldSystemFont(ofSize: 16)
             accountCell.backgroundColor = .systemGray6
             accountCell.textLabel?.textColor = .darkGray
@@ -152,7 +152,7 @@ class AccountView: UITableViewController {
     func deleteAccount() {
         let ac = UIAlertController(title: "Delete account", message: "Are you sure, you want to delete your account?", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
-            guard let mail = self?.mail else { return }
+            guard let mail = self?.loggedUser else { return }
             guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
             Storage.shared.users.remove(at: index)
             Utilities.setUser(nil)
@@ -169,7 +169,7 @@ class AccountView: UITableViewController {
     // push vc to ActiveAdsView
     func pushToActiveAdsView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ActiveAdsView") as? ActiveAdsView {
-            vc.mail = mail
+            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -178,7 +178,7 @@ class AccountView: UITableViewController {
     // push vc to EndedAdsView
     func pushToEndedAdsView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "EndedAdsView") as? EndedAdsView {
-            vc.mail = mail
+            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -195,7 +195,7 @@ class AccountView: UITableViewController {
     // push vc to ChangeNumberView
     func pushToChangeNumberView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeNumberView") as? ChangeNumberView {
-            vc.mail = mail
+            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -204,7 +204,7 @@ class AccountView: UITableViewController {
     // push vc to ChangeEmailView
     func pushToChangeEmailView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeEmailView") as? ChangeEmailView {
-            vc.mail = mail
+            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -213,7 +213,7 @@ class AccountView: UITableViewController {
     // push vc to ChangePasswordView
     func pushToChangePasswordView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangePasswordView") as? ChangePasswordView {
-            vc.mail = mail
+            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -230,13 +230,13 @@ class AccountView: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
-        print(mail)
+        print(loggedUser)
         updateSection()
     }
     
     // load number of active/ended items
     func loadItemsNumber() {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
         active = Storage.shared.users[index].activeItems.count
         ended = Storage.shared.users[index].endedItems.count
     }
