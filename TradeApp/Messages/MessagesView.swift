@@ -6,13 +6,10 @@
 //
 
 import UIKit
-import Network
 
 class MessagesView: UITableViewController {
     
-    let monitor = NWPathMonitor()
-    var connectedOnLoad: Bool!
-    var connected: Bool!
+    var loggedUser: String!
     
     var messages = ["message"]
 
@@ -22,7 +19,7 @@ class MessagesView: UITableViewController {
         title = "Messages"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        checkConnection()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "messageCell")
     }
     
     // set number of items in section
@@ -43,48 +40,6 @@ class MessagesView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
             navigationController?.pushViewController(vc, animated: true)
-        }
-    }
-    
-    // check for internet connection
-    func checkConnection() {
-        monitor.pathUpdateHandler = { path in
-            
-            if self.connectedOnLoad != nil {
-                self.connected = !self.connected
-                self.pushToNoConnectionView()
-                print("Connected: \(self.connected!)")
-            }
-            
-            guard self.connectedOnLoad == nil else { return }
-            
-            if path.status == .satisfied {
-                self.connectedOnLoad = true
-                self.connected = true
-            } else {
-                self.connectedOnLoad = false
-                self.connected = false
-            }
-            
-            self.pushToNoConnectionView()
-            print("Connected: \(self.connected!)")
-        }
-        
-        let queue = DispatchQueue(label: "Monitor")
-        monitor.start(queue: queue)
-    }
-    
-    // show no connection view
-    func pushToNoConnectionView() {
-        DispatchQueue.main.async {
-            if self.connected == false {
-                if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
-                    vc.navigationItem.hidesBackButton = true
-                    self.navigationController?.pushViewController(vc, animated: false)
-                }
-            } else {
-                self.navigationController?.popViewController(animated: false)
-            }
         }
     }
     

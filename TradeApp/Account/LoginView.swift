@@ -254,10 +254,10 @@ class LoginView: UITableViewController {
     }
     
     // set tab bar item title after view appeared
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        changeTitle()
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        changeTitle()
+//    }
     
     // push vc if user is signed in
     func loginPush(after: LoginPushType) {
@@ -273,6 +273,14 @@ class LoginView: UITableViewController {
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }
+            
+        } else if tabBarController?.selectedIndex == 3 {
+            if let vc = storyboard?.instantiateViewController(withIdentifier: "MessagesView") as? MessagesView {
+                vc.loggedUser = loggedUser
+                vc.navigationItem.hidesBackButton = true
+                navigationController?.pushViewController(vc, animated: true)
+            }
+            
         } else if tabBarController?.selectedIndex == 4 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
                 vc.loggedUser = loggedUser
@@ -292,13 +300,13 @@ class LoginView: UITableViewController {
     }
     
     // set tab bar item title
-    func changeTitle() {
-        if tabBarController?.selectedIndex == 2 {
-            navigationController?.tabBarItem.title = "Add"
-        } else if tabBarController?.selectedIndex == 3 {
-            navigationController?.tabBarItem.title = "Account"
-        }
-    }
+//    func changeTitle() {
+//        if tabBarController?.selectedIndex == 2 {
+//            navigationController?.tabBarItem.title = "Add"
+//        } else if tabBarController?.selectedIndex == 3 || tabBarController?.selectedIndex == 4 {
+//            navigationController?.tabBarItem.title = "Account"
+//        }
+//    }
     
     // check for internet connection
     func checkConnection() {
