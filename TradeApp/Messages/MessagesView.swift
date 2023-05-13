@@ -32,6 +32,7 @@ class MessagesView: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "messageCell", for: indexPath)
         cell.textLabel?.text = "John Smith"
         cell.accessoryType = .disclosureIndicator
+        cell.imageView?.image = UIImage(systemName: "photo")
         
         return cell
     }

@@ -34,7 +34,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         
-        messages.append(Message(sender: currentUser, messageId: "1", sentDate: Date().addingTimeInterval(-86400), kind: .text("Hello World")))
+        messages.append(Message(sender: currentUser, messageId: "1", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
         
         messages.append(Message(sender: otherUser, messageId: "2", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
         
@@ -45,6 +45,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messages.append(Message(sender: currentUser, messageId: "5", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
         
         messages.append(Message(sender: otherUser, messageId: "6", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
+        
+        setLayout()
 
     }
     
@@ -62,5 +64,45 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
         return messages.count
     }
+    
+    // set message background color
+    func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
+        return isFromCurrentSender(message: message) ? UIColor.systemBlue : UIColor.systemGray5
+    }
+    
+    // set avatars hidden
+    func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        return avatarView.isHidden = true
+    }
+    
+    // set bottom label as date
+    func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        return NSAttributedString(string: MessageKitDateFormatter.shared.string(from: message.sentDate), attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption1)])
+    }
+    
+    // set top label height
+    func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        return 0
+    }
+    
+    // set bottom label height
+    func cellBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        return 20
+    }
+    
+    // set messages layout
+    func setLayout() {
+        if let layout = messagesCollectionView.collectionViewLayout as? MessagesCollectionViewFlowLayout {
+            layout.textMessageSizeCalculator.outgoingAvatarSize = .zero
+            layout.textMessageSizeCalculator.incomingAvatarSize = .zero
+            layout.photoMessageSizeCalculator.outgoingAvatarSize = .zero
+            layout.photoMessageSizeCalculator.incomingAvatarSize = .zero
+            layout.attributedTextMessageSizeCalculator.incomingAvatarSize = .zero
+            layout.attributedTextMessageSizeCalculator.outgoingAvatarSize = .zero
+            layout.attributedTextMessageSizeCalculator.avatarLeadingTrailingPadding = .zero
+        }
+    }
+    
+    
     
 }
