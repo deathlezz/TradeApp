@@ -300,13 +300,15 @@ class LoginView: UITableViewController {
     }
     
     // set tab bar item title
-//    func changeTitle() {
-//        if tabBarController?.selectedIndex == 2 {
-//            navigationController?.tabBarItem.title = "Add"
-//        } else if tabBarController?.selectedIndex == 3 || tabBarController?.selectedIndex == 4 {
-//            navigationController?.tabBarItem.title = "Account"
-//        }
-//    }
+    func changeTitle() {
+        if tabBarController?.selectedIndex == 2 {
+            navigationController?.tabBarItem.title = "Add"
+        } else if tabBarController?.selectedIndex == 3  {
+            navigationController?.tabBarItem.title = "Messages"
+        } else if tabBarController?.selectedIndex == 4 {
+            navigationController?.tabBarItem.title = "Account"
+        }
+    }
     
     // check for internet connection
     func checkConnection() {

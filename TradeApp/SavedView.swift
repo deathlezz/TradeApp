@@ -14,6 +14,8 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     
     var isPushed: Bool!
     
+    var emptyArrayView: UIView!
+    
     var selectButton: UIBarButtonItem!
     var cancelButton: UIBarButtonItem!
     var deleteButton: UIBarButtonItem!
@@ -32,6 +34,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         checkConnection()
+        addAmptyArrayView()
         
         self.tabBarController?.delegate = self
         
@@ -176,6 +179,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         isPushed = false
         savedItems = Utilities.loadItems()
         updateSavedItems()
+        isArrayEmpty()
         collectionView.reloadData()
     }
     
@@ -243,6 +247,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
                 self.selectedCells.removeAll()
                 Utilities.removeItems(self.selectedItems)
                 self.updateHeader()
+                self.isArrayEmpty()
             }
         }
     }
@@ -367,6 +372,31 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
             for item in user.activeItems {
                 Storage.shared.items.append(item!)
             }
+        }
+    }
+    
+    // set up empty array view
+    func addAmptyArrayView() {
+        let screenSize = UIScreen.main.bounds.size
+        let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
+        myView.backgroundColor = .systemGray6
+        let label = UILabel(frame: CGRect(x: (screenSize.width / 2) - 100, y: (screenSize.height / 2) - 25, width: 200, height: 50))
+        label.text = "Nothing to show here"
+        label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        label.textColor = .lightGray
+        label.textAlignment = .center
+        label.backgroundColor = .systemGray6
+        myView.addSubview(label)
+        view.addSubview(myView)
+        emptyArrayView = myView
+    }
+    
+    // check if array is empty or not
+    func isArrayEmpty() {
+        if savedItems.count > 0 {
+            emptyArrayView.isHidden = true
+        } else {
+            emptyArrayView.isHidden = false
         }
     }
     

@@ -7,6 +7,7 @@
 
 import UIKit
 import MessageKit
+import InputBarAccessoryView
 
 struct Sender: SenderType {
     var senderId: String
@@ -20,7 +21,9 @@ struct Message: MessageType {
     var kind: MessageKind
 }
 
-class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate {
+class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate, InputBarAccessoryViewDelegate {
+    
+    var chatTitle: String!
     
     let currentUser = Sender(senderId: "self", displayName: "dzz")
     let otherUser = Sender(senderId: "other", displayName: "john smith")
@@ -29,25 +32,27 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        title = chatTitle
 
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
+        messageInputBar.delegate = self
         
-        messages.append(Message(sender: currentUser, messageId: "1", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
-        
-        messages.append(Message(sender: otherUser, messageId: "2", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
-        
-        messages.append(Message(sender: currentUser, messageId: "3", sentDate: Date().addingTimeInterval(-60000), kind: .text("Here is a long reply. Here is a long reply. Here is a long reply.")))
-        
-        messages.append(Message(sender: otherUser, messageId: "4", sentDate: Date().addingTimeInterval(-50000), kind: .text("Look it works")))
-        
-        messages.append(Message(sender: currentUser, messageId: "5", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
-        
-        messages.append(Message(sender: otherUser, messageId: "6", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
+        messages.append(Message(sender: currentUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
+
+        messages.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
+
+        messages.append(Message(sender: currentUser, messageId: "2", sentDate: Date().addingTimeInterval(-60000), kind: .text("Here is a long reply. Here is a long reply. Here is a long reply.")))
+
+        messages.append(Message(sender: otherUser, messageId: "3", sentDate: Date().addingTimeInterval(-50000), kind: .text("Look it works")))
+
+        messages.append(Message(sender: currentUser, messageId: "4", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
+
+        messages.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
         
         setLayout()
-
     }
     
     // return current sender
@@ -75,9 +80,27 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         return avatarView.isHidden = true
     }
     
+    // set "send" button
+    func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
+        print(text)
+        messages.append(Message(sender: currentUser, messageId: "\(messages.count)", sentDate: Date(), kind: .text(text)))
+        
+        var indexPath = IndexPath()
+        
+        if messages.count > 0 {
+            indexPath = IndexPath(index: messages.count - 1)
+        } else {
+            indexPath = IndexPath(index: 0)
+        }
+        
+        messagesCollectionView.insertItems(at: [indexPath])
+        inputBar.inputTextView.text = ""
+    }
+    
     // set bottom label as date
     func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
-        return NSAttributedString(string: MessageKitDateFormatter.shared.string(from: message.sentDate), attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption1)])
+        let string = NSAttributedString(string: MessageKitDateFormatter.shared.string(from: message.sentDate), attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption1)])
+        return string
     }
     
     // set top label height
@@ -87,14 +110,16 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // set bottom label height
     func cellBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        return 20
+        return 30
     }
     
-    // set messages layout
+    // set up messages layout
     func setLayout() {
         if let layout = messagesCollectionView.collectionViewLayout as? MessagesCollectionViewFlowLayout {
             layout.textMessageSizeCalculator.outgoingAvatarSize = .zero
             layout.textMessageSizeCalculator.incomingAvatarSize = .zero
+            layout.textMessageSizeCalculator.outgoingCellBottomLabelAlignment.textInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
+            layout.textMessageSizeCalculator.incomingCellBottomLabelAlignment.textInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
             layout.photoMessageSizeCalculator.outgoingAvatarSize = .zero
             layout.photoMessageSizeCalculator.incomingAvatarSize = .zero
             layout.attributedTextMessageSizeCalculator.incomingAvatarSize = .zero
@@ -102,7 +127,5 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
             layout.attributedTextMessageSizeCalculator.avatarLeadingTrailingPadding = .zero
         }
     }
-    
-    
     
 }

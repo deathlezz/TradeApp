@@ -15,6 +15,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     var radiusStages = [0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 175, 200]
     
+    var emptyArrayView: UIView!
+    
     let monitor = NWPathMonitor()
     var connectedOnLoad: Bool!
     var connected: Bool!
@@ -40,6 +42,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         checkConnection()
+        addAmptyArrayView()
         
         tabBarController?.delegate = self
         
@@ -74,6 +77,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             self?.loadRecentItems()
             
             DispatchQueue.main.async {
+                self?.isArrayEmpty()
                 self?.collectionView.reloadData()
             }
         }
@@ -175,6 +179,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         currentUnit = Utilities.loadDistanceUnit()
         changeTitle()
         hideButtons()
+        isArrayEmpty()
         collectionView.reloadData()
     }
     
@@ -483,6 +488,31 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         let soon = itemDate.addingTimeInterval(86400)
         
         return soon >= now
+    }
+    
+    // set up empty array view
+    func addAmptyArrayView() {
+        let screenSize = UIScreen.main.bounds.size
+        let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
+        myView.backgroundColor = .systemGray6
+        let label = UILabel(frame: CGRect(x: (screenSize.width / 2) - 100, y: (screenSize.height / 2) - 25, width: 200, height: 50))
+        label.text = "Nothing to show here"
+        label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        label.textColor = .lightGray
+        label.textAlignment = .center
+        label.backgroundColor = .systemGray6
+        myView.addSubview(label)
+        view.addSubview(myView)
+        emptyArrayView = myView
+    }
+    
+    // check if array is empty or not
+    func isArrayEmpty() {
+        if Storage.shared.filteredItems.count > 0 {
+            emptyArrayView.isHidden = true
+        } else {
+            emptyArrayView.isHidden = false
+        }
     }
     
 }
