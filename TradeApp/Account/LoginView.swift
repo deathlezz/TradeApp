@@ -254,10 +254,10 @@ class LoginView: UITableViewController {
     }
     
     // set tab bar item title after view appeared
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//        changeTitle()
-//    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        changeTitle()
+    }
     
     // push vc if user is signed in
     func loginPush(after: LoginPushType) {

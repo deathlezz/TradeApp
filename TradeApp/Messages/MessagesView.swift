@@ -19,10 +19,11 @@ class MessagesView: UITableViewController {
         super.viewDidLoad()
 
         title = "Messages"
-        navigationController?.tabBarItem.title = "Messages"
         navigationController?.navigationBar.prefersLargeTitles = true
         
         addAmptyArrayView()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "messageCell")
     }
@@ -90,6 +91,11 @@ class MessagesView: UITableViewController {
         } else {
             emptyArrayView.isHidden = false
         }
+    }
+    
+    // sign out current user
+    @objc func signOut() {
+        navigationController?.popViewController(animated: true)
     }
 
 }

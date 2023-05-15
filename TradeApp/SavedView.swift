@@ -36,7 +36,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         checkConnection()
         addAmptyArrayView()
         
-        self.tabBarController?.delegate = self
+//        self.tabBarController?.delegate = self
         
         selectButton = UIBarButtonItem(title: "Select", style: .plain, target: self, action: #selector(selectTapped))
         cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelTapped))
