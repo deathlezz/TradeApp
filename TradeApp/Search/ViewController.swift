@@ -17,10 +17,10 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     var emptyArrayView: UIView!
     
-//    let monitor = NWPathMonitor()
+    let monitor = NWPathMonitor()
     var connectedOnLoad: Bool!
     var connected: Bool!
-    var statusChecked = false
+//    var statusChecked = false
     
     var currentUnit: String!
     var currentFilters = [String: String]()
@@ -426,18 +426,18 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // check for internet connection
     func checkConnection() {
-        let monitor = NWPathMonitor()
+//        let monitor = NWPathMonitor()
         monitor.pathUpdateHandler = { path in
             
-//            if self.connectedOnLoad != nil {
-//                self.connected = !self.connected
-//                self.pushToNoConnectionView()
+            if self.connectedOnLoad != nil {
+                self.connected = !self.connected
+                self.pushToNoConnectionView()
 //                self.statusChecked = true
-//                print("Connected: \(self.connected!)")
-//                print("Connected another time")
-//            }
+                print("Connected: \(self.connected!)")
+                print("Connected another time")
+            }
             
-//            guard self.connectedOnLoad == nil else { return }
+            guard self.connectedOnLoad == nil else { return }
             
             if path.status == .satisfied {
                 self.connectedOnLoad = true

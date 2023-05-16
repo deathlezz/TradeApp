@@ -38,7 +38,7 @@ class MessagesView: UITableViewController {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
         let conf = UIImage.SymbolConfiguration(scale: .large)
         cell.textLabel?.text = messages[indexPath.row]
-        cell.detailTextLabel?.text = "default random message"
+        cell.detailTextLabel?.text = "latest sent message"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
         cell.imageView?.image = UIImage(systemName: "photo", withConfiguration: conf)
@@ -49,6 +49,7 @@ class MessagesView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
             vc.chatTitle = messages[indexPath.row]
+            vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
         }

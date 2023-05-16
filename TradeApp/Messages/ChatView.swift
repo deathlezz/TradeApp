@@ -40,6 +40,12 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        messagesCollectionView.addGestureRecognizer(tap)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        
         messages.append(Message(sender: currentUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
 
         messages.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
@@ -95,6 +101,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         
         messagesCollectionView.insertItems(at: [indexPath])
         inputBar.inputTextView.text = ""
+        messagesCollectionView.scrollToLastItem()
     }
     
     // set bottom label as date
@@ -126,6 +133,28 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
             layout.attributedTextMessageSizeCalculator.outgoingAvatarSize = .zero
             layout.attributedTextMessageSizeCalculator.avatarLeadingTrailingPadding = .zero
         }
+    }
+    
+    // scroll view to last sent message
+    @objc func adjustForKeyboard(notification: Notification) {
+        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+
+        let keyboardScreenEnd = keyboardValue.cgRectValue
+        let keyboardViewEndFrame = view.convert(keyboardScreenEnd, from: view.window)
+
+        if notification.name == UIResponder.keyboardWillHideNotification {
+            messagesCollectionView.contentInset = .zero
+        } else {
+            messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height - view.safeAreaInsets.bottom, right: 0)
+        }
+
+        messagesCollectionView.scrollIndicatorInsets = messagesCollectionView.contentInset
+        messagesCollectionView.scrollToLastItem()
+    }
+    
+    // hide keyboard on tap
+    @objc func dismissKeyboard() {
+        messageInputBar.inputTextView.resignFirstResponder()
     }
     
 }
