@@ -416,7 +416,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // show source type alert
     func addNewPhoto() {
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
-            let ac = UIAlertController(title: "Source", message: nil, preferredStyle: .actionSheet)
+            let ac = UIAlertController(title: "Select image source", message: nil, preferredStyle: .actionSheet)
             ac.addAction(UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
                 self?.showPicker(fromCamera: true)
             })

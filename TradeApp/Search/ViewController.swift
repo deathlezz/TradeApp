@@ -20,7 +20,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     let monitor = NWPathMonitor()
     var connectedOnLoad: Bool!
     var connected: Bool!
-//    var statusChecked = false
     
     var currentUnit: String!
     var currentFilters = [String: String]()
@@ -43,7 +42,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         checkConnection()
-        addAmptyArrayView()
+        addEmptyArrayView()
         
         tabBarController?.delegate = self
         
@@ -496,7 +495,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     }
     
     // set up empty array view
-    func addAmptyArrayView() {
+    func addEmptyArrayView() {
         let screenSize = UIScreen.main.bounds.size
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
         myView.backgroundColor = .systemGray6

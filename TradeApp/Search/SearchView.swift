@@ -26,7 +26,7 @@ class SearchView: UITableViewController {
         navigationController?.hidesBarsOnSwipe = false
         
         setUpSearchBar()
-        addAmptyArrayView()
+        addEmptyArrayView()
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
@@ -227,7 +227,7 @@ class SearchView: UITableViewController {
     }
     
     // set up empty array view
-    func addAmptyArrayView() {
+    func addEmptyArrayView() {
         let screenSize = UIScreen.main.bounds.size
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
         myView.backgroundColor = .white

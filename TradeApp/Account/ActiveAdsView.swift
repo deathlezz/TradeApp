@@ -9,6 +9,8 @@ import UIKit
 
 class ActiveAdsView: UITableViewController {
     
+    var emptyArrayView: UIView!
+    
     var header: UILabel!
     
     var mail: String!
@@ -26,6 +28,7 @@ class ActiveAdsView: UITableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name("reloadActiveAds"), object: nil)
         
+        addEmptyArrayView()
         loadData()
     }
     
@@ -109,6 +112,7 @@ class ActiveAdsView: UITableViewController {
             
             tableView.deleteRows(at: [indexPath], with: .fade)
             updateHeader()
+            isArrayEmpty()
         }
     }
     
@@ -149,6 +153,7 @@ class ActiveAdsView: UITableViewController {
     // hide toolbar before view appears
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        isArrayEmpty()
         navigationController?.isToolbarHidden = true
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
     }
@@ -191,6 +196,7 @@ class ActiveAdsView: UITableViewController {
         let indexPath = IndexPath(row: itemIndex, section: 0)
         tableView.deleteRows(at: [indexPath], with: .fade)
         updateHeader()
+        isArrayEmpty()
     }
     
     // load user active ads
@@ -201,6 +207,31 @@ class ActiveAdsView: UITableViewController {
             DispatchQueue.main.async {
                 self?.tableView.reloadData()
             }
+        }
+    }
+    
+    // set up empty array view
+    func addEmptyArrayView() {
+        let screenSize = UIScreen.main.bounds.size
+        let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
+        myView.backgroundColor = .systemGray6
+        let label = UILabel(frame: CGRect(x: (screenSize.width / 2) - 100, y: (screenSize.height / 2) - 175, width: 200, height: 50))
+        label.text = "Nothing to show here"
+        label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        label.textColor = .lightGray
+        label.textAlignment = .center
+        label.backgroundColor = .systemGray6
+        myView.addSubview(label)
+        view.addSubview(myView)
+        emptyArrayView = myView
+    }
+    
+    // check if array is empty or not
+    func isArrayEmpty() {
+        if activeAds.count > 0 {
+            emptyArrayView.isHidden = true
+        } else {
+            emptyArrayView.isHidden = false
         }
     }
     

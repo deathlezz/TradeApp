@@ -21,11 +21,11 @@ class MessagesView: UITableViewController {
         title = "Messages"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        addAmptyArrayView()
-        
         NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "messageCell")
+        
+        addEmptyArrayView()
     }
     
     // set number of items in section
@@ -60,6 +60,7 @@ class MessagesView: UITableViewController {
         if editingStyle == .delete {
             messages.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
+            isArrayEmpty()
         }
     }
     
@@ -70,7 +71,7 @@ class MessagesView: UITableViewController {
     }
     
     // set up empty array view
-    func addAmptyArrayView() {
+    func addEmptyArrayView() {
         let screenSize = UIScreen.main.bounds.size
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
         myView.backgroundColor = .white

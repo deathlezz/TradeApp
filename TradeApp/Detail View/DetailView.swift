@@ -262,7 +262,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         let googleMaps = URL(string: "comgooglemaps://")!
         
         if UIApplication.shared.canOpenURL(appleMaps) && UIApplication.shared.canOpenURL(googleMaps) {
-            let ac = UIAlertController(title: "Maps", message: "Choose map provider", preferredStyle: .actionSheet)
+            let ac = UIAlertController(title: "Choose a map provider", message: nil, preferredStyle: .actionSheet)
             ac.addAction(UIAlertAction(title: "Google Maps", style: .default) { _ in
                 guard let url = URL(string: "comgooglemaps://?saddr=&daddr=\(lat),\(long)") else { return }
                 UIApplication.shared.open(url)

@@ -40,13 +40,10 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        messagesCollectionView.addGestureRecognizer(tap)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         
-        messages.append(Message(sender: currentUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
+        messages.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
 
         messages.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
 
@@ -104,19 +101,14 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.scrollToLastItem()
     }
     
-    // set bottom label as date
-    func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+    // set message bottom label as date
+    func messageBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
         let string = NSAttributedString(string: MessageKitDateFormatter.shared.string(from: message.sentDate), attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption1)])
         return string
     }
     
-    // set top label height
-    func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        return 0
-    }
-    
-    // set bottom label height
-    func cellBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+    // set message bottom label height
+    func messageBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
         return 30
     }
     
@@ -125,8 +117,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         if let layout = messagesCollectionView.collectionViewLayout as? MessagesCollectionViewFlowLayout {
             layout.textMessageSizeCalculator.outgoingAvatarSize = .zero
             layout.textMessageSizeCalculator.incomingAvatarSize = .zero
-            layout.textMessageSizeCalculator.outgoingCellBottomLabelAlignment.textInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
-            layout.textMessageSizeCalculator.incomingCellBottomLabelAlignment.textInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+            layout.textMessageSizeCalculator.outgoingMessageBottomLabelAlignment.textInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
+            layout.textMessageSizeCalculator.incomingMessageBottomLabelAlignment.textInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
             layout.photoMessageSizeCalculator.outgoingAvatarSize = .zero
             layout.photoMessageSizeCalculator.incomingAvatarSize = .zero
             layout.attributedTextMessageSizeCalculator.incomingAvatarSize = .zero
@@ -150,11 +142,6 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
 
         messagesCollectionView.scrollIndicatorInsets = messagesCollectionView.contentInset
         messagesCollectionView.scrollToLastItem()
-    }
-    
-    // hide keyboard on tap
-    @objc func dismissKeyboard() {
-        messageInputBar.inputTextView.resignFirstResponder()
     }
     
 }
