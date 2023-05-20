@@ -18,6 +18,8 @@ class DetailView: UITableViewController, Index, Coordinates {
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
     
+    var phone: Int!
+    
     var latitude: Double!
     var longitude: Double!
     
@@ -45,6 +47,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         loggedUser = Utilities.loadUser()
         savedItems = Utilities.loadItems()
+        loadPhoneNumber()
         isSaved()
         setToolbar()
         tableView.reloadData()
@@ -209,20 +212,19 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set action for call button
     @objc func callTapped() {
+        guard let phone = phone else { return }
         
-        var phoneNumber: Int?
-        let users = Storage.shared.users
-        
-        for user in users {
-            for activeItem in user.activeItems {
-                if activeItem?.id == item?.id {
-                    phoneNumber = user.phoneNumber ?? 0
-                }
-            }
-        }
-
-        guard let url = URL(string: "telprompt://\(phoneNumber!)"), UIApplication.shared.canOpenURL(url) else { return }
-        UIApplication.shared.open(url)
+        let ac = UIAlertController(title: "Phone number", message: "\(phone)", preferredStyle: .actionSheet)
+        ac.addAction(UIAlertAction(title: "Phone call", style: .default) { _ in
+            guard let url = URL(string: "telprompt://\(phone)"), UIApplication.shared.canOpenURL(url) else { return }
+            UIApplication.shared.open(url)
+        })
+        ac.addAction(UIAlertAction(title: "Text message", style: .default) { _ in
+            guard let url = URL(string: "sms://\(phone)"), UIApplication.shared.canOpenURL(url) else { return }
+            UIApplication.shared.open(url)
+        })
+        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(ac, animated: true)
     }
     
     // set action for message button
@@ -295,7 +297,9 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set toolbar
     func setToolbar() {
-        let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+        var callFrame = UIButton()
+        var messageFrame = UIButton()
+        
         let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
         callFrame.setImage(image, for: .normal)
         callFrame.addTarget(self, action: #selector(callTapped), for: .touchUpInside)
@@ -305,7 +309,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         callFrame.layer.borderWidth = 0.2
         let callButton = UIBarButtonItem(customView: callFrame)
         
-        let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
         let message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
         messageFrame.setImage(message, for: .normal)
         messageFrame.addTarget(self, action: #selector(messageTapped), for: .touchUpInside)
@@ -315,11 +318,62 @@ class DetailView: UITableViewController, Index, Coordinates {
         messageFrame.layer.borderWidth = 0.2
         let messageButton = UIBarButtonItem(customView: messageFrame)
         
-        if loggedUser == nil {
+//        let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+//        let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+//        callFrame.setImage(image, for: .normal)
+//        callFrame.addTarget(self, action: #selector(callTapped), for: .touchUpInside)
+//        callFrame.backgroundColor = .white
+//        callFrame.layer.cornerRadius = 7
+//        callFrame.layer.borderColor = UIColor.lightGray.cgColor
+//        callFrame.layer.borderWidth = 0.2
+//        let callButton = UIBarButtonItem(customView: callFrame)
+//
+//        let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+//        let message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+//        messageFrame.setImage(message, for: .normal)
+//        messageFrame.addTarget(self, action: #selector(messageTapped), for: .touchUpInside)
+//        messageFrame.backgroundColor = .white
+//        messageFrame.layer.cornerRadius = 7
+//        messageFrame.layer.borderColor = UIColor.lightGray.cgColor
+//        messageFrame.layer.borderWidth = 0.2
+//        let messageButton = UIBarButtonItem(customView: messageFrame)
+        
+        if loggedUser == nil && phone == 0 {
+            // show disabled message button only
+            messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width) - 20, height: 50))
             messageButton.isEnabled = false
+            toolbarItems = [messageButton]
+        } else if loggedUser == nil {
+            // show call button and disabled message button
+            callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+            messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+            messageButton.isEnabled = false
+            toolbarItems = [callButton, messageButton]
+        } else if phone == 0 {
+            // show message button only
+            messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width) - 20, height: 50))
+            toolbarItems = [messageButton]
+        } else {
+            // show both buttons
+            callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+            messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+            toolbarItems = [callButton, messageButton]
         }
         
-        toolbarItems = [callButton, messageButton]
+//        toolbarItems = [callButton, messageButton]
+    }
+    
+    // load item's phone number
+    func loadPhoneNumber() {
+        let users = Storage.shared.users
+        
+        for user in users {
+            for activeItem in user.activeItems {
+                if activeItem?.id == item?.id {
+                    phone = user.phoneNumber ?? 0
+                }
+            }
+        }
     }
     
 }
