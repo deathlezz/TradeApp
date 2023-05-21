@@ -167,7 +167,7 @@ class EndedAdsView: UITableViewController {
     
     // set action for tapped state button
     @objc func stateTapped(_ sender: UIButton) {
-        let ac = UIAlertController(title: "Activate ad", message: "Are you sure, you want to activate this ad", preferredStyle: .alert)
+        let ac = UIAlertController(title: "Activate ad", message: "Are you sure, you want to activate this ad?", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         ac.addAction(UIAlertAction(title: "Activate", style: .default) { [weak self] _ in
             self?.activateAd(sender)

@@ -297,9 +297,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set toolbar
     func setToolbar() {
-        var callFrame = UIButton()
-        var messageFrame = UIButton()
-        
+        let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
         let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
         callFrame.setImage(image, for: .normal)
         callFrame.addTarget(self, action: #selector(callTapped), for: .touchUpInside)
@@ -309,6 +307,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         callFrame.layer.borderWidth = 0.2
         let callButton = UIBarButtonItem(customView: callFrame)
         
+        let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
         let message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
         messageFrame.setImage(message, for: .normal)
         messageFrame.addTarget(self, action: #selector(messageTapped), for: .touchUpInside)
@@ -318,49 +317,21 @@ class DetailView: UITableViewController, Index, Coordinates {
         messageFrame.layer.borderWidth = 0.2
         let messageButton = UIBarButtonItem(customView: messageFrame)
         
-//        let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
-//        let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
-//        callFrame.setImage(image, for: .normal)
-//        callFrame.addTarget(self, action: #selector(callTapped), for: .touchUpInside)
-//        callFrame.backgroundColor = .white
-//        callFrame.layer.cornerRadius = 7
-//        callFrame.layer.borderColor = UIColor.lightGray.cgColor
-//        callFrame.layer.borderWidth = 0.2
-//        let callButton = UIBarButtonItem(customView: callFrame)
-//
-//        let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
-//        let message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
-//        messageFrame.setImage(message, for: .normal)
-//        messageFrame.addTarget(self, action: #selector(messageTapped), for: .touchUpInside)
-//        messageFrame.backgroundColor = .white
-//        messageFrame.layer.cornerRadius = 7
-//        messageFrame.layer.borderColor = UIColor.lightGray.cgColor
-//        messageFrame.layer.borderWidth = 0.2
-//        let messageButton = UIBarButtonItem(customView: messageFrame)
-        
         if loggedUser == nil && phone == 0 {
             // show disabled message button only
-            messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width) - 20, height: 50))
+            messageButton.customView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 20, height: 50)
             messageButton.isEnabled = false
-            toolbarItems = [messageButton]
+            callButton.isHidden = true
         } else if loggedUser == nil {
             // show call button and disabled message button
-            callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
-            messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
             messageButton.isEnabled = false
-            toolbarItems = [callButton, messageButton]
         } else if phone == 0 {
             // show message button only
-            messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width) - 20, height: 50))
-            toolbarItems = [messageButton]
-        } else {
-            // show both buttons
-            callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
-            messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
-            toolbarItems = [callButton, messageButton]
+            messageButton.customView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 20, height: 50)
+            callButton.isHidden = true
         }
         
-//        toolbarItems = [callButton, messageButton]
+        toolbarItems = [callButton, messageButton]
     }
     
     // load item's phone number

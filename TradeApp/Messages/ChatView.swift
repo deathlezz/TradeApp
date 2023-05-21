@@ -40,7 +40,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardDidHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         
         messages.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
@@ -128,20 +128,19 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     }
     
     // scroll view to last sent message
-    @objc func adjustForKeyboard(notification: Notification) {
+    @objc func adjustForKeyboard(_ notification: Notification) {
         guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
 
         let keyboardScreenEnd = keyboardValue.cgRectValue
         let keyboardViewEndFrame = view.convert(keyboardScreenEnd, from: view.window)
-
-        if notification.name == UIResponder.keyboardWillHideNotification {
-            messagesCollectionView.contentInset = .zero
-        } else {
-            messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height - view.safeAreaInsets.bottom, right: 0)
-        }
-
-        messagesCollectionView.scrollIndicatorInsets = messagesCollectionView.contentInset
+        
+        messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height - view.safeAreaInsets.bottom, right: 0)
+        print(keyboardViewEndFrame.height - view.safeAreaInsets.bottom)
         messagesCollectionView.scrollToLastItem()
+        print(keyboardViewEndFrame.height - view.safeAreaInsets.bottom)
+
+//        messagesCollectionView.scrollIndicatorInsets = messagesCollectionView.contentInset
+//        messagesCollectionView.scrollToLastItem()
     }
     
 }

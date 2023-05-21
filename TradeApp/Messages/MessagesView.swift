@@ -38,7 +38,7 @@ class MessagesView: UITableViewController {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
         let conf = UIImage.SymbolConfiguration(scale: .large)
         cell.textLabel?.text = messages[indexPath.row]
-        cell.detailTextLabel?.text = "latest sent message"
+        cell.detailTextLabel?.text = "latest sent message • 10:45"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
         cell.imageView?.image = UIImage(systemName: "photo", withConfiguration: conf)
