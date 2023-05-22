@@ -40,8 +40,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardDidHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
         
         messages.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
 
@@ -134,13 +134,10 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         let keyboardScreenEnd = keyboardValue.cgRectValue
         let keyboardViewEndFrame = view.convert(keyboardScreenEnd, from: view.window)
         
-        messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height - view.safeAreaInsets.bottom, right: 0)
-        print(keyboardViewEndFrame.height - view.safeAreaInsets.bottom)
+        messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height, right: 0)
+        messagesCollectionView.scrollIndicatorInsets = UIEdgeInsets(top: view.safeAreaInsets.top, left: 0, bottom: keyboardViewEndFrame.height, right: 0)
         messagesCollectionView.scrollToLastItem()
-        print(keyboardViewEndFrame.height - view.safeAreaInsets.bottom)
 
-//        messagesCollectionView.scrollIndicatorInsets = messagesCollectionView.contentInset
-//        messagesCollectionView.scrollToLastItem()
     }
     
 }

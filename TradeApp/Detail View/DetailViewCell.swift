@@ -53,7 +53,7 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     }
     
     // get current image index
-    @objc func getIndex(_ notification: NSNotification) {
+    @objc func getIndex(_ notification: Notification) {
         currentImage = notification.userInfo?["index"] as! Int
         scrollToItem()
     }
