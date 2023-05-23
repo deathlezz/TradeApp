@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MessageKit
 
 class MessagesView: UITableViewController {
     
@@ -13,7 +14,7 @@ class MessagesView: UITableViewController {
     
     var loggedUser: String!
     
-    var messages = ["BMW E36 2.0 LPG"]
+    var chats: [String: [MessageType]] = ["BMW E36 2.0 LPG": []]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,24 +22,40 @@ class MessagesView: UITableViewController {
         title = "Messages"
         navigationController?.navigationBar.prefersLargeTitles = true
         
+        let currentUser = Sender(senderId: "self", displayName: "dzz")
+        let otherUser = Sender(senderId: "other", displayName: "john smith")
+        
         NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "messageCell")
+        
+        chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
+
+        chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
+
+        chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "2", sentDate: Date().addingTimeInterval(-60000), kind: .text("Here is a long reply. Here is a long reply. Here is a long reply.")))
+
+        chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "3", sentDate: Date().addingTimeInterval(-50000), kind: .text("Look it works")))
+
+        chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "4", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
+
+        chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
         
         addEmptyArrayView()
     }
     
     // set number of items in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count
+        return chats.count
     }
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
         let conf = UIImage.SymbolConfiguration(scale: .large)
-        cell.textLabel?.text = messages[indexPath.row]
-        cell.detailTextLabel?.text = "latest sent message • 10:45"
+        let chatKey = Array(chats.keys)[indexPath.row]
+        cell.textLabel?.text = chatKey
+        cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) • \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
         cell.imageView?.image = UIImage(systemName: "photo", withConfiguration: conf)
@@ -48,7 +65,9 @@ class MessagesView: UITableViewController {
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
-            vc.chatTitle = messages[indexPath.row]
+            let chatTitle = Array(chats.keys)[indexPath.row]
+            vc.chatTitle = chatTitle
+            vc.messages = chats[chatTitle] ?? [MessageType]()
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
@@ -58,9 +77,16 @@ class MessagesView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            messages.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
-            isArrayEmpty()
+            let ac = UIAlertController(title: "Delete chat", message: "Are you sure, you want to delete this chat?", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
+                let chatKey = Array(self.chats.keys)[indexPath.row]
+                self.chats.removeValue(forKey: chatKey)
+//                self?.messages.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+                self.isArrayEmpty()
+            })
+            present(ac, animated: true)
         }
     }
     
@@ -88,7 +114,7 @@ class MessagesView: UITableViewController {
     
     // check if array is empty or not
     func isArrayEmpty() {
-        if messages.count > 0 {
+        if chats.count > 0 {
             emptyArrayView.isHidden = true
         } else {
             emptyArrayView.isHidden = false
@@ -98,6 +124,18 @@ class MessagesView: UITableViewController {
     // sign out current user
     @objc func signOut() {
         navigationController?.popViewController(animated: true)
+    }
+    
+    // convert message kind text into string
+    func getMessageText(_ messageKind: MessageKind) -> String {
+        if case .text(let value) = messageKind {
+            if value.count > 32 {
+                return value.prefix(32) + "..."
+            } else {
+                return value
+            }
+        }
+        return ""
     }
 
 }

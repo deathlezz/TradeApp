@@ -33,6 +33,9 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         title = "Saved"
         navigationController?.navigationBar.prefersLargeTitles = true
         
+        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
+        
         checkConnection()
         addAmptyArrayView()
         
@@ -294,7 +297,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     }
     
     // check for internet connection
-    func checkConnection() {
+    @objc func checkConnection() {
         monitor.pathUpdateHandler = { path in
             
             if self.connectedOnLoad != nil {

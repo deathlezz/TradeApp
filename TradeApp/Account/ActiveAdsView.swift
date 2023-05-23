@@ -104,15 +104,20 @@ class ActiveAdsView: UITableViewController {
             guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
             guard let itemID = activeAds[indexPath.row]?.id else { return }
             
-            Storage.shared.items.removeAll(where: {$0.id == itemID})
-            Storage.shared.filteredItems.removeAll(where: {$0.id == itemID})
-            
-            Storage.shared.users[index].activeItems.remove(at: indexPath.row)
-            activeAds.remove(at: indexPath.row)
-            
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            updateHeader()
-            isArrayEmpty()
+            let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
+                Storage.shared.items.removeAll(where: {$0.id == itemID})
+                Storage.shared.filteredItems.removeAll(where: {$0.id == itemID})
+                
+                Storage.shared.users[index].activeItems.remove(at: indexPath.row)
+                self?.activeAds.remove(at: indexPath.row)
+                
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                self?.updateHeader()
+                self?.isArrayEmpty()
+            })
+            present(ac, animated: true)
         }
     }
     

@@ -41,6 +41,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         title = "Recently added"
         navigationController?.navigationBar.prefersLargeTitles = true
         
+        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
+        
         checkConnection()
         addEmptyArrayView()
         
@@ -424,7 +427,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     }
     
     // check for internet connection
-    func checkConnection() {
+    @objc func checkConnection() {
 //        let monitor = NWPathMonitor()
         monitor.pathUpdateHandler = { path in
             
