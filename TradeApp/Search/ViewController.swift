@@ -8,6 +8,41 @@
 import UIKit
 import CoreLocation
 import Network
+import SystemConfiguration
+
+public class InternetConnectionManager {
+    
+    private init() {
+        
+    }
+    
+    public static func isConnectedToNetwork() -> Bool {
+        
+        var zeroAddress = sockaddr_in()
+        zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
+        zeroAddress.sin_family = sa_family_t(AF_INET)
+        guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
+            
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                
+                SCNetworkReachabilityCreateWithAddress(nil, $0)
+                
+            }
+            
+        }) else {
+            
+            return false
+        }
+        var flags = SCNetworkReachabilityFlags()
+        if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
+            return false
+        }
+        let isReachable = (flags.rawValue & UInt32(kSCNetworkFlagsReachable)) != 0
+        let needsConnection = (flags.rawValue & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
+        return (isReachable && !needsConnection)
+    }
+    
+}
 
 class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
@@ -20,6 +55,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     let monitor = NWPathMonitor()
     var connectedOnLoad: Bool!
     var connected: Bool!
+    var isPushed = false
     
     var currentUnit: String!
     var currentFilters = [String: String]()
@@ -43,6 +79,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.didBecomeActiveNotification, object: nil)
         
         checkConnection()
         addEmptyArrayView()
@@ -428,45 +465,57 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // check for internet connection
     @objc func checkConnection() {
-//        let monitor = NWPathMonitor()
-        monitor.pathUpdateHandler = { path in
-            
-            if self.connectedOnLoad != nil {
-                self.connected = !self.connected
-                self.pushToNoConnectionView()
-//                self.statusChecked = true
-                print("Connected: \(self.connected!)")
-                print("Connected another time")
-            }
-            
-            guard self.connectedOnLoad == nil else { return }
-            
-            if path.status == .satisfied {
-                self.connectedOnLoad = true
-                self.connected = true
-            } else {
-                self.connectedOnLoad = false
-                self.connected = false
-            }
-            
-            self.pushToNoConnectionView()
-            print("Connected: \(self.connected!)")
-            print("First connection")
+        
+        if InternetConnectionManager.isConnectedToNetwork() {
+            self.connectedOnLoad = true
+            self.connected = true
+        } else {
+            self.connectedOnLoad = false
+            self.connected = false
         }
         
-        let queue = DispatchQueue(label: "Monitor")
-        monitor.start(queue: queue)
+        self.pushToNoConnectionView()
+        print("Connected: \(self.connected!)")
+        print("First connection")
+//        let monitor = NWPathMonitor()
+//        monitor.pathUpdateHandler = { path in
+//
+////            if self.connectedOnLoad != nil {
+////                self.connected = !self.connected
+////                self.pushToNoConnectionView()
+//////                self.statusChecked = true
+////                print("Connected: \(self.connected!)")
+////                print("Connected another time")
+////            }
+//
+////            guard self.connectedOnLoad == nil else { return }
+//
+//            if InternetConnectionManager.isConnectedToNetwork() {
+//                self.connectedOnLoad = true
+//                self.connected = true
+//            } else {
+//                self.connectedOnLoad = false
+//                self.connected = false
+//            }
+//
+//            self.pushToNoConnectionView()
+//            print("Connected: \(self.connected!)")
+//            print("First connection")
+//        }
+//
+//        let queue = DispatchQueue(label: "Monitor")
+//        monitor.start(queue: queue)
     }
     
     // show no connection view
     func pushToNoConnectionView() {
         DispatchQueue.main.async {
-            if self.connected == false {
+            if self.connected == false && self.isPushed == false {
                 if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
                     vc.navigationItem.hidesBackButton = true
                     self.navigationController?.pushViewController(vc, animated: false)
                 }
-            } else {
+            } else if self.connected == true && self.isPushed == true {
                 self.navigationController?.popViewController(animated: false)
             }
         }

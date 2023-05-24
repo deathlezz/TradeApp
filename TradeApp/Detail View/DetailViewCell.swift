@@ -61,7 +61,9 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     // scroll to item before view appeared
     func scrollToItem() {
         let indexPath = IndexPath(item: currentImage, section: 0)
+        collectionView.isPagingEnabled = false
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+        collectionView.isPagingEnabled = true
     }
     
 }

@@ -35,6 +35,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         
         NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.didBecomeActiveNotification, object: nil)
         
         checkConnection()
         addAmptyArrayView()

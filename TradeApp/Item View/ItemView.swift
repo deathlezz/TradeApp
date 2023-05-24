@@ -64,7 +64,9 @@ class ItemView: UICollectionViewController {
     // scroll to current image before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        collectionView.scrollToItem(at: IndexPath(item: currentImage, section: 0), at: .centeredHorizontally, animated: false)
+        let indexPath = IndexPath(item: currentImage, section: 0)
+        collectionView.isPagingEnabled = false
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
         collectionView.isPagingEnabled = true
     }
     

@@ -41,6 +41,7 @@ class LoginView: UITableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.didBecomeActiveNotification, object: nil)
         
         checkConnection()
         
@@ -316,15 +317,15 @@ class LoginView: UITableViewController {
     // check for internet connection
     @objc func checkConnection() {
         monitor.pathUpdateHandler = { path in
-            
+
             if self.connectedOnLoad != nil {
                 self.connected = !self.connected
                 self.pushToNoConnectionView()
                 print("Connected: \(self.connected!)")
             }
-            
+
             guard self.connectedOnLoad == nil else { return }
-            
+
             if path.status == .satisfied {
                 self.connectedOnLoad = true
                 self.connected = true
@@ -332,11 +333,11 @@ class LoginView: UITableViewController {
                 self.connectedOnLoad = false
                 self.connected = false
             }
-            
+
             self.pushToNoConnectionView()
             print("Connected: \(self.connected!)")
         }
-        
+
         let queue = DispatchQueue(label: "Monitor")
         monitor.start(queue: queue)
     }
