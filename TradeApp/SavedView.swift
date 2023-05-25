@@ -13,6 +13,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     var savedItems = [Item]()
     
     var isPushed: Bool!
+    var isMonitoring = false
     
     var emptyArrayView: UIView!
     
@@ -33,9 +34,9 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         title = "Saved"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.didBecomeActiveNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.didBecomeActiveNotification, object: nil)
         
         checkConnection()
         addAmptyArrayView()
@@ -299,6 +300,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     
     // check for internet connection
     @objc func checkConnection() {
+        guard isMonitoring == false else { return }
         monitor.pathUpdateHandler = { path in
             
             if self.connectedOnLoad != nil {
@@ -323,6 +325,8 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         
         let queue = DispatchQueue(label: "Monitor")
         monitor.start(queue: queue)
+        isMonitoring = true
+        print("Started monitoring")
     }
     
     // show no connection view
