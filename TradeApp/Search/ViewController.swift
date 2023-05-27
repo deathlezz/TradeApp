@@ -7,7 +7,7 @@
 
 import UIKit
 import CoreLocation
-//import Network
+import Network
 //import Reachability
 
 class ViewController: UICollectionViewController, UITabBarControllerDelegate {
@@ -18,12 +18,12 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     var emptyArrayView: UIView!
     
-    var isMonitoring = false
+//    var isMonitoring = false
     
-//    let monitor = NWPathMonitor()
-    var connectedOnLoad: Bool!
-    var connected: Bool!
-//    var isPushed = false
+    let monitor = NWPathMonitor()
+//    var connectedOnLoad: Bool!
+//    var connected: Bool!
+    var isPushed = false
     
     var currentUnit: String!
     var currentFilters = [String: String]()
@@ -437,21 +437,48 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         }
     }
     
+//    func check() {
+//        guard let url = URL(string: "http://www.apple.com") else { return }
+//        let config = URLSessionConfiguration.default
+//        config.waitsForConnectivity = true
+//
+//        URLSession(configuration: config).dataTask(with: url) { data, response, error in
+//            if let error = error {
+//                print(error.localizedDescription)
+//
+//            } else {
+//                // use your data here
+//                print("connection possible")
+//            }
+//
+//        }.resume()
+//    }
+    
     func checkConnection() {
-        guard let url = URL(string: "http://www.apple.com") else { return }
-        let config = URLSessionConfiguration.default
-        config.waitsForConnectivity = true
-        
-        URLSession(configuration: config).dataTask(with: url) { data, response, error in
-            if let error = error {
-                print(error.localizedDescription)
-                
+        monitor.pathUpdateHandler = { path in
+            if path.status != .satisfied {
+                // show connection alert on main thread
+                print("not satisfied")
+                guard !self.isPushed else { return }
+                DispatchQueue.main.async { [weak self] in
+                    if let vc = self?.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
+                        vc.navigationItem.hidesBackButton = true
+                        self?.isPushed = true
+                        self?.navigationController?.pushViewController(vc, animated: false)
+                    }
+                }
             } else {
-                // use your data here
-                print("connection possible")
+                print("satisfied")
+                guard self.isPushed else { return }
+                DispatchQueue.main.async { [weak self] in
+                    self?.navigationController?.popViewController(animated: false)
+                    self?.isPushed = false
+                }
             }
-                
-        }.resume()
+        }
+        
+        let queue = DispatchQueue(label: "Monitor")
+        monitor.start(queue: queue)
     }
     
     // check for internet connection
@@ -486,18 +513,18 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
 //    }
     
     // show no connection view
-    func pushToNoConnectionView() {
-        DispatchQueue.main.async {
-            if self.connected == false {
-                if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
-                    vc.navigationItem.hidesBackButton = true
-                    self.navigationController?.pushViewController(vc, animated: false)
-                }
-            } else if self.connected == true {
-                self.navigationController?.popViewController(animated: false)
-            }
-        }
-    }
+//    func pushToNoConnectionView() {
+//        DispatchQueue.main.async {
+//            if self.connected == false {
+//                if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
+//                    vc.navigationItem.hidesBackButton = true
+//                    self.navigationController?.pushViewController(vc, animated: false)
+//                }
+//            } else if self.connected == true {
+//                self.navigationController?.popViewController(animated: false)
+//            }
+//        }
+//    }
     
     // load recently added items
     func loadRecentItems() {

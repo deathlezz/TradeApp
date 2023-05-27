@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Network
+//import Network
 
 class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     
@@ -21,7 +21,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     var cancelButton: UIBarButtonItem!
     var deleteButton: UIBarButtonItem!
     
-    let monitor = NWPathMonitor()
+//    let monitor = NWPathMonitor()
     var connectedOnLoad: Bool!
     var connected: Bool!
     
@@ -38,7 +38,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
 //        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
 //        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.didBecomeActiveNotification, object: nil)
         
-        checkConnection()
+//        checkConnection()
         addAmptyArrayView()
         
 //        self.tabBarController?.delegate = self
@@ -299,35 +299,35 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     }
     
     // check for internet connection
-    @objc func checkConnection() {
-        guard isMonitoring == false else { return }
-        monitor.pathUpdateHandler = { path in
-            
-            if self.connectedOnLoad != nil {
-                self.connected = !self.connected
-                self.pushToNoConnectionView()
-                print("Connected: \(self.connected!)")
-            }
-            
-            guard self.connectedOnLoad == nil else { return }
-            
-            if path.status == .satisfied {
-                self.connectedOnLoad = true
-                self.connected = true
-            } else {
-                self.connectedOnLoad = false
-                self.connected = false
-            }
-            
-            self.pushToNoConnectionView()
-            print("Connected: \(self.connected!)")
-        }
-        
-        let queue = DispatchQueue(label: "Monitor")
-        monitor.start(queue: queue)
-        isMonitoring = true
-        print("Started monitoring")
-    }
+//    @objc func checkConnection() {
+//        guard isMonitoring == false else { return }
+//        monitor.pathUpdateHandler = { path in
+//
+//            if self.connectedOnLoad != nil {
+//                self.connected = !self.connected
+//                self.pushToNoConnectionView()
+//                print("Connected: \(self.connected!)")
+//            }
+//
+//            guard self.connectedOnLoad == nil else { return }
+//
+//            if path.status == .satisfied {
+//                self.connectedOnLoad = true
+//                self.connected = true
+//            } else {
+//                self.connectedOnLoad = false
+//                self.connected = false
+//            }
+//
+//            self.pushToNoConnectionView()
+//            print("Connected: \(self.connected!)")
+//        }
+//
+//        let queue = DispatchQueue(label: "Monitor")
+//        monitor.start(queue: queue)
+//        isMonitoring = true
+//        print("Started monitoring")
+//    }
     
     // show no connection view
     func pushToNoConnectionView() {
