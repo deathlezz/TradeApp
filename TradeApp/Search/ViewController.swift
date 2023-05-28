@@ -8,7 +8,6 @@
 import UIKit
 import CoreLocation
 import Network
-//import Reachability
 
 class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
@@ -18,11 +17,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     var emptyArrayView: UIView!
     
-//    var isMonitoring = false
-    
     let monitor = NWPathMonitor()
-//    var connectedOnLoad: Bool!
-//    var connected: Bool!
     var isPushed = false
     
     var currentUnit: String!
@@ -44,16 +39,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         title = "Recently added"
         navigationController?.navigationBar.prefersLargeTitles = true
-        
-//        checkConnection()
-        
-//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.didBecomeActiveNotification, object: nil)
-//
-//        NotificationCenter.default.addObserver(self, selector: #selector(stopMonitoring), name: UIApplication.didEnterBackgroundNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(stopMonitoring), name: UIApplication.protectedDataWillBecomeUnavailableNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(stopMonitoring), name: UIApplication.willResignActiveNotification, object: nil)
         
         checkConnection()
         addEmptyArrayView()
@@ -437,28 +422,12 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         }
     }
     
-//    func check() {
-//        guard let url = URL(string: "http://www.apple.com") else { return }
-//        let config = URLSessionConfiguration.default
-//        config.waitsForConnectivity = true
-//
-//        URLSession(configuration: config).dataTask(with: url) { data, response, error in
-//            if let error = error {
-//                print(error.localizedDescription)
-//
-//            } else {
-//                // use your data here
-//                print("connection possible")
-//            }
-//
-//        }.resume()
-//    }
-    
+    // monitor connection changes
     func checkConnection() {
         monitor.pathUpdateHandler = { path in
             if path.status != .satisfied {
                 // show connection alert on main thread
-                print("not satisfied")
+                print("Connection is not satisfied")
                 guard !self.isPushed else { return }
                 DispatchQueue.main.async { [weak self] in
                     if let vc = self?.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
@@ -468,7 +437,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                     }
                 }
             } else {
-                print("satisfied")
+                print("Connection is satisfied")
                 guard self.isPushed else { return }
                 DispatchQueue.main.async { [weak self] in
                     self?.navigationController?.popViewController(animated: false)
@@ -480,51 +449,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         let queue = DispatchQueue(label: "Monitor")
         monitor.start(queue: queue)
     }
-    
-    // check for internet connection
-//    @objc func checkConnection() {
-//        guard isMonitoring == false else { return }
-//        monitor.pathUpdateHandler = { path in
-//
-//            if self.connectedOnLoad != nil {
-//                self.connected = !self.connected
-//                self.pushToNoConnectionView()
-//                print("Connected: \(self.connected!)")
-//            }
-//
-//            guard self.connectedOnLoad == nil else { return }
-//
-//            if path.status == .satisfied {
-//                self.connectedOnLoad = true
-//                self.connected = true
-//            } else {
-//                self.connectedOnLoad = false
-//                self.connected = false
-//            }
-//
-//            self.pushToNoConnectionView()
-//            print("Connected: \(self.connected!)")
-//        }
-//
-//        let queue = DispatchQueue(label: "Monitor")
-//        monitor.start(queue: queue)
-//        isMonitoring = true
-//        print("Started monitoring")
-//    }
-    
-    // show no connection view
-//    func pushToNoConnectionView() {
-//        DispatchQueue.main.async {
-//            if self.connected == false {
-//                if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
-//                    vc.navigationItem.hidesBackButton = true
-//                    self.navigationController?.pushViewController(vc, animated: false)
-//                }
-//            } else if self.connected == true {
-//                self.navigationController?.popViewController(animated: false)
-//            }
-//        }
-//    }
     
     // load recently added items
     func loadRecentItems() {
@@ -575,21 +499,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             emptyArrayView.isHidden = false
         }
     }
-    
-//    @objc func stopMonitoring() {
-//        guard isMonitoring == true else { return }
-//        monitor.cancel()
-//        isMonitoring = false
-//        connectedOnLoad = nil
-//        connected = nil
-//        print("Stopped monitoring")
-//    }
-    
-//    @objc func startMonitoring() {
-//        guard isMonitoring == false else { return }
-//        let queue = DispatchQueue(label: "Monitor")
-//        monitor.start(queue: queue)
-//    }
     
 }
 

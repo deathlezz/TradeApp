@@ -6,24 +6,21 @@
 //
 
 import UIKit
-//import Network
+import Network
 
-class SavedView: UICollectionViewController, UITabBarControllerDelegate {
+class SavedView: UICollectionViewController {
     
     var savedItems = [Item]()
     
-    var isPushed: Bool!
-    var isMonitoring = false
+    let monitor = NWPathMonitor()
+    var isPushed = false
+    var isDetailShown = false
     
     var emptyArrayView: UIView!
     
     var selectButton: UIBarButtonItem!
     var cancelButton: UIBarButtonItem!
     var deleteButton: UIBarButtonItem!
-    
-//    let monitor = NWPathMonitor()
-    var connectedOnLoad: Bool!
-    var connected: Bool!
     
     var selectedCells = [UICollectionViewCell]()
     var selectedItems = [Item]()
@@ -34,14 +31,8 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         title = "Saved"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.didBecomeActiveNotification, object: nil)
-        
-//        checkConnection()
+        checkConnection()
         addAmptyArrayView()
-        
-//        self.tabBarController?.delegate = self
         
         selectButton = UIBarButtonItem(title: "Select", style: .plain, target: self, action: #selector(selectTapped))
         cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelTapped))
@@ -89,12 +80,12 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
     
     // set action for selected cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if navigationItem.rightBarButtonItems == [selectButton] && connected {
+        if navigationItem.rightBarButtonItems == [selectButton] && monitor.currentPath.status == .satisfied {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
                 let item = savedItems[indexPath.item]
                 vc.item = Storage.shared.items.first(where: {$0.id == item.id})
                 vc.hidesBottomBarWhenPushed = true
-                isPushed = true
+                isDetailShown = true
                 navigationController?.pushViewController(vc, animated: true)
             }
             
@@ -113,7 +104,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
                     self.updateHeader()
                 }
             }
-        } else if navigationItem.rightBarButtonItems == [selectButton] && !connected {
+        } else if navigationItem.rightBarButtonItems == [selectButton] && monitor.currentPath.status != .satisfied {
             connectionAlert()
         }
     }
@@ -181,7 +172,7 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
         navigationController?.isToolbarHidden = true
-        isPushed = false
+        isDetailShown = false
         savedItems = Utilities.loadItems()
         updateSavedItems()
         isArrayEmpty()
@@ -298,49 +289,33 @@ class SavedView: UICollectionViewController, UITabBarControllerDelegate {
         })
     }
     
-    // check for internet connection
-//    @objc func checkConnection() {
-//        guard isMonitoring == false else { return }
-//        monitor.pathUpdateHandler = { path in
-//
-//            if self.connectedOnLoad != nil {
-//                self.connected = !self.connected
-//                self.pushToNoConnectionView()
-//                print("Connected: \(self.connected!)")
-//            }
-//
-//            guard self.connectedOnLoad == nil else { return }
-//
-//            if path.status == .satisfied {
-//                self.connectedOnLoad = true
-//                self.connected = true
-//            } else {
-//                self.connectedOnLoad = false
-//                self.connected = false
-//            }
-//
-//            self.pushToNoConnectionView()
-//            print("Connected: \(self.connected!)")
-//        }
-//
-//        let queue = DispatchQueue(label: "Monitor")
-//        monitor.start(queue: queue)
-//        isMonitoring = true
-//        print("Started monitoring")
-//    }
-    
-    // show no connection view
-    func pushToNoConnectionView() {
-        DispatchQueue.main.async {
-            if self.connected == false && self.isPushed {
-                if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
-                    vc.navigationItem.hidesBackButton = true
-                    self.navigationController?.pushViewController(vc, animated: false)
+    // monitor connection changes
+    func checkConnection() {
+        monitor.pathUpdateHandler = { path in
+            
+            if path.status != .satisfied && self.isDetailShown {
+                // show connection alert on main thread
+                print("Connection is not satisfied")
+                guard !self.isPushed else { return }
+                DispatchQueue.main.async { [weak self] in
+                    if let vc = self?.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
+                        vc.navigationItem.hidesBackButton = true
+                        self?.isPushed = true
+                        self?.navigationController?.pushViewController(vc, animated: false)
+                    }
                 }
-            } else {
-                self.navigationController?.popViewController(animated: false)
+            } else if path.status == .satisfied && self.isDetailShown {
+                print("Connection is satisfied")
+                guard self.isPushed else { return }
+                DispatchQueue.main.async { [weak self] in
+                    self?.navigationController?.popViewController(animated: false)
+                    self?.isPushed = false
+                }
             }
         }
+        
+        let queue = DispatchQueue(label: "Monitor")
+        monitor.start(queue: queue)
     }
     
     // show no connection alert
