@@ -24,11 +24,8 @@ class LoginView: UITableViewController {
     
     var loggedUser: String!
     
-    var isMonitoring = false
-    
     let monitor = NWPathMonitor()
-    var connectedOnLoad: Bool!
-    var connected: Bool!
+    var isPushed = false
     
     var segment: SegmentedControlCell!
     var email: TextFieldCell!
@@ -40,10 +37,6 @@ class LoginView: UITableViewController {
 
         title = "Account"
         navigationController?.navigationBar.prefersLargeTitles = true
-        
-//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.willEnterForegroundNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(checkConnection), name: UIApplication.didBecomeActiveNotification, object: nil)
         
         checkConnection()
         
@@ -271,7 +264,7 @@ class LoginView: UITableViewController {
             guard loggedUser != nil else { return }
         }
         
-        guard connected else { return }
+        guard monitor.currentPath.status == .satisfied else { return }
         
         if tabBarController?.selectedIndex == 2 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
@@ -316,49 +309,32 @@ class LoginView: UITableViewController {
         }
     }
     
-    // check for internet connection
-    @objc func checkConnection() {
-        guard isMonitoring == false else { return }
+    // monitor connection changes
+    func checkConnection() {
         monitor.pathUpdateHandler = { path in
-            
-            if self.connectedOnLoad != nil {
-                self.connected = !self.connected
-                self.pushToNoConnectionView()
-                print("Connected: \(self.connected!)")
-            }
-            
-            guard self.connectedOnLoad == nil else { return }
-            
-            if path.status == .satisfied {
-                self.connectedOnLoad = true
-                self.connected = true
+            if path.status != .satisfied {
+                // show connection alert on main thread
+                print("Connection is not satisfied")
+                guard !self.isPushed else { return }
+                DispatchQueue.main.async { [weak self] in
+                    if let vc = self?.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
+                        vc.navigationItem.hidesBackButton = true
+                        self?.isPushed = true
+                        self?.navigationController?.pushViewController(vc, animated: false)
+                    }
+                }
             } else {
-                self.connectedOnLoad = false
-                self.connected = false
+                print("Connection is satisfied")
+                guard self.isPushed else { return }
+                DispatchQueue.main.async { [weak self] in
+                    self?.navigationController?.popViewController(animated: false)
+                    self?.isPushed = false
+                }
             }
-            
-            self.pushToNoConnectionView()
-            print("Connected: \(self.connected!)")
         }
         
         let queue = DispatchQueue(label: "Monitor")
         monitor.start(queue: queue)
-        isMonitoring = true
-        print("Started monitoring")
-    }
-    
-    // show no connection view
-    func pushToNoConnectionView() {
-        DispatchQueue.main.async {
-            if self.connected == false {
-                if let vc = self.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
-                    vc.navigationItem.hidesBackButton = true
-                    self.navigationController?.pushViewController(vc, animated: false)
-                }
-            } else {
-                self.navigationController?.popViewController(animated: false)
-            }
-        }
     }
     
 }
