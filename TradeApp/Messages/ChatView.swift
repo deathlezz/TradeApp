@@ -22,13 +22,16 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         super.viewDidLoad()
         
         title = chatTitle
+        navigationItem.largeTitleDisplayMode = .never
 
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         setLayout()
     }
@@ -109,9 +112,16 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         let keyboardScreenEnd = keyboardValue.cgRectValue
         let keyboardViewEndFrame = view.convert(keyboardScreenEnd, from: view.window)
         
-        messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height, right: 0)
-        messagesCollectionView.scrollIndicatorInsets = UIEdgeInsets(top: view.safeAreaInsets.top, left: 0, bottom: keyboardViewEndFrame.height, right: 0)
-        messagesCollectionView.scrollToLastItem()
+        if notification.name == UIResponder.keyboardWillHideNotification {
+            messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: view.safeAreaInsets.bottom, right: 0)
+            messagesCollectionView.scrollIndicatorInsets = UIEdgeInsets(top: view.safeAreaInsets.top, left: 0, bottom: messageInputBar.frame.height, right: 0)
+            print("hide")
+        } else {
+            messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height - view.safeAreaInsets.bottom, right: 0)
+            messagesCollectionView.scrollIndicatorInsets = UIEdgeInsets(top: view.safeAreaInsets.top, left: 0, bottom: keyboardViewEndFrame.height + messageInputBar.frame.height, right: 0)
+            messagesCollectionView.scrollToLastItem()
+            print("show")
+        }
     }
     
 }
