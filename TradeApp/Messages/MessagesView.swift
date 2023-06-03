@@ -14,7 +14,7 @@ class MessagesView: UITableViewController {
     
     var loggedUser: String!
     
-    var chats: [String: [MessageType]] = ["BMW E36 2.0 LPG": []]
+    var chats = [String: [MessageType]]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,25 +22,14 @@ class MessagesView: UITableViewController {
         title = "Messages"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        let currentUser = Sender(senderId: "self", displayName: "dzz")
-        let otherUser = Sender(senderId: "other", displayName: "john smith")
+//        let currentUser = Sender(senderId: "self", displayName: "dzz")
+//        let otherUser = Sender(senderId: "other", displayName: "john smith")
         
         NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "messageCell")
-        
-        chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
-
-        chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
-
-        chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "2", sentDate: Date().addingTimeInterval(-60000), kind: .text("Here is a long reply. Here is a long reply. Here is a long reply.")))
-
-        chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "3", sentDate: Date().addingTimeInterval(-50000), kind: .text("Look it works")))
-
-        chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "4", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
-
-        chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
-        
+                
+        loadChats()
         addEmptyArrayView()
     }
     
@@ -136,6 +125,12 @@ class MessagesView: UITableViewController {
             }
         }
         return ""
+    }
+    
+    // load user chats
+    func loadChats() {
+        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
+        chats = Storage.shared.users[index].chats
     }
 
 }
