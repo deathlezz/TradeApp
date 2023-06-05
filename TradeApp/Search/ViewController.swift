@@ -69,15 +69,14 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             self?.resetFilters()
             let newUser = User(mail: "mail@wp.pl", password: "passWord123", phoneNumber: 998978778)
             Storage.shared.users.append(newUser)
+            self?.loadChats()
             self?.mail = Utilities.loadUser()
             self?.currentUnit = Utilities.loadDistanceUnit()
             self?.loadData()
             self?.loadItems()
             self?.loadRecentItems()
-            self?.loadChats()
             
             DispatchQueue.main.async {
-                print(Storage.shared.users[0].chats["BMW E36 2.0 LPG"])
                 self?.isArrayEmpty()
                 self?.collectionView.reloadData()
             }
@@ -504,10 +503,12 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // fetch user chats from server
     func loadChats() {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
         
         let currentUser = Sender(senderId: "self", displayName: "dzz")
         let otherUser = Sender(senderId: "other", displayName: "john smith")
+        
+        Storage.shared.users[index].chats["BMW E36 2.0 LPG"] = []
         
         Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
 
@@ -520,6 +521,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "4", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
 
         Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
+        
+        print(Storage.shared.users[index].chats)
     }
     
 }
