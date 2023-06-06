@@ -6,6 +6,5 @@ target 'TradeApp' do
   use_frameworks!
 
 pod 'MessageKit'
-pod 'ReachabilitySwift'
 
 end
