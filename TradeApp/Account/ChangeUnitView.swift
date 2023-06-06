@@ -71,14 +71,14 @@ class ChangeUnitView: UITableViewController {
     @objc func handleSegmentChange(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
             UIView.transition(with: unit, duration: 0.2, options: .transitionCrossDissolve, animations: {
-                self.unit.textLabel?.text = "1 mi = 1.609 km"
+                self.unit.textLabel?.text = "1 mi = 1,609 km"
             }) { finished in
                 self.setDistanceUnit("mi")
             }
             
         } else {
             UIView.transition(with: unit, duration: 0.2, options: .transitionCrossDissolve, animations: {
-                self.unit.textLabel?.text = "1 km = 0.621 mi"
+                self.unit.textLabel?.text = "1 km = 0,621 mi"
             }) { finished in
                 self.setDistanceUnit("km")
             }
@@ -95,10 +95,10 @@ class ChangeUnitView: UITableViewController {
     func updateSegment() {
         if currentUnit == "mi" {
             segment.segment.selectedSegmentIndex = 0
-            unit.textLabel?.text = "1 mi = 1.609 km"
+            unit.textLabel?.text = "1 mi = 1,609 km"
         } else {
             segment.segment.selectedSegmentIndex = 1
-            unit.textLabel?.text = "1 km = 0.621 mi"
+            unit.textLabel?.text = "1 km = 0,621 mi"
         }
     }
 
