@@ -11,7 +11,6 @@ import CoreLocation
 
 protocol Coordinates {
     func pushCoords(_ lat: Double, _ long: Double)
-//    func pushDistance(_ string: String)
 }
 
 class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate {
@@ -61,7 +60,6 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             guard let itemLocation = item else { return }
-            
             delegate?.pushCoords(itemLocation.coordinate.latitude, itemLocation.coordinate.longitude)
             
             var distance = itemLocation.distance(from: location)
@@ -74,8 +72,6 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
             
             let rounded = String(format: "%.0f", distance)
             distanceLabel.text = updateUnit(rounded)
-
-//            delegate?.pushDistance(updateUnit(rounded))
         }
     }
 
@@ -106,7 +102,7 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
                     let center = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
                     let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.7, longitudeDelta: 0.7))
                     
-                    self?.mapView.setRegion(region, animated: false)
+                    self?.mapView.setRegion(region, animated: true)
                     self?.didGeocode = true
                     
                     let itemLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
