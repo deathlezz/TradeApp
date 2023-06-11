@@ -29,7 +29,6 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         
-        
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         

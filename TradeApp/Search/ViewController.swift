@@ -8,6 +8,7 @@
 import UIKit
 import CoreLocation
 import Network
+import Firebase
 
 class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
@@ -31,6 +32,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     var filterButton: UIBarButtonItem!
     var sortButton: UIBarButtonItem!
     
+    var reference: DatabaseReference!
+    
     var mail: String!
 
     override func viewDidLoad() {
@@ -42,6 +45,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         checkConnection()
         addEmptyArrayView()
+        setUpFirebase()
         
         tabBarController?.delegate = self
         
@@ -75,6 +79,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             self?.loadData()
             self?.loadItems()
             self?.loadRecentItems()
+//            self?.getData()
             
             DispatchQueue.main.async {
                 self?.isArrayEmpty()
@@ -523,6 +528,25 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
         
         print(Storage.shared.users[index].chats)
+    }
+    
+    // set up firebase server location
+    func setUpFirebase() {
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+    }
+    
+    // send data to firebase
+    func sendData() {
+        reference.child("user_id").setValue("New data")
+    }
+    
+    // get data from firebase
+    func getData() {
+        reference.child("user_id").observeSingleEvent(of: .value, with: { snapshot in
+            if let data = snapshot.value as? String {
+                print("The value from the database: \(data)")
+            }
+        })
     }
     
 }

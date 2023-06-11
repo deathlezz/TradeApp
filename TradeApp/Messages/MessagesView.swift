@@ -22,9 +22,6 @@ class MessagesView: UITableViewController {
         title = "Messages"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-//        let currentUser = Sender(senderId: "self", displayName: "dzz")
-//        let otherUser = Sender(senderId: "other", displayName: "john smith")
-        
         NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "messageCell")
