@@ -10,6 +10,15 @@ import CoreLocation
 import Network
 import Firebase
 
+extension Encodable {
+    var toDictionnary: [String : Any]? {
+        guard let data =  try? JSONEncoder().encode(self) else {
+            return nil
+        }
+        return try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
+    }
+}
+
 class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
@@ -215,15 +224,30 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         guard let index = Storage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
         
+        var items = [Item]()
+        
+        let userInfoDictionary = ["username" : 1,
+                                   "email" : 2,
+                                   "userID" : 3,
+                      "consecutiveDaysLoggedOn" : 4]
+        
         for _ in 0...3 {
             let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
             let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date(), views: 2234, saved: 6, lat: 56.116524, long: -3.936903, id: itemID())
             let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date(), views: 5654, saved: 28, lat: 55.864239, long: -4.251806, id: itemID())
             
-            Storage.shared.users[index].activeItems.append(tesla)
-            Storage.shared.users[index].activeItems.append(bmw)
-            Storage.shared.users[index].activeItems.append(fiat)
+//            Storage.shared.users[index].activeItems.append(tesla)
+//            Storage.shared.users[index].activeItems.append(bmw)
+//            Storage.shared.users[index].activeItems.append(fiat)
+            
+            items.append(tesla)
+            items.append(bmw)
+            items.append(fiat)
         }
+        
+        let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
+        
+        reference.child("mail@wp_pl").setValue(tesla.category)
         
     }
     

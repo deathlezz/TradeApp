@@ -75,7 +75,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         
         messagesCollectionView.insertItems(at: [indexPath])
         inputBar.inputTextView.text = nil
-        messagesCollectionView.scrollToLastItem()
+        messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
     }
     
     // set message bottom label as date
@@ -113,7 +113,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         
         messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height + messageInputBar.frame.height - view.safeAreaInsets.bottom, right: 0)
         messagesCollectionView.scrollIndicatorInsets = UIEdgeInsets(top: view.safeAreaInsets.top, left: 0, bottom: 0, right: 0)
-        messagesCollectionView.scrollToLastItem()
+        messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
     }
     
 }

@@ -20,4 +20,22 @@ struct Item: Codable {
     var lat: Double?
     var long: Double?
     var id: Int
+    
+    // function for saving data
+    func toAnyObject() -> [String: Any] {
+        return [
+            "photos": photos,
+            "title": title,
+            "price": price,
+            "category": category,
+            "location": location,
+            "description": description,
+            "date": date,
+            "views": views,
+            "saved": saved,
+            "lat": lat,
+            "long": long,
+            "id": id
+        ]
+     }
 }
