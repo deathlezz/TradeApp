@@ -27,14 +27,14 @@ struct Item: Codable {
             "photos": photos,
             "title": title,
             "price": price,
-            "category": category,
+            "category": category!,
             "location": location,
-            "description": description,
-            "date": date,
-            "views": views,
-            "saved": saved,
-            "lat": lat,
-            "long": long,
+            "description": description!,
+            "date": date.formatDate(),
+            "views": views!,
+            "saved": saved!,
+            "lat": lat!,
+            "long": long!,
             "id": id
         ]
      }
