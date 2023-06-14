@@ -370,8 +370,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
                             Storage.shared.users[userIndex].activeItems.append(newItem)
                             Storage.shared.items.append(newItem)
-//                            Storage.shared.recentlyAdded.append(newItem)
-//                            Storage.shared.filteredItems = Storage.shared.recentlyAdded
                             self?.showAlert(.success)
                         }
                     }

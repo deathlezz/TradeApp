@@ -68,7 +68,6 @@ class MessagesView: UITableViewController {
             ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
                 let chatKey = Array(self.chats.keys)[indexPath.row]
                 self.chats.removeValue(forKey: chatKey)
-//                self?.messages.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .automatic)
                 self.isArrayEmpty()
             })

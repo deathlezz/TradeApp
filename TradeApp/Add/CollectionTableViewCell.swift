@@ -47,7 +47,6 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? PhotosCell {
             
             cell.layer.cornerRadius = 10
-//            cell.imageView.image = AddItemView.shared.images[indexPath.item]
             cell.imageView.image = images[indexPath.item]
             return cell
         }
@@ -60,7 +59,6 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         
         delegate?.pushIndex(indexPath: indexPath.item)
         
-//        if AddItemView.shared.images[indexPath.item] == UIImage(systemName: "plus") {
         if images[indexPath.item] == UIImage(systemName: "plus") {
             delegate?.addNewPhoto()
         } else {
@@ -70,8 +68,6 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     
     // item has been dragged
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-//        guard AddItemView.shared.images.filter({$0 != UIImage(systemName: "plus")}).count > 1 else { return [] }
-//        let item = AddItemView.shared.images[indexPath.item]
         guard images.filter({$0 != UIImage(systemName: "plus")}).count > 1 else { return [] }
         let item = images[indexPath.item]
         guard item != UIImage(systemName: "plus") else { return [] }
@@ -93,7 +89,6 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     // item has been dropped
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
         var destinationIndexPath: IndexPath
-//        let numberOfPhotos = AddItemView.shared.images.filter {$0 != UIImage(systemName: "plus")}.count
         let numberOfPhotos = images.filter {$0 != UIImage(systemName: "plus")}.count
         
         if let indexPath = coordinator.destinationIndexPath {
@@ -121,8 +116,6 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
            let sourceIndexPath = item.sourceIndexPath {
             
             collectionView.performBatchUpdates({
-//                AddItemView.shared.images.remove(at: sourceIndexPath.item)
-//                AddItemView.shared.images.insert(item.dragItem.localObject as! UIImage, at: destinationIndexPath.item)
                 images.remove(at: sourceIndexPath.item)
                 images.insert(item.dragItem.localObject as! UIImage, at: destinationIndexPath.item)
                 
