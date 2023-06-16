@@ -8,8 +8,8 @@
 import Foundation
 import UIKit
 
-class Storage {
-    static let shared = Storage()
+class AppStorage {
+    static let shared = AppStorage()
     var items = [Item]()
     var filteredItems = [Item]()
     var recentlyAdded = [Item]()

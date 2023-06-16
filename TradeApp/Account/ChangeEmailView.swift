@@ -144,9 +144,9 @@ class ChangeEmailView: UITableViewController {
     // set email change function
     func changeEmail(to: String) {
         guard let mail = mail else { return }
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         
-        Storage.shared.users[index].mail = newEmail.textField.text
+        AppStorage.shared.users[index].mail = newEmail.textField.text!
         Utilities.setUser(nil)
         
         let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)

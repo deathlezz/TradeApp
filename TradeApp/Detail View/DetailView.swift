@@ -336,7 +336,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // load item's phone number
     func loadPhoneNumber() {
-        let users = Storage.shared.users
+        let users = AppStorage.shared.users
         
         for user in users {
             for activeItem in user.activeItems {

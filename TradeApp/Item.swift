@@ -21,10 +21,10 @@ struct Item: Codable {
     var long: Double?
     var id: Int
     
-    // function for saving data
-    func toAnyObject() -> [String: Any] {
+    // convert custom model to Any object
+    func toAnyObject(urls: [String: String]) -> [String: Any] {
         return [
-            "photos": photos,
+            "photos": urls,
             "title": title,
             "price": price,
             "category": category!,
@@ -37,5 +37,5 @@ struct Item: Codable {
             "long": long!,
             "id": id
         ]
-     }
+    }
 }

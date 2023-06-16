@@ -132,20 +132,20 @@ class ChangeNumberView: UITableViewController {
     
     // set action for tapped button
     @objc func submitTapped() {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         
         if isNumberValid() && sections.count == 2 {
-            Storage.shared.users[index].phoneNumber = Int(newNumber.textField.text!)
+            AppStorage.shared.users[index].phoneNumber = Int(newNumber.textField.text!)
             currentNumber = Int(newNumber.textField.text!)
             newNumber.textField.text = nil
             updateRows()
         } else if isNumberValid() && sections.count == 3 {
-            Storage.shared.users[index].phoneNumber = Int(newNumber.textField.text!)
+            AppStorage.shared.users[index].phoneNumber = Int(newNumber.textField.text!)
             currentNumber = Int(newNumber.textField.text!)
             newNumber.textField.text = nil
             updateNumberCell()
         } else if newNumber.textField.text == "" && sections.count == 3 {
-            Storage.shared.users[index].phoneNumber = Int(newNumber.textField.text!)
+            AppStorage.shared.users[index].phoneNumber = Int(newNumber.textField.text!)
             newNumber.textField.text = nil
             currentNumber = nil
             updateRows()
@@ -173,8 +173,8 @@ class ChangeNumberView: UITableViewController {
     
     // load user's current phone number
     func loadCurrentNumber() {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        currentNumber = Storage.shared.users[index].phoneNumber
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        currentNumber = AppStorage.shared.users[index].phoneNumber
     }
     
     // update table view rows

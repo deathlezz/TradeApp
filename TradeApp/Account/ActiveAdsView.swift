@@ -101,16 +101,16 @@ class ActiveAdsView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+            guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
             guard let itemID = activeAds[indexPath.row]?.id else { return }
             
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
-                Storage.shared.items.removeAll(where: {$0.id == itemID})
-                Storage.shared.filteredItems.removeAll(where: {$0.id == itemID})
+                AppStorage.shared.items.removeAll(where: {$0.id == itemID})
+                AppStorage.shared.filteredItems.removeAll(where: {$0.id == itemID})
                 
-                Storage.shared.users[index].activeItems.remove(at: indexPath.row)
+                AppStorage.shared.users[index].activeItems.remove(at: indexPath.row)
                 self?.activeAds.remove(at: indexPath.row)
                 
                 tableView.deleteRows(at: [indexPath], with: .fade)
@@ -151,8 +151,8 @@ class ActiveAdsView: UITableViewController {
     
     // load user's active ads
     func loadUserAds() {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        activeAds = Storage.shared.users[index].activeItems
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        activeAds = AppStorage.shared.users[index].activeItems
     }
     
     // hide toolbar before view appears
@@ -186,17 +186,17 @@ class ActiveAdsView: UITableViewController {
     
     // finish the ad
     func finishAd(_ sender: UIButton) {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         guard let itemIndex = activeAds.firstIndex(where: {$0?.id == sender.tag}) else { return }
         
         activeAds[itemIndex]?.date = Date()
-        Storage.shared.users[index].endedItems.append(activeAds[itemIndex])
+        AppStorage.shared.users[index].endedItems.append(activeAds[itemIndex])
         
-        Storage.shared.users[index].activeItems.removeAll(where: {$0?.id == sender.tag})
+        AppStorage.shared.users[index].activeItems.removeAll(where: {$0?.id == sender.tag})
         activeAds.remove(at: itemIndex)
         
-        Storage.shared.items.removeAll(where: {$0.id == sender.tag})
-        Storage.shared.filteredItems.removeAll(where: {$0.id == sender.tag})
+        AppStorage.shared.items.removeAll(where: {$0.id == sender.tag})
+        AppStorage.shared.filteredItems.removeAll(where: {$0.id == sender.tag})
         
         let indexPath = IndexPath(row: itemIndex, section: 0)
         tableView.deleteRows(at: [indexPath], with: .fade)

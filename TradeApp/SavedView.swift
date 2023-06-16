@@ -83,7 +83,7 @@ class SavedView: UICollectionViewController {
         if navigationItem.rightBarButtonItems == [selectButton] && monitor.currentPath.status == .satisfied {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
                 let item = savedItems[indexPath.item]
-                vc.item = Storage.shared.items.first(where: {$0.id == item.id})
+                vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
                 vc.hidesBottomBarWhenPushed = true
                 isDetailShown = true
                 navigationController?.pushViewController(vc, animated: true)
@@ -328,7 +328,7 @@ class SavedView: UICollectionViewController {
     // update items on load
     func updateSavedItems() {
         for item in savedItems {
-            if let first = Storage.shared.items.first(where: {$0.id == item.id}) {
+            if let first = AppStorage.shared.items.first(where: {$0.id == item.id}) {
                 // check if these items are equal
                 if first.photos[0] != item.photos[0] || first.title != item.title || first.price != item.price ||
                     first.date != item.date || first.location != item.location {
@@ -348,12 +348,12 @@ class SavedView: UICollectionViewController {
     
     // load all active items
     func loadItems() {
-        Storage.shared.items.removeAll()
-        let users = Storage.shared.users
+        AppStorage.shared.items.removeAll()
+        let users = AppStorage.shared.users
         
         for user in users {
             for item in user.activeItems {
-                Storage.shared.items.append(item!)
+                AppStorage.shared.items.append(item!)
             }
         }
     }

@@ -18,4 +18,13 @@ struct Message: MessageType {
     var messageId: String
     var sentDate: Date
     var kind: MessageKind
+    
+    func toAnyObject() -> [String: Any]{
+        return [
+            "sender": sender.senderId,
+            "messageId": messageId,
+            "sentDate": sentDate.formatDate(),
+            "kind": "\(kind)"
+        ]
+    }
 }

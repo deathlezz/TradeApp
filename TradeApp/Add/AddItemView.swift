@@ -7,6 +7,8 @@
 
 import UIKit
 import CoreLocation
+import Firebase
+import FirebaseStorage
 
 enum AlertType {
     case emptyField
@@ -28,6 +30,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var isEditMode: Bool!
     var isAdActive: Bool!
     
+    var reference: DatabaseReference!
+    
     var uploadedPhotos = [UIImage]()
     
     var item: Item?
@@ -43,6 +47,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
@@ -327,6 +333,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // set action for submit button
     @objc func submitTapped() {
         let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
+            
         guard let title = textFieldCells[0].textField.text else { return }
         guard let price = textFieldCells[1].textField.text else { return }
         guard let category = textFieldCells[2].textField.text else { return }
@@ -340,36 +347,36 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                     Utilities.forwardGeocoding(address: location) { (lat, long) in
                         
                         if self?.isEditMode != nil {
-                            guard let userIndex = Storage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
+                            guard let userIndex = AppStorage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
                             
                             if self?.isAdActive == true {
-                                guard let itemIndex = Storage.shared.users[userIndex].activeItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
-                                Storage.shared.users[userIndex].activeItems[itemIndex]?.photos = photos
-                                Storage.shared.users[userIndex].activeItems[itemIndex]?.title = title
-                                Storage.shared.users[userIndex].activeItems[itemIndex]?.price = Int(price)!
-                                Storage.shared.users[userIndex].activeItems[itemIndex]?.category = category
-                                Storage.shared.users[userIndex].activeItems[itemIndex]?.location = location
-                                Storage.shared.users[userIndex].activeItems[itemIndex]?.description = description
+                                guard let itemIndex = AppStorage.shared.users[userIndex].activeItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
+                                AppStorage.shared.users[userIndex].activeItems[itemIndex] = newItem
+
                                 NotificationCenter.default.post(name: NSNotification.Name("reloadActiveAds"), object: nil)
                                 self?.showAlert(.edit)
                             } else {
-                                guard let itemIndex = Storage.shared.users[userIndex].endedItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
-                                Storage.shared.users[userIndex].endedItems[itemIndex]?.photos = photos
-                                Storage.shared.users[userIndex].endedItems[itemIndex]?.title = title
-                                Storage.shared.users[userIndex].endedItems[itemIndex]?.price = Int(price)!
-                                Storage.shared.users[userIndex].endedItems[itemIndex]?.category = category
-                                Storage.shared.users[userIndex].endedItems[itemIndex]?.location = location
-                                Storage.shared.users[userIndex].endedItems[itemIndex]?.description = description
+                                guard let itemIndex = AppStorage.shared.users[userIndex].endedItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
+                                AppStorage.shared.users[userIndex].endedItems[itemIndex] = newItem
+                                
                                 NotificationCenter.default.post(name: NSNotification.Name("reloadEndedAds"), object: nil)
                                 self?.showAlert(.edit)
                             }
                             
                         } else {
-                            guard let userIndex = Storage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
+                            guard let userIndex = AppStorage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
                             
                             let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
-                            Storage.shared.users[userIndex].activeItems.append(newItem)
-                            Storage.shared.items.append(newItem)
+                            AppStorage.shared.users[userIndex].activeItems.append(newItem)
+                            AppStorage.shared.items.append(newItem)
+                            
+                            self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
+                                guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+                                self?.saveItem(user: mail, item: newItem, urls: urls)
+                            }
+                            
                             self?.showAlert(.success)
                         }
                     }
@@ -534,7 +541,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // create unique item ID
     func itemID() -> Int {
         var uniqueID: Int!
-        let usedIDs = Storage.shared.items.map {$0.id}
+        let usedIDs = AppStorage.shared.items.map {$0.id}
         let range = 10000000...99999999
         
         while uniqueID == nil {
@@ -558,5 +565,35 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let reorderedImages = notification.userInfo?["images"] as! [UIImage]
         images = reorderedImages
     }
+    
+    // save images to Firebase Storage and return images URLs
+    func uploadImages(images: [Data?], itemID: Int, completion: @escaping ([String: String]) -> Void) {
+        var imagesURL = [String: String]()
+        
+        for (index, image) in images.enumerated() {
+            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child("\(itemID)").child("image\(index)")
+            
+            guard let img = image else { return }
+            
+            storageRef.putData(img) { (metadata, error) in
+                if metadata != nil {
+                    storageRef.downloadURL() { (url, error) in
+                
+                        guard let urlString = url?.absoluteString else { return }
+                        imagesURL["image\(index)"] = urlString
+                        completion(imagesURL)
+                    }
+                }
+            }
+        }
+    }
+    
+    // save item to Firebase Database
+    func saveItem(user: String, item: Item, urls: [String: String]) {
+        let newItem = item.toAnyObject(urls: urls)
+        
+        reference.child(user).child("activeItems").child("\(item.id)").setValue(newItem)
+    }
+    
     
 }

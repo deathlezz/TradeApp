@@ -211,26 +211,26 @@ class Utilities {
         
         // location filter
         if currentLocation != nil {
-            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.location == currentLocation}
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.location == currentLocation}
         }
         
         // price filter
         if currentPriceFrom != nil && currentPriceTo != nil {
-            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(currentPriceFrom!)! && $0.price <= Int(currentPriceTo!)!}
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price >= Int(currentPriceFrom!)! && $0.price <= Int(currentPriceTo!)!}
         } else if currentPriceFrom != nil {
-            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(currentPriceFrom!)!}
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price >= Int(currentPriceFrom!)!}
         } else if currentPriceTo != nil {
-            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price <= Int(currentPriceTo!)!}
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price <= Int(currentPriceTo!)!}
         }
         
         // sort filter
         if currentSort != nil {
             if currentSort == "Lowest price" {
-                Storage.shared.filteredItems.sort(by: {$0.price < $1.price})
+                AppStorage.shared.filteredItems.sort(by: {$0.price < $1.price})
             } else if currentSort == "Highest price" {
-                Storage.shared.filteredItems.sort(by: {$0.price > $1.price})
+                AppStorage.shared.filteredItems.sort(by: {$0.price > $1.price})
             } else if currentSort == "Date added" {
-                Storage.shared.filteredItems.sort(by: {$0.date < $1.date})
+                AppStorage.shared.filteredItems.sort(by: {$0.date < $1.date})
             }
         }
     }

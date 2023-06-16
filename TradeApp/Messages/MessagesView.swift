@@ -125,8 +125,8 @@ class MessagesView: UITableViewController {
     
     // load user chats
     func loadChats() {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
-        chats = Storage.shared.users[index].chats
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
+        chats = AppStorage.shared.users[index].chats
     }
 
 }

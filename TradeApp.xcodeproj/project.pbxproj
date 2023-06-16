@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		BC00F5D4C405108402329A4C /* Pods_TradeApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA885478CC76ACEB3C03AEF3 /* Pods_TradeApp.framework */; };
 		BC019D292958A85C00EB04F8 /* DetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC019D282958A85C00EB04F8 /* DetailViewCell.swift */; };
+		BC10F2A02A3CD3E00013CE10 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BC10F29F2A3CD3E00013CE10 /* GoogleService-Info.plist */; };
 		BC16850229AF625A002ED0C5 /* ChangeEmailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC16850129AF625A002ED0C5 /* ChangeEmailView.swift */; };
 		BC17416F292D33680055A0B8 /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC17416E292D33680055A0B8 /* ItemView.swift */; };
 		BC174171292D46B30055A0B8 /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC174170292D46B30055A0B8 /* FilterView.swift */; };
@@ -33,7 +34,7 @@
 		BC5CB880293B7EF10017AE69 /* TextViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5CB87F293B7EF10017AE69 /* TextViewCell.swift */; };
 		BC611B9D29AA9C2C00F259FD /* ChangeUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC611B9C29AA9C2C00F259FD /* ChangeUnitView.swift */; };
 		BC66A6E92929154B00F33E7D /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC66A6E82929154B00F33E7D /* Item.swift */; };
-		BC66A6EB29296D8900F33E7D /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC66A6EA29296D8900F33E7D /* Storage.swift */; };
+		BC66A6EB29296D8900F33E7D /* AppStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC66A6EA29296D8900F33E7D /* AppStorage.swift */; };
 		BC6770702927D4A600985CAB /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC67706F2927D4A600985CAB /* SearchView.swift */; };
 		BC67B219298C6245000E45D1 /* RadiusCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC67B218298C6245000E45D1 /* RadiusCell.swift */; };
 		BC69075B2939247F005D1EAB /* PhotosCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC69075A2939247F005D1EAB /* PhotosCell.swift */; };
@@ -46,7 +47,6 @@
 		BCB234B92A03DBF7000106EE /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB234B82A03DBF7000106EE /* ChatView.swift */; };
 		BCCE154B293BE14F00C256E4 /* ButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCE154A293BE14F00C256E4 /* ButtonCell.swift */; };
 		BCE805D929324670009CB632 /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE805D829324670009CB632 /* SavedView.swift */; };
-		BCEB67BF2A371F0000D3A2C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BCEB67BE2A371F0000D3A2C7 /* GoogleService-Info.plist */; };
 		BCEFEE1B29F69D6F005D5776 /* KeychainItemAccessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEFEE1A29F69D6F005D5776 /* KeychainItemAccessibility.swift */; };
 		BCEFEE1C29F69D6F005D5776 /* KeychainWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEFEE1929F69D6F005D5776 /* KeychainWrapper.swift */; };
 		BCEFEE1F29F6A864005D5776 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BCEFEE1D29F6A864005D5776 /* DataModel.xcdatamodeld */; };
@@ -65,6 +65,7 @@
 		9FAFE5942B45952937146DF2 /* Pods-TradeApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TradeApp.debug.xcconfig"; path = "Target Support Files/Pods-TradeApp/Pods-TradeApp.debug.xcconfig"; sourceTree = "<group>"; };
 		BA885478CC76ACEB3C03AEF3 /* Pods_TradeApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TradeApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC019D282958A85C00EB04F8 /* DetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewCell.swift; sourceTree = "<group>"; };
+		BC10F29F2A3CD3E00013CE10 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BC16850129AF625A002ED0C5 /* ChangeEmailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeEmailView.swift; sourceTree = "<group>"; };
 		BC17416E292D33680055A0B8 /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
 		BC174170292D46B30055A0B8 /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
@@ -89,7 +90,7 @@
 		BC5CB87F293B7EF10017AE69 /* TextViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewCell.swift; sourceTree = "<group>"; };
 		BC611B9C29AA9C2C00F259FD /* ChangeUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeUnitView.swift; sourceTree = "<group>"; };
 		BC66A6E82929154B00F33E7D /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
-		BC66A6EA29296D8900F33E7D /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
+		BC66A6EA29296D8900F33E7D /* AppStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStorage.swift; sourceTree = "<group>"; };
 		BC67706F2927D4A600985CAB /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		BC67B218298C6245000E45D1 /* RadiusCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusCell.swift; sourceTree = "<group>"; };
 		BC69075A2939247F005D1EAB /* PhotosCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosCell.swift; sourceTree = "<group>"; };
@@ -102,7 +103,6 @@
 		BCB234B82A03DBF7000106EE /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		BCCE154A293BE14F00C256E4 /* ButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCell.swift; sourceTree = "<group>"; };
 		BCE805D829324670009CB632 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
-		BCEB67BE2A371F0000D3A2C7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BCEFEE1929F69D6F005D5776 /* KeychainWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainWrapper.swift; sourceTree = "<group>"; };
 		BCEFEE1A29F69D6F005D5776 /* KeychainItemAccessibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainItemAccessibility.swift; sourceTree = "<group>"; };
 		BCEFEE1E29F6A864005D5776 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
@@ -284,7 +284,7 @@
 				BCE805D829324670009CB632 /* SavedView.swift */,
 				BC2FD2D629EAD30200CAC8BA /* NoConnectionView.swift */,
 				BC5A4EEC292C1754003A20B7 /* Utilities.swift */,
-				BC66A6EA29296D8900F33E7D /* Storage.swift */,
+				BC66A6EA29296D8900F33E7D /* AppStorage.swift */,
 				BC66A6E82929154B00F33E7D /* Item.swift */,
 				BC42D98B29B8BB99003B6476 /* User.swift */,
 				BCEFEE1D29F6A864005D5776 /* DataModel.xcdatamodeld */,
@@ -292,7 +292,7 @@
 				BCF2F94B29266D2400930252 /* Main.storyboard */,
 				BCF2F94E29266D2600930252 /* Assets.xcassets */,
 				BCF2F95029266D2600930252 /* LaunchScreen.storyboard */,
-				BCEB67BE2A371F0000D3A2C7 /* GoogleService-Info.plist */,
+				BC10F29F2A3CD3E00013CE10 /* GoogleService-Info.plist */,
 				BCF2F95329266D2600930252 /* Info.plist */,
 			);
 			path = TradeApp;
@@ -359,7 +359,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BCF2F95229266D2600930252 /* LaunchScreen.storyboard in Resources */,
-				BCEB67BF2A371F0000D3A2C7 /* GoogleService-Info.plist in Resources */,
+				BC10F2A02A3CD3E00013CE10 /* GoogleService-Info.plist in Resources */,
 				BCF2F94F29266D2600930252 /* Assets.xcassets in Resources */,
 				BCF2F94D29266D2400930252 /* Main.storyboard in Resources */,
 			);
@@ -444,7 +444,7 @@
 				BC325C442986A0AD00EF83AB /* HeaderView.swift in Sources */,
 				BCEFEE1B29F69D6F005D5776 /* KeychainItemAccessibility.swift in Sources */,
 				BC17416F292D33680055A0B8 /* ItemView.swift in Sources */,
-				BC66A6EB29296D8900F33E7D /* Storage.swift in Sources */,
+				BC66A6EB29296D8900F33E7D /* AppStorage.swift in Sources */,
 				BC16850229AF625A002ED0C5 /* ChangeEmailView.swift in Sources */,
 				BC6FDA7529D612A000AFA4E9 /* EndedAdsView.swift in Sources */,
 				BCF2F94629266D2400930252 /* AppDelegate.swift in Sources */,

@@ -10,15 +10,6 @@ import CoreLocation
 import Network
 import Firebase
 
-extension Encodable {
-    var toDictionnary: [String : Any]? {
-        guard let data =  try? JSONEncoder().encode(self) else {
-            return nil
-        }
-        return try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
-    }
-}
-
 class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
@@ -54,7 +45,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         checkConnection()
         addEmptyArrayView()
-        setUpFirebase()
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         tabBarController?.delegate = self
         
@@ -81,11 +73,11 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         DispatchQueue.global().async { [weak self] in
             self?.resetFilters()
             let newUser = User(mail: "mail@wp.pl", password: "passWord123", phoneNumber: 998978778)
-            Storage.shared.users.append(newUser)
+            AppStorage.shared.users.append(newUser)
             self?.loadChats()
             self?.mail = Utilities.loadUser()
             self?.currentUnit = Utilities.loadDistanceUnit()
-            self?.loadData()
+//            self?.loadData()
             self?.loadItems()
             self?.loadRecentItems()
 //            self?.getData()
@@ -104,7 +96,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // number of items in section
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return Storage.shared.filteredItems.count
+        return AppStorage.shared.filteredItems.count
     }
     
     // set collection view cell
@@ -112,13 +104,13 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
             fatalError("Unable to dequeue itemCell")
         }
-        let thumbnail = UIImage(data: Storage.shared.filteredItems[indexPath.item].photos[0]!)
+        let thumbnail = UIImage(data: AppStorage.shared.filteredItems[indexPath.item].photos[0]!)
         
         cell.image.image = thumbnail
-        cell.title.text = Storage.shared.filteredItems[indexPath.item].title
-        cell.price.text = "£\(Storage.shared.filteredItems[indexPath.item].price)"
-        cell.location.text = Storage.shared.filteredItems[indexPath.item].location
-        cell.date.text = Storage.shared.filteredItems[indexPath.item].date.formatDate()
+        cell.title.text = AppStorage.shared.filteredItems[indexPath.item].title
+        cell.price.text = "£\(AppStorage.shared.filteredItems[indexPath.item].price)"
+        cell.location.text = AppStorage.shared.filteredItems[indexPath.item].location
+        cell.date.text = AppStorage.shared.filteredItems[indexPath.item].date.formatDate()
         cell.layer.borderWidth = 0.2
         cell.layer.borderColor = UIColor.lightGray.cgColor
         cell.layer.cornerRadius = 10
@@ -130,7 +122,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-            vc.item = Storage.shared.filteredItems[indexPath.item]
+            vc.item = AppStorage.shared.filteredItems[indexPath.item]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -141,7 +133,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
-                headerView.textLabel.text = Storage.shared.filteredItems.count == 1 ? "Found 1 ad" : "Found \(Storage.shared.filteredItems.count) ads"
+                headerView.textLabel.text = AppStorage.shared.filteredItems.count == 1 ? "Found 1 ad" : "Found \(AppStorage.shared.filteredItems.count) ads"
                 headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 14)
                 headerView.textLabel.textColor = .gray
                 return headerView
@@ -222,32 +214,27 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         let car = UIImage(systemName: "car")?.pngData()
         let plus = UIImage(systemName: "plus")?.pngData()
         
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
         
         var items = [Item]()
-        
-        let userInfoDictionary = ["username" : 1,
-                                   "email" : 2,
-                                   "userID" : 3,
-                      "consecutiveDaysLoggedOn" : 4]
         
         for _ in 0...3 {
             let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
             let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date(), views: 2234, saved: 6, lat: 56.116524, long: -3.936903, id: itemID())
             let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date(), views: 5654, saved: 28, lat: 55.864239, long: -4.251806, id: itemID())
             
-//            Storage.shared.users[index].activeItems.append(tesla)
-//            Storage.shared.users[index].activeItems.append(bmw)
-//            Storage.shared.users[index].activeItems.append(fiat)
+            AppStorage.shared.users[index].activeItems.append(tesla)
+            AppStorage.shared.users[index].activeItems.append(bmw)
+            AppStorage.shared.users[index].activeItems.append(fiat)
             
             items.append(tesla)
             items.append(bmw)
             items.append(fiat)
         }
         
-        let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
-        
-        reference.child("mail@wp_pl").setValue(tesla.category)
+//        let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
+//
+//        reference.child("mail@wp_pl").setValue(tesla.category)
         
     }
     
@@ -255,19 +242,19 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     @objc func sort() {
         let ac = UIAlertController(title: "Sort items by", message: nil, preferredStyle: .actionSheet)
         ac.addAction(UIAlertAction(title: "Lowest price", style: .default) { [weak self] _ in
-            Storage.shared.filteredItems.sort(by: {$0.price < $1.price})
+            AppStorage.shared.filteredItems.sort(by: {$0.price < $1.price})
             self?.currentFilters["Sort"] = "Lowest price"
             Utilities.saveFilters(self!.currentFilters)
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Highest price", style: .default) { [weak self] _ in
-            Storage.shared.filteredItems.sort(by: {$0.price > $1.price})
+            AppStorage.shared.filteredItems.sort(by: {$0.price > $1.price})
             self?.currentFilters["Sort"] = "Highest price"
             Utilities.saveFilters(self!.currentFilters)
             self?.collectionView.reloadData()
         })
         ac.addAction(UIAlertAction(title: "Date added", style: .default) { [weak self] _ in
-            Storage.shared.filteredItems.sort(by: {$0.date < $1.date})
+            AppStorage.shared.filteredItems.sort(by: {$0.date < $1.date})
             self?.currentFilters["Sort"] = "Date added"
             Utilities.saveFilters(self!.currentFilters)
             self?.collectionView.reloadData()
@@ -320,12 +307,12 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // load all active items
     func loadItems() {
-        Storage.shared.items.removeAll()
-        let users = Storage.shared.users
+        AppStorage.shared.items.removeAll()
+        let users = AppStorage.shared.users
         
         for user in users {
             for item in user.activeItems {
-                Storage.shared.items.append(item!)
+                AppStorage.shared.items.append(item!)
             }
         }
     }
@@ -350,7 +337,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     // create unique item ID
     func itemID() -> Int {
         var uniqueID: Int!
-        let usedIDs = Storage.shared.items.map {$0.id}
+        let usedIDs = AppStorage.shared.items.map {$0.id}
         let range = 10000000...99999999
         
         while uniqueID == nil {
@@ -368,19 +355,19 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     func checkMainFilters() {
         if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
             if currentFilters["Category"] == categories[0] {
-                Storage.shared.filteredItems = Storage.shared.items
-                Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+                AppStorage.shared.filteredItems = AppStorage.shared.items
+                AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
             } else {
-                Storage.shared.filteredItems = Storage.shared.items.filter {$0.category == currentFilters["Category"]}
-                Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+                AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
+                AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
             }
         } else if currentFilters["Search"] != nil {
-            Storage.shared.filteredItems = Storage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
         } else if currentFilters["Category"] != nil {
             if currentFilters["Category"] == categories[0] {
-                Storage.shared.filteredItems = Storage.shared.items
+                AppStorage.shared.filteredItems = AppStorage.shared.items
             } else {
-                Storage.shared.filteredItems = Storage.shared.items.filter {$0.category == currentFilters["Category"]}
+                AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
             }
         }
     }
@@ -388,11 +375,11 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     // check price filter
     func checkPriceFilter() {
         if currentFilters["PriceFrom"] != nil && currentFilters["PriceTo"] != nil {
-            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(currentFilters["PriceFrom"]!)! && $0.price <= Int(currentFilters["PriceTo"]!)!}
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price >= Int(currentFilters["PriceFrom"]!)! && $0.price <= Int(currentFilters["PriceTo"]!)!}
         } else if currentFilters["PriceFrom"] != nil {
-            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price >= Int(currentFilters["PriceFrom"]!)!}
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price >= Int(currentFilters["PriceFrom"]!)!}
         } else if currentFilters["PriceTo"] != nil {
-            Storage.shared.filteredItems = Storage.shared.filteredItems.filter {$0.price <= Int(currentFilters["PriceTo"]!)!}
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price <= Int(currentFilters["PriceTo"]!)!}
         }
     }
     
@@ -400,11 +387,11 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     func checkSortFilter() {
         if currentFilters["Sort"] != nil {
             if currentFilters["Sort"] == "Lowest price" {
-                Storage.shared.filteredItems.sort(by: {$0.price < $1.price})
+                AppStorage.shared.filteredItems.sort(by: {$0.price < $1.price})
             } else if currentFilters["Sort"] == "Highest price" {
-                Storage.shared.filteredItems.sort(by: {$0.price > $1.price})
+                AppStorage.shared.filteredItems.sort(by: {$0.price > $1.price})
             } else if currentFilters["Sort"] == "Date added" {
-                Storage.shared.filteredItems.sort(by: {$0.date < $1.date})
+                AppStorage.shared.filteredItems.sort(by: {$0.date < $1.date})
             }
         }
     }
@@ -432,7 +419,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                     unit = 1000
                 }
                 
-                for item in Storage.shared.filteredItems {
+                for item in AppStorage.shared.filteredItems {
                     
                     let itemLocation = CLLocation(latitude: item.lat!, longitude: item.long!)
                     let distance = Int(cityLocation.distance(from: itemLocation) / unit)
@@ -446,7 +433,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                Storage.shared.filteredItems = matched
+                AppStorage.shared.filteredItems = matched
                 self.collectionView.reloadData()
             }
         }
@@ -482,19 +469,19 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // load recently added items
     func loadRecentItems() {
-        Storage.shared.recentlyAdded.removeAll()
+        AppStorage.shared.recentlyAdded.removeAll()
         
-        for user in Storage.shared.users {
+        for user in AppStorage.shared.users {
             for item in user.activeItems {
                 guard let item = item else { return }
                 
                 if isItemRecent(item.date) {
-                    Storage.shared.recentlyAdded.append(item)
+                    AppStorage.shared.recentlyAdded.append(item)
                 }
             }
         }
         
-        Storage.shared.filteredItems = Storage.shared.recentlyAdded
+        AppStorage.shared.filteredItems = AppStorage.shared.recentlyAdded
     }
     
     // check if item was added in the last 24h
@@ -523,7 +510,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // check if array is empty or not
     func isArrayEmpty() {
-        if Storage.shared.filteredItems.count > 0 {
+        if AppStorage.shared.filteredItems.count > 0 {
             emptyArrayView.isHidden = true
         } else {
             emptyArrayView.isHidden = false
@@ -532,31 +519,26 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // fetch user chats from server
     func loadChats() {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
         
         let currentUser = Sender(senderId: "self", displayName: "dzz")
         let otherUser = Sender(senderId: "other", displayName: "john smith")
         
-        Storage.shared.users[index].chats["BMW E36 2.0 LPG"] = []
+        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"] = []
         
-        Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
+        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
 
-        Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
+        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
 
-        Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "2", sentDate: Date().addingTimeInterval(-60000), kind: .text("Here is a long reply. Here is a long reply. Here is a long reply.")))
+        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "2", sentDate: Date().addingTimeInterval(-60000), kind: .text("Here is a long reply. Here is a long reply. Here is a long reply.")))
 
-        Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "3", sentDate: Date().addingTimeInterval(-50000), kind: .text("Look it works")))
+        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "3", sentDate: Date().addingTimeInterval(-50000), kind: .text("Look it works")))
 
-        Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "4", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
+        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "4", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
 
-        Storage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
+        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
         
-        print(Storage.shared.users[index].chats)
-    }
-    
-    // set up firebase server location
-    func setUpFirebase() {
-        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+        print(AppStorage.shared.users[index].chats)
     }
     
     // send data to firebase

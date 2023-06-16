@@ -153,8 +153,8 @@ class AccountView: UITableViewController {
         let ac = UIAlertController(title: "Delete account", message: "Are you sure, you want to delete your account?", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
             guard let mail = self?.loggedUser else { return }
-            guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-            Storage.shared.users.remove(at: index)
+            guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+            AppStorage.shared.users.remove(at: index)
             Utilities.setUser(nil)
             self?.navigationController?.popToRootViewController(animated: true)
             self?.showAlert(title: "Success", message: "Your account has been deleted")
@@ -236,9 +236,9 @@ class AccountView: UITableViewController {
     
     // load number of active/ended items
     func loadItemsNumber() {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
-        active = Storage.shared.users[index].activeItems.count
-        ended = Storage.shared.users[index].endedItems.count
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
+        active = AppStorage.shared.users[index].activeItems.count
+        ended = AppStorage.shared.users[index].endedItems.count
     }
     
     // update user ads section

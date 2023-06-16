@@ -102,13 +102,13 @@ class EndedAdsView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+            guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
             guard let itemID = endedAds[indexPath.row]?.id else { return }
             
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
-                Storage.shared.users[index].endedItems.removeAll(where: {$0?.id == itemID})
+                AppStorage.shared.users[index].endedItems.removeAll(where: {$0?.id == itemID})
                 self?.endedAds.remove(at: indexPath.row)
                 
                 tableView.deleteRows(at: [indexPath], with: .fade)
@@ -149,8 +149,8 @@ class EndedAdsView: UITableViewController {
     
     // load user's active ads
     func loadUserAds() {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        endedAds = Storage.shared.users[index].endedItems
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        endedAds = AppStorage.shared.users[index].endedItems
     }
     
     // hide toolbar before view appears
@@ -182,14 +182,14 @@ class EndedAdsView: UITableViewController {
     
     // activate the ad
     func activateAd(_ sender: UIButton) {
-        guard let index = Storage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         guard let itemIndex = endedAds.firstIndex(where: {$0?.id == sender.tag}) else { return }
         
         endedAds[itemIndex]?.date = Date()
-        Storage.shared.users[index].activeItems.append(endedAds[itemIndex])
-        Storage.shared.items.append(endedAds[itemIndex]!)
+        AppStorage.shared.users[index].activeItems.append(endedAds[itemIndex])
+        AppStorage.shared.items.append(endedAds[itemIndex]!)
 
-        Storage.shared.users[index].endedItems.remove(at: itemIndex)
+        AppStorage.shared.users[index].endedItems.remove(at: itemIndex)
         endedAds.remove(at: itemIndex)
         
         let indexPath = IndexPath(row: itemIndex, section: 0)
