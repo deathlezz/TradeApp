@@ -331,7 +331,9 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // set action for submit button
-    @objc func submitTapped() {
+    @objc func submitTapped(_ sender: UIButton) {
+        sender.isUserInteractionEnabled = false
+        
         let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
             
         guard let title = textFieldCells[0].textField.text else { return }
@@ -349,19 +351,34 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                         if self?.isEditMode != nil {
                             guard let userIndex = AppStorage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
                             
+                            // edit active item
                             if self?.isAdActive == true {
                                 guard let itemIndex = AppStorage.shared.users[userIndex].activeItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!)
                                 AppStorage.shared.users[userIndex].activeItems[itemIndex] = newItem
+                                
+                                self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
+                                    guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+                                    self?.saveItem(user: mail, item: newItem, urls: urls)
+                                }
 
                                 NotificationCenter.default.post(name: NSNotification.Name("reloadActiveAds"), object: nil)
+                                sender.isUserInteractionEnabled = true
                                 self?.showAlert(.edit)
+                                
                             } else {
+                                // edit ended item
                                 guard let itemIndex = AppStorage.shared.users[userIndex].endedItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!)
                                 AppStorage.shared.users[userIndex].endedItems[itemIndex] = newItem
                                 
+                                self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
+                                    guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+                                    self?.saveItem(user: mail, item: newItem, urls: urls)
+                                }
+                                
                                 NotificationCenter.default.post(name: NSNotification.Name("reloadEndedAds"), object: nil)
+                                sender.isUserInteractionEnabled = true
                                 self?.showAlert(.edit)
                             }
                             
@@ -377,15 +394,18 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 self?.saveItem(user: mail, item: newItem, urls: urls)
                             }
                             
+                            sender.isUserInteractionEnabled = true
                             self?.showAlert(.success)
                         }
                     }
                     
                 } else {
+                    sender.isUserInteractionEnabled = true
                     self?.showAlert(.cityError)
                 }
                 
             } else {
+                sender.isUserInteractionEnabled = true
                 self?.showAlert(.emptyField)
             }
         }
@@ -454,8 +474,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // set chosen image
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         guard let image = info[.editedImage] as? UIImage else { return }
-        dismiss(animated: true)
-        
+
         if action == .edit {
             images[index] = image
         } else {
@@ -475,6 +494,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
         NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+
+        dismiss(animated: true)
     }
     
     // edit photo alert

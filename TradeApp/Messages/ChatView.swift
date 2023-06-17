@@ -8,10 +8,16 @@
 import UIKit
 import MessageKit
 import InputBarAccessoryView
+import Firebase
 
 class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate, InputBarAccessoryViewDelegate {
     
     var chatTitle: String!
+    var itemID: Int!
+    var loggedUser: String!
+    var buyer: String!
+    
+    var reference: DatabaseReference!
     
     let currentUser = Sender(senderId: "self", displayName: "dzz")
     let otherUser = Sender(senderId: "other", displayName: "john smith")
@@ -33,6 +39,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         
         setLayout()
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // return current sender
@@ -63,7 +71,10 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     // set "send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         print(text)
-        messages.append(Message(sender: currentUser, messageId: "\(messages.count)", sentDate: Date(), kind: .text(text)))
+        
+        let message = Message(sender: currentUser, messageId: "\(messages.count)", sentDate: Date(), kind: .text(text))
+        messages.append(message)
+        saveMessage(user: loggedUser, buyer: "dzz@wp.pl", itemID: 65886733, message: message)
         
         var indexPath = IndexPath()
         
@@ -114,6 +125,14 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height + messageInputBar.frame.height - view.safeAreaInsets.bottom, right: 0)
         messagesCollectionView.scrollIndicatorInsets = UIEdgeInsets(top: view.safeAreaInsets.top, left: 0, bottom: 0, right: 0)
         messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
+    }
+    
+    // save message to Firebase Database
+    func saveMessage(user: String, buyer: String, itemID: Int, message: Message) {
+        let fixedUser = user.replacingOccurrences(of: ".", with: "_")
+        let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
+        let msg = message.toAnyObject()
+        reference.child(fixedUser).child("chats").child("\(itemID)").child(fixedBuyer).child(message.messageId).setValue(msg)
     }
     
 }

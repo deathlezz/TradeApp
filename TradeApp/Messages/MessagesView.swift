@@ -53,6 +53,7 @@ class MessagesView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
             let chatTitle = Array(chats.keys)[indexPath.row]
             vc.chatTitle = chatTitle
+            vc.loggedUser = loggedUser
             vc.messages = chats[chatTitle] ?? [MessageType]()
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never

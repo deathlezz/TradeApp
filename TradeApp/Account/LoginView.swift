@@ -7,6 +7,7 @@
 
 import UIKit
 import Network
+import Firebase
 
 enum AccountAction {
     case login
@@ -31,6 +32,8 @@ class LoginView: UITableViewController {
     var email: TextFieldCell!
     var password: TextFieldCell!
     var repeatPassword: TextFieldCell!
+    
+    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,6 +45,8 @@ class LoginView: UITableViewController {
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 10
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // set number of sections
@@ -156,8 +161,8 @@ class LoginView: UITableViewController {
     
     // set action for tapped button
     @objc func submitTapped() {
-        let mail = email.textField.text!
-        let passText = password.textField.text
+        guard let mail = email.textField.text else { return }
+        guard let passText = password.textField.text else { return }
                 
         if segment.segment.selectedSegmentIndex == 0 {
             if let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) {
@@ -194,12 +199,13 @@ class LoginView: UITableViewController {
                 return showAlert(title: "Password repeated incorrectly", message: "Re-enter password again")
             }
             
-            // new user account created
+            // user already exist alert
             if let _ = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) {
                 showAlert(title: "Error", message: "This email is already used")
+                
             } else {
-                let newUser = User(mail: mail, password: passText!)
-                AppStorage.shared.users.append(newUser)
+                // new user account created
+                createUser(mail: mail, password: passText)
                 accountCreatedAlert()
             }
         }
@@ -335,6 +341,15 @@ class LoginView: UITableViewController {
         
         let queue = DispatchQueue(label: "Monitor")
         monitor.start(queue: queue)
+    }
+    
+    // save user to Firebase database
+    func createUser(mail: String, password: String) {
+        let newUser = User(mail: mail, password: password)
+        let userMail = mail.replacingOccurrences(of: ".", with: "_")
+        
+        AppStorage.shared.users.append(newUser)
+        reference.child(userMail).setValue(newUser.toAnyObject())
     }
     
 }

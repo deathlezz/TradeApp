@@ -19,7 +19,6 @@ struct User {
     func toAnyObject() -> [String: Any] {
         
         return [
-            "mail": mail,
             "password": password
         ]
         
