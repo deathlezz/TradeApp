@@ -6,6 +6,15 @@
 //
 
 import UIKit
+import Firebase
+import FirebaseStorage
+
+extension Dictionary {
+    // Designed for use with Dictionary and Array types
+    var jsonData: Data? {
+        return try? JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
+    }
+}
 
 class AccountView: UITableViewController {
     
@@ -16,6 +25,8 @@ class AccountView: UITableViewController {
     
     var active: Int!
     var ended: Int!
+    
+    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,8 +34,27 @@ class AccountView: UITableViewController {
         title = "Account"
         navigationController?.navigationBar.prefersLargeTitles = true
         
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+        
         tableView.separatorStyle = .none
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AccountCell")
+        
+//        reference.child("mail@wp_pl").child("activeItems").observeSingleEvent(of: .value, with: { snapshot in
+//            print("ok")
+//            if let data = snapshot.value as? [String: Any] {
+//                print(data)
+//                guard let json = data.jsonData else { return }
+//
+//                do {
+//
+//                    let people = try JSONDecoder().decode([Item].self, from: json)
+//
+//                    print(people)
+//                } catch let decodeError {
+//                    print(decodeError)
+//                }
+//            }
+//        })
     }
     
     // set number of sections
@@ -152,13 +182,14 @@ class AccountView: UITableViewController {
     func deleteAccount() {
         let ac = UIAlertController(title: "Delete account", message: "Are you sure, you want to delete your account?", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
-            guard let mail = self?.loggedUser else { return }
-            guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-            AppStorage.shared.users.remove(at: index)
-            Utilities.setUser(nil)
-            self?.navigationController?.popToRootViewController(animated: true)
+            
+            // remove user from database
+            guard let fixedMail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+            self?.reference.child(fixedMail).removeValue()
+            self?.deleteImages(user: fixedMail)
             self?.showAlert(title: "Success", message: "Your account has been deleted")
         })
+        
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
             let indexPath = IndexPath(row: 4, section: 2)
             self?.tableView.deselectRow(at: indexPath, animated: true)
@@ -219,10 +250,12 @@ class AccountView: UITableViewController {
         }
     }
     
-    // set alert for incorect textField input
+    // set alert for successful account deleting
     func showAlert(title: String, message: String) {
         let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+            self?.navigationController?.popToRootViewController(animated: true)
+        })
         present(ac, animated: true)
     }
     
@@ -251,6 +284,26 @@ class AccountView: UITableViewController {
                 self?.tableView.reloadSections(indexSet, with: .automatic)
             }
         }
+    }
+    
+    // delete user images from Firebase Storage
+    func deleteImages(user: String) {
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
+        let activeItems = AppStorage.shared.users[index].activeItems
+        let endedItems = AppStorage.shared.users[index].endedItems
+        let items = activeItems + endedItems
+        
+        for item in items {
+            guard let photosCount = item?.photos.count else { return }
+            guard let itemID = item?.id else { return }
+            for i in 0..<photosCount {
+                let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(i)")
+                storageRef.delete() { _ in }
+            }
+        }
+        
+        AppStorage.shared.users.remove(at: index)
+        Utilities.setUser(nil)
     }
     
 }

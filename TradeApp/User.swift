@@ -11,7 +11,7 @@ import MessageKit
 struct User {
     var activeItems = [Item?]()
     var endedItems = [Item?]()
-    var chats = [String: [MessageType]]()
+    var chats = [String: [Message]]()
     var mail: String
     var password: String
     var phoneNumber: Int?

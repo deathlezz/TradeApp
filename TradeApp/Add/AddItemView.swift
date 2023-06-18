@@ -590,9 +590,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // save images to Firebase Storage and return images URLs
     func uploadImages(images: [Data?], itemID: Int, completion: @escaping ([String: String]) -> Void) {
         var imagesURL = [String: String]()
+        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
         for (index, image) in images.enumerated() {
-            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child("\(itemID)").child("image\(index)")
+            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(mail).child("\(itemID)").child("image\(index)")
             
             guard let img = image else { return }
             
