@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 class ChangeEmailView: UITableViewController {
     
@@ -15,6 +16,8 @@ class ChangeEmailView: UITableViewController {
     var newEmail: TextFieldCell!
     
     var mail: String!
+    
+    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,6 +27,8 @@ class ChangeEmailView: UITableViewController {
 
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // set number of sections
@@ -132,6 +137,7 @@ class ChangeEmailView: UITableViewController {
         }
         
         changeEmail(to: newMailText)
+        saveEmail(email: newMailText)
     }
     
     // set alert for incorect textField input
@@ -154,6 +160,21 @@ class ChangeEmailView: UITableViewController {
             self?.navigationController?.popToRootViewController(animated: true)
         })
         present(ac, animated: true)
+    }
+    
+    // save mail to Firebase Database
+    func saveEmail(email: String) {
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        let fixedNewMail = email.replacingOccurrences(of: ".", with: "_")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(fixedMail).observeSingleEvent(of: .value) { snapshot in
+                if let value = snapshot.value as? [String: Any] {
+                    self?.reference.child(fixedNewMail).setValue(value)
+                    self?.reference.child(fixedMail).removeValue()
+                }
+            }
+        }
     }
     
 }

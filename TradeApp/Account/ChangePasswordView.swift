@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 class ChangePasswordView: UITableViewController {
     
@@ -13,6 +14,8 @@ class ChangePasswordView: UITableViewController {
     
     var cells = [TextFieldCell]()    
     var mail: String!
+    
+    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +25,8 @@ class ChangePasswordView: UITableViewController {
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // set number of sections
@@ -154,6 +159,7 @@ class ChangePasswordView: UITableViewController {
         }
         
         changePassword(to: newPassword)
+        savePassword(password: newPassword)
     }
     
     // set password change function
@@ -180,6 +186,12 @@ class ChangePasswordView: UITableViewController {
         let passRegEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$"
         let passPred = NSPredicate(format:"SELF MATCHES %@", passRegEx)
         return passPred.evaluate(with: cells[1].textField.text)
+    }
+    
+    // save password to Firebase Database
+    func savePassword(password: String) {
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        reference.child(fixedMail).child("password").setValue(password)
     }
 
 }

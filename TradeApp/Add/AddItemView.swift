@@ -334,7 +334,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     @objc func submitTapped(_ sender: UIButton) {
         sender.isUserInteractionEnabled = false
         
-        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
+        var photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
             
         guard let title = textFieldCells[0].textField.text else { return }
         guard let price = textFieldCells[1].textField.text else { return }

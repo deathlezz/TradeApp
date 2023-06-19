@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Firebase
+import FirebaseStorage
 
 class ActiveAdsView: UITableViewController {
     
@@ -15,6 +17,8 @@ class ActiveAdsView: UITableViewController {
     
     var mail: String!
     var activeAds = [Item?]()
+    
+    var reference: DatabaseReference!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +31,8 @@ class ActiveAdsView: UITableViewController {
         tableView.separatorInset.left = 17
         
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name("reloadActiveAds"), object: nil)
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         addEmptyArrayView()
         loadData()
@@ -110,6 +116,8 @@ class ActiveAdsView: UITableViewController {
                 AppStorage.shared.items.removeAll(where: {$0.id == itemID})
                 AppStorage.shared.filteredItems.removeAll(where: {$0.id == itemID})
                 
+                self?.deleteItem(itemID: itemID)
+                
                 AppStorage.shared.users[index].activeItems.remove(at: indexPath.row)
                 self?.activeAds.remove(at: indexPath.row)
                 
@@ -149,12 +157,6 @@ class ActiveAdsView: UITableViewController {
         tableView.endUpdates()
     }
     
-    // load user's active ads
-    func loadUserAds() {
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        activeAds = AppStorage.shared.users[index].activeItems
-    }
-    
     // hide toolbar before view appears
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -192,6 +194,8 @@ class ActiveAdsView: UITableViewController {
         activeAds[itemIndex]?.date = Date()
         AppStorage.shared.users[index].endedItems.append(activeAds[itemIndex])
         
+        moveItem(itemID: sender.tag)
+        
         AppStorage.shared.users[index].activeItems.removeAll(where: {$0?.id == sender.tag})
         activeAds.remove(at: itemIndex)
         
@@ -213,6 +217,12 @@ class ActiveAdsView: UITableViewController {
                 self?.tableView.reloadData()
             }
         }
+    }
+    
+    // load user's active ads
+    func loadUserAds() {
+        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        activeAds = AppStorage.shared.users[index].activeItems
     }
     
     // set up empty array view
@@ -237,6 +247,40 @@ class ActiveAdsView: UITableViewController {
             emptyArrayView.isHidden = true
         } else {
             emptyArrayView.isHidden = false
+        }
+    }
+    
+    // move item
+    func moveItem(itemID: Int) {
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
+                if let value = snapshot.value as? [String: Any] {
+                    self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").setValue(value)
+                    self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").removeValue()
+                }
+            }
+        }
+    }
+    
+    // delete item from Firebase
+    func deleteItem(itemID: Int) {
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").child("photos").observeSingleEvent(of: .value) { snapshot in
+                print("before cast")
+                if let value = snapshot.value as? [String: String] {
+                    print("after cast")
+                    for i in 0..<value.keys.count {
+                        print("inside loop")
+                        let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(fixedMail).child("\(itemID)").child("image\(i)")
+                        storageRef.delete() { _ in }
+                    }
+                    self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").removeValue()
+                }
+            }
         }
     }
     

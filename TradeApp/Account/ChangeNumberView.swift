@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 enum NumberAction {
     case add
@@ -24,6 +25,8 @@ class ChangeNumberView: UITableViewController {
     
     var mail: String!
     var currentNumber: Int!
+    
+    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +37,8 @@ class ChangeNumberView: UITableViewController {
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CurrentNumberCell")
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         DispatchQueue.global().async { [weak self] in
             self?.loadCurrentNumber()
@@ -133,20 +138,24 @@ class ChangeNumberView: UITableViewController {
     // set action for tapped button
     @objc func submitTapped() {
         guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        guard let phoneNumber = newNumber.textField.text else { return }
         
         if isNumberValid() && sections.count == 2 {
-            AppStorage.shared.users[index].phoneNumber = Int(newNumber.textField.text!)
-            currentNumber = Int(newNumber.textField.text!)
+            AppStorage.shared.users[index].phoneNumber = Int(phoneNumber)
+            currentNumber = Int(phoneNumber)
+            saveNumber(number: phoneNumber)
             newNumber.textField.text = nil
             updateRows()
         } else if isNumberValid() && sections.count == 3 {
-            AppStorage.shared.users[index].phoneNumber = Int(newNumber.textField.text!)
-            currentNumber = Int(newNumber.textField.text!)
+            AppStorage.shared.users[index].phoneNumber = Int(phoneNumber)
+            currentNumber = Int(phoneNumber)
+            saveNumber(number: phoneNumber)
             newNumber.textField.text = nil
             updateNumberCell()
         } else if newNumber.textField.text == "" && sections.count == 3 {
-            AppStorage.shared.users[index].phoneNumber = Int(newNumber.textField.text!)
+            AppStorage.shared.users[index].phoneNumber = Int(phoneNumber)
             newNumber.textField.text = nil
+            saveNumber(number: phoneNumber)
             currentNumber = nil
             updateRows()
         } else {
@@ -254,6 +263,17 @@ class ChangeNumberView: UITableViewController {
             sections = ["Current number", "New number", "Button"]
             tableView.insertSections(indexSet, with: .fade)
             updateHeader(after: .add)
+        }
+    }
+    
+    // save number to Firebase Database
+    func saveNumber(number: String) {
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        
+        if !number.isEmpty {
+            reference.child(fixedMail).child("phoneNumber").setValue(number)
+        } else {
+            reference.child(fixedMail).child("phoneNumber").removeValue()
         }
     }
 }

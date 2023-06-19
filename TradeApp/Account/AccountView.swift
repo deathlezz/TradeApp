@@ -39,22 +39,45 @@ class AccountView: UITableViewController {
         tableView.separatorStyle = .none
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AccountCell")
         
-//        reference.child("mail@wp_pl").child("activeItems").observeSingleEvent(of: .value, with: { snapshot in
-//            print("ok")
-//            if let data = snapshot.value as? [String: Any] {
-//                print(data)
-//                guard let json = data.jsonData else { return }
+        reference.child("mail@wp_pl").child("activeItems").child("\(36033610)").observeSingleEvent(of: .value, with: { snapshot in
+            print("ok")
+            if let data = snapshot.value as? [String: Any] {
+                // change urls to [UIImage] as data
+                // create whole data model
+                // convert data to custom model
+//                var fixedData = String(describing: data)
+//                let array = fixedData["photos"]
+//                let dataImages = convertPhotos(urls: array)
+//                print(array)
+                
+//                print("before")
+//                let stringPhotos = data["photos"] as! [String]
+//                let arrayPhotos = stringPhotos.map {String(describing: $0)}
+//                let stringDate = String(describing: data["date"])
+//                let dataPhotos = self.convertPhotos(urls: arrayPhotos)
+//                print("after")
+                
+                let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale(identifier: "en")
+                dateFormatter.dateFormat = "d MMM, HH:mm"
+                
+//                let date = dateFormatter.date(from: stringDate)
+//                let dta = self.convertPhotos(urls: arrayPhotos)
+//
+//                fixedData["photos"] = dta
+//                fixedData["date"] = date
+                
+//                guard let json = fixedData.jsonData else { return }
 //
 //                do {
-//
 //                    let people = try JSONDecoder().decode([Item].self, from: json)
 //
 //                    print(people)
 //                } catch let decodeError {
 //                    print(decodeError)
 //                }
-//            }
-//        })
+            }
+        })
     }
     
     // set number of sections
@@ -304,6 +327,20 @@ class AccountView: UITableViewController {
         
         AppStorage.shared.users.remove(at: index)
         Utilities.setUser(nil)
+    }
+    
+    // convert images urls to data array
+    func convertPhotos(urls: [String]) -> [Data?] {
+        var dataPhotos = [Data]()
+        
+        for url in urls {
+            DispatchQueue.global().async {
+                let url = URL(string: url)
+                let data = try? Data(contentsOf: url!)
+                dataPhotos.append(data!)
+            }
+        }
+        return dataPhotos
     }
     
 }
