@@ -30,7 +30,7 @@ struct Item: Codable {
             "category": category!,
             "location": location,
             "description": description!,
-            "date": date.formatDate(),
+            "date": date.toString(),
             "views": views!,
             "saved": saved!,
             "lat": lat!,

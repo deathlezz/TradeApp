@@ -250,7 +250,7 @@ class ActiveAdsView: UITableViewController {
         }
     }
     
-    // move item
+    // move item from activeItems to endedItems folder
     func moveItem(itemID: Int) {
         let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
         
@@ -270,11 +270,8 @@ class ActiveAdsView: UITableViewController {
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").child("photos").observeSingleEvent(of: .value) { snapshot in
-                print("before cast")
                 if let value = snapshot.value as? [String: String] {
-                    print("after cast")
                     for i in 0..<value.keys.count {
-                        print("inside loop")
                         let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(fixedMail).child("\(itemID)").child("image\(i)")
                         storageRef.delete() { _ in }
                     }

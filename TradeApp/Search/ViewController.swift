@@ -110,7 +110,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         cell.title.text = AppStorage.shared.filteredItems[indexPath.item].title
         cell.price.text = "£\(AppStorage.shared.filteredItems[indexPath.item].price)"
         cell.location.text = AppStorage.shared.filteredItems[indexPath.item].location
-        cell.date.text = AppStorage.shared.filteredItems[indexPath.item].date.formatDate()
+        cell.date.text = AppStorage.shared.filteredItems[indexPath.item].date.toString()
         cell.layer.borderWidth = 0.2
         cell.layer.borderColor = UIColor.lightGray.cgColor
         cell.layer.cornerRadius = 10
@@ -548,8 +548,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // get data from firebase
     func getData() {
-        reference.child("user_id").observeSingleEvent(of: .value, with: { snapshot in
-            if let data = snapshot.value as? String {
+        reference.observeSingleEvent(of: .value, with: { snapshot in
+            if let data = snapshot.value as? [String: Any] {
                 print("The value from the database: \(data)")
             }
         })

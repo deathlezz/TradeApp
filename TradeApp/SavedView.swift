@@ -69,7 +69,7 @@ class SavedView: UICollectionViewController {
         cell.title.text = savedItems[indexPath.item].title
         cell.price.text = "£\(savedItems[indexPath.item].price)"
         cell.location.text = savedItems[indexPath.item].location
-        cell.date.text = savedItems[indexPath.item].date.formatDate()
+        cell.date.text = savedItems[indexPath.item].date.toString()
         cell.layer.cornerRadius = 10
         cell.layer.borderWidth = 0.2
         cell.layer.borderColor = UIColor.lightGray.cgColor

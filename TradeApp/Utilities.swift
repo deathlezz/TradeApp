@@ -10,13 +10,23 @@ import UIKit
 import CoreLocation
 import CoreData
 
-// date formatter extension
+// convert date to string
 extension Date {
-    func formatDate() -> String {
+    func toString() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en")
         dateFormatter.dateFormat = "d MMM, HH:mm"
         return dateFormatter.string(from: self)
+    }
+}
+
+// convert string to date
+extension String {
+    func toDate() -> Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en")
+        dateFormatter.dateFormat = "d MMM, HH:mm"
+        return dateFormatter.date(from: self)!
     }
 }
 

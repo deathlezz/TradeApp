@@ -23,7 +23,7 @@ struct Message: MessageType {
         return [
             "sender": sender.senderId,
             "messageId": messageId,
-            "sentDate": sentDate.formatDate(),
+            "sentDate": sentDate.toString(),
             "kind": "\(kind)"
         ]
     }

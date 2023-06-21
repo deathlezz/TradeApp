@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Firebase
+import FirebaseStorage
 
 class EndedAdsView: UITableViewController {
     
@@ -16,6 +18,8 @@ class EndedAdsView: UITableViewController {
     var mail: String!
     var endedAds = [Item?]()
     
+    var reference: DatabaseReference!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -25,6 +29,8 @@ class EndedAdsView: UITableViewController {
         tableView.separatorStyle = .singleLine
         tableView.sectionHeaderTopPadding = 0
         tableView.separatorInset.left = 17
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name("reloadEndedAds"), object: nil)
         
@@ -108,6 +114,11 @@ class EndedAdsView: UITableViewController {
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
+                AppStorage.shared.items.removeAll(where: {$0.id == itemID})
+                AppStorage.shared.filteredItems.removeAll(where: {$0.id == itemID})
+                
+                self?.deleteItem(itemID: itemID)
+                
                 AppStorage.shared.users[index].endedItems.removeAll(where: {$0?.id == itemID})
                 self?.endedAds.remove(at: indexPath.row)
                 
@@ -147,10 +158,14 @@ class EndedAdsView: UITableViewController {
         tableView.endUpdates()
     }
     
-    // load user's active ads
+    // load user's ended ads
     func loadUserAds() {
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        endedAds = AppStorage.shared.users[index].endedItems
+        getEndedAds() { dict in
+            self.endedAds = self.toItemModel(dict: dict)
+        }
+        
+//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+//        endedAds = AppStorage.shared.users[index].endedItems
     }
     
     // hide toolbar before view appears
@@ -188,6 +203,8 @@ class EndedAdsView: UITableViewController {
         endedAds[itemIndex]?.date = Date()
         AppStorage.shared.users[index].activeItems.append(endedAds[itemIndex])
         AppStorage.shared.items.append(endedAds[itemIndex]!)
+        
+        moveItem(itemID: sender.tag)
 
         AppStorage.shared.users[index].endedItems.remove(at: itemIndex)
         endedAds.remove(at: itemIndex)
@@ -231,6 +248,97 @@ class EndedAdsView: UITableViewController {
             emptyArrayView.isHidden = true
         } else {
             emptyArrayView.isHidden = false
+        }
+    }
+    
+    // move item from endedItems to activeItems folder in Firebase
+    func moveItem(itemID: Int) {
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
+                if let value = snapshot.value as? [String: Any] {
+                    self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").setValue(value)
+                    self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").removeValue()
+                }
+            }
+        }
+    }
+    
+    // delete item from Firebase
+    func deleteItem(itemID: Int) {
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").child("photos").observeSingleEvent(of: .value) { snapshot in
+                if let value = snapshot.value as? [String: String] {
+                    for i in 0..<value.keys.count {
+                        let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(fixedMail).child("\(itemID)").child("image\(i)")
+                        storageRef.delete() { _ in }
+                    }
+                    self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").removeValue()
+                }
+            }
+        }
+    }
+    
+    // return converted images
+    func convertImages(urls: [String], completion: @escaping ([String: Data?]) -> Void) {
+        var images = [String: Data?]()
+        
+        let links = urls.map {URL(string: $0)}
+        
+        for (index, url) in links.enumerated() {
+            let task = URLSession.shared.dataTask(with: url!) { (data, response, error) in
+                if let data = data {
+                    images["image\(index)"] = data
+                }
+                completion(images)
+            }
+            task.resume()
+        }
+    }
+    
+    // convert dictionary to [Item] model
+    func toItemModel(dict: [String: [String: Any]]) -> [Item] {
+        var result = [Item]()
+        print(dict)
+        
+        do {
+            let json = try JSONSerialization.data(withJSONObject: dict)
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let decodedItems = try decoder.decode([Item].self, from: json)
+            result = decodedItems
+        } catch {
+            print(error)
+        }
+        
+        return result
+    }
+    
+    // download ended ads from Firebase
+    func getEndedAds(completion: @escaping ([String: [String: Any]]) -> Void) {
+        var fixedItems = [String: [String: Any]]()
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        
+        self.reference.child(fixedMail).child("endedItems").observeSingleEvent(of: .value) { snapshot in
+            if let data = snapshot.value as? [String: [String: Any]] {
+                fixedItems = data
+                for (key, value) in data {
+                    let photos = value["photos"] as! [String: String]
+                    let date = value["date"] as! String
+                    
+                    let fixedUrls = photos.values.map {String($0)}
+                    
+                    self.convertImages(urls: fixedUrls) { images in
+                        fixedItems[key]?["photos"] = images
+                        fixedItems[key]?["date"] = date.toDate()
+                    }
+                    
+                    completion(fixedItems)
+                }
+            }
         }
     }
     

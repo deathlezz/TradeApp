@@ -97,7 +97,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         case "Tags":
             let cell = tableView.dequeueReusableCell(withIdentifier: "Text", for: indexPath)
             cell.textLabel?.numberOfLines = 0
-            cell.textLabel?.text = "\(item.category!) | \(item.location) | Added on \(item.date.formatDate())"
+            cell.textLabel?.text = "\(item.category!) | \(item.location) | Added on \(item.date.toString())"
             cell.textLabel?.font = UIFont.systemFont(ofSize: 12)
             cell.isUserInteractionEnabled = false
             return cell
