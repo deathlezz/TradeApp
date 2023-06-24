@@ -16,7 +16,7 @@ class EndedAdsView: UITableViewController {
     var header: UILabel!
     
     var mail: String!
-    var endedAds = [Item?]()
+    var endedAds = [Item]()
     
     var reference: DatabaseReference!
     
@@ -35,7 +35,7 @@ class EndedAdsView: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name("reloadEndedAds"), object: nil)
         
         addEmptyArrayView()
-        loadData()
+        loadUserAds()
     }
     
     // set number of sections
@@ -72,23 +72,23 @@ class EndedAdsView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "endedAdCell", for: indexPath) as? AdCell {
-            let thumbnail = endedAds[indexPath.row]?.photos[0] ?? Data()
-            cell.thumbnail.image = UIImage(data: thumbnail)
-            cell.title.text = endedAds[indexPath.row]?.title
-            cell.price.text = "£\(endedAds[indexPath.row]?.price ?? 0)"
-            cell.availability.text = setExpiryDate(endedAds[indexPath.row]?.date ?? Date())
-            cell.views.setTitle(endedAds[indexPath.row]?.views?.description, for: .normal)
+            let thumbnail = UIImage(data: (endedAds[indexPath.row].photos[0])!)
+            cell.thumbnail.image = thumbnail
+            cell.title.text = endedAds[indexPath.row].title
+            cell.price.text = "£\(endedAds[indexPath.row].price)"
+            cell.availability.text = setExpiryDate(endedAds[indexPath.row].date.toDate())
+            cell.views.setTitle(endedAds[indexPath.row].views?.description, for: .normal)
             cell.views.isUserInteractionEnabled = false
-            cell.saved.setTitle(endedAds[indexPath.row]?.saved?.description, for: .normal)
+            cell.saved.setTitle(endedAds[indexPath.row].saved?.description, for: .normal)
             cell.saved.isUserInteractionEnabled = false
             cell.stateButton.layer.borderWidth = 1.5
             cell.stateButton.layer.borderColor = UIColor.darkGray.cgColor
             cell.stateButton.titleLabel?.textColor = .darkGray
             cell.stateButton.layer.cornerRadius = 7
-            cell.stateButton.tag = endedAds[indexPath.row]!.id
+            cell.stateButton.tag = endedAds[indexPath.row].id
             cell.stateButton.addTarget(self, action: #selector(stateTapped), for: .touchUpInside)
             cell.editButton.addTarget(self, action: #selector(editTapped), for: .touchUpInside)
-            cell.editButton.tag = endedAds[indexPath.row]!.id
+            cell.editButton.tag = endedAds[indexPath.row].id
             cell.separatorInset = .zero
             return cell
         }
@@ -109,7 +109,7 @@ class EndedAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-            guard let itemID = endedAds[indexPath.row]?.id else { return }
+            let itemID = endedAds[indexPath.row].id
             
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
@@ -142,7 +142,7 @@ class EndedAdsView: UITableViewController {
     // set action for tapped edit button
     @objc func editTapped(_ sender: UIButton) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
-            guard let item = endedAds.first(where: {$0?.id == sender.tag}) else { return }
+            guard let item = endedAds.first(where: {$0.id == sender.tag}) else { return }
             vc.isEditMode = true
             vc.isAdActive = false
             vc.loggedUser = mail
@@ -160,9 +160,18 @@ class EndedAdsView: UITableViewController {
     
     // load user's ended ads
     func loadUserAds() {
-        getEndedAds() { dict in
-            self.endedAds = self.toItemModel(dict: dict)
+        DispatchQueue.global().async { [weak self] in
+            self?.getEndedAds() { dict in
+                self?.endedAds = self?.toItemModel(dict: dict) ?? [Item]()
+                
+                DispatchQueue.main.async {
+                    self?.isArrayEmpty()
+                    self?.tableView.reloadData()
+                }
+            }
+            
         }
+        
         
 //        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
 //        endedAds = AppStorage.shared.users[index].endedItems
@@ -198,11 +207,11 @@ class EndedAdsView: UITableViewController {
     // activate the ad
     func activateAd(_ sender: UIButton) {
         guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        guard let itemIndex = endedAds.firstIndex(where: {$0?.id == sender.tag}) else { return }
+        guard let itemIndex = endedAds.firstIndex(where: {$0.id == sender.tag}) else { return }
         
-        endedAds[itemIndex]?.date = Date()
+        endedAds[itemIndex].date = Date().toString()
         AppStorage.shared.users[index].activeItems.append(endedAds[itemIndex])
-        AppStorage.shared.items.append(endedAds[itemIndex]!)
+        AppStorage.shared.items.append(endedAds[itemIndex])
         
         moveItem(itemID: sender.tag)
 
@@ -286,32 +295,48 @@ class EndedAdsView: UITableViewController {
     func convertImages(urls: [String], completion: @escaping ([String: Data?]) -> Void) {
         var images = [String: Data?]()
         
-        let links = urls.map {URL(string: $0)}
+        let links = urls.sorted(by: <).map {URL(string: $0)}
         
         for (index, url) in links.enumerated() {
             let task = URLSession.shared.dataTask(with: url!) { (data, response, error) in
                 if let data = data {
+                    print("index:\(index)")
                     images["image\(index)"] = data
                 }
+
                 completion(images)
             }
+            
             task.resume()
         }
+        
     }
     
     // convert dictionary to [Item] model
     func toItemModel(dict: [String: [String: Any]]) -> [Item] {
         var result = [Item]()
-        print(dict)
         
-        do {
-            let json = try JSONSerialization.data(withJSONObject: dict)
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            let decodedItems = try decoder.decode([Item].self, from: json)
-            result = decodedItems
-        } catch {
-            print(error)
+        for item in dict {
+            
+            let dictPhotos = item.value["photos"] as! [String: Data]
+            print(dictPhotos.count)
+            
+            let arrayPhotos = dictPhotos.map {$0.value}
+            let title = item.value["title"] as? String
+            let price = item.value["price"] as? Int
+            let category = item.value["category"] as? String
+            let location = item.value["location"] as? String
+            let description = item.value["description"] as? String
+            let date = item.value["date"] as? String
+            let views = item.value["views"] as? Int
+            let saved = item.value["saved"] as? Int
+            let lat = item.value["lat"] as? Double
+            let long = item.value["long"] as? Double
+            let id = item.value["id"] as? Int
+            
+            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!, views: views!, saved: saved!, lat: lat!, long: long!, id: id!)
+            
+            result.append(model)
         }
         
         return result
@@ -332,11 +357,13 @@ class EndedAdsView: UITableViewController {
                     let fixedUrls = photos.values.map {String($0)}
                     
                     self.convertImages(urls: fixedUrls) { images in
+                        print(images)
                         fixedItems[key]?["photos"] = images
-                        fixedItems[key]?["date"] = date.toDate()
+                        fixedItems[key]?["date"] = date.toDate().toString()
+                        
+                        completion(fixedItems)
                     }
-                    
-                    completion(fixedItems)
+
                 }
             }
         }

@@ -14,6 +14,7 @@ import CoreData
 extension Date {
     func toString() -> String {
         let dateFormatter = DateFormatter()
+        dateFormatter.calendar = .current
         dateFormatter.locale = Locale(identifier: "en")
         dateFormatter.dateFormat = "d MMM, HH:mm"
         return dateFormatter.string(from: self)
@@ -24,6 +25,7 @@ extension Date {
 extension String {
     func toDate() -> Date {
         let dateFormatter = DateFormatter()
+        dateFormatter.calendar = .current
         dateFormatter.locale = Locale(identifier: "en")
         dateFormatter.dateFormat = "d MMM, HH:mm"
         return dateFormatter.date(from: self)!
@@ -186,7 +188,7 @@ class Utilities {
             var items = [Item]()
             
             for result in results {
-                let item = Item(photos: [result.image], title: result.title!, price: Int(result.price), location: result.location!, date: result.date!, id: Int(result.id))
+                let item = Item(photos: [result.image], title: result.title!, price: Int(result.price), location: result.location!, date: result.date!.toString(), id: Int(result.id))
                 items.append(item)
             }
             return items

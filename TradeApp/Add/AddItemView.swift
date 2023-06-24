@@ -354,7 +354,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             // edit active item
                             if self?.isAdActive == true {
                                 guard let itemIndex = AppStorage.shared.users[userIndex].activeItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!)
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date().toString(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!)
                                 AppStorage.shared.users[userIndex].activeItems[itemIndex] = newItem
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
@@ -369,7 +369,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             } else {
                                 // edit ended item
                                 guard let itemIndex = AppStorage.shared.users[userIndex].endedItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!)
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date().toString(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!)
                                 AppStorage.shared.users[userIndex].endedItems[itemIndex] = newItem
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
@@ -385,7 +385,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                         } else {
                             guard let userIndex = AppStorage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
                             
-                            let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
+                            let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date().toString(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
                             AppStorage.shared.users[userIndex].activeItems.append(newItem)
                             AppStorage.shared.items.append(newItem)
                             

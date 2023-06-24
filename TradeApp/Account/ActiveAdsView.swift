@@ -76,7 +76,7 @@ class ActiveAdsView: UITableViewController {
             cell.thumbnail.image = UIImage(data: thumbnail)
             cell.title.text = activeAds[indexPath.row]?.title
             cell.price.text = "£\(activeAds[indexPath.row]?.price ?? 0)"
-            cell.availability.text = setExpiryDate(activeAds[indexPath.row]?.date ?? Date())
+            cell.availability.text = setExpiryDate(activeAds[indexPath.row]?.date.toDate() ?? Date())
             cell.views.setTitle(activeAds[indexPath.row]?.views?.description, for: .normal)
             cell.views.isUserInteractionEnabled = false
             cell.saved.setTitle(activeAds[indexPath.row]?.saved?.description, for: .normal)
@@ -191,7 +191,7 @@ class ActiveAdsView: UITableViewController {
         guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         guard let itemIndex = activeAds.firstIndex(where: {$0?.id == sender.tag}) else { return }
         
-        activeAds[itemIndex]?.date = Date()
+        activeAds[itemIndex]?.date = Date().toString()
         AppStorage.shared.users[index].endedItems.append(activeAds[itemIndex])
         
         moveItem(itemID: sender.tag)

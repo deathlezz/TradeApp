@@ -63,13 +63,13 @@ class SavedView: UICollectionViewController {
             fatalError("Unable to dequeue itemCell")
         }
         
-        let img = UIImage(data: savedItems[indexPath.item].photos[0]!)
+        let thumbnail = UIImage(data: savedItems[indexPath.item].photos[0]!)
         
-        cell.image.image = img
+        cell.image.image = thumbnail
         cell.title.text = savedItems[indexPath.item].title
         cell.price.text = "£\(savedItems[indexPath.item].price)"
         cell.location.text = savedItems[indexPath.item].location
-        cell.date.text = savedItems[indexPath.item].date.toString()
+        cell.date.text = savedItems[indexPath.item].date
         cell.layer.cornerRadius = 10
         cell.layer.borderWidth = 0.2
         cell.layer.borderColor = UIColor.lightGray.cgColor

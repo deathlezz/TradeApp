@@ -7,14 +7,14 @@
 
 import Foundation
 
-struct Item: Codable {
+struct Item {
     var photos: [Data?]
     var title: String
     var price: Int
     var category: String?
     var location: String
     var description: String?
-    var date: Date
+    var date: String
     var views: Int?
     var saved: Int?
     var lat: Double?
@@ -30,7 +30,7 @@ struct Item: Codable {
             "category": category!,
             "location": location,
             "description": description!,
-            "date": date.toString(),
+            "date": date,
             "views": views!,
             "saved": saved!,
             "lat": lat!,
