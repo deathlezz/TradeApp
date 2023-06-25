@@ -32,7 +32,7 @@ class EndedAdsView: UITableViewController {
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name("reloadEndedAds"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loadUserAds), name: NSNotification.Name("reloadEndedAds"), object: nil)
         
         addEmptyArrayView()
         loadUserAds()
@@ -159,7 +159,7 @@ class EndedAdsView: UITableViewController {
     }
     
     // load user's ended ads
-    func loadUserAds() {
+    @objc func loadUserAds() {
         DispatchQueue.global().async { [weak self] in
             self?.getEndedAds() { dict in
                 self?.endedAds = self?.toItemModel(dict: dict) ?? [Item]()
@@ -169,12 +169,7 @@ class EndedAdsView: UITableViewController {
                     self?.tableView.reloadData()
                 }
             }
-            
         }
-        
-        
-//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-//        endedAds = AppStorage.shared.users[index].endedItems
     }
     
     // hide toolbar before view appears
@@ -215,24 +210,13 @@ class EndedAdsView: UITableViewController {
         
         moveItem(itemID: sender.tag)
 
-        AppStorage.shared.users[index].endedItems.remove(at: itemIndex)
+        AppStorage.shared.users[index].endedItems.removeAll(where: {$0?.id == sender.tag})
         endedAds.remove(at: itemIndex)
         
         let indexPath = IndexPath(row: itemIndex, section: 0)
         tableView.deleteRows(at: [indexPath], with: .fade)
         updateHeader()
         isArrayEmpty()
-    }
-    
-    // load user ended ads
-    @objc func loadData() {
-        DispatchQueue.global().async { [weak self] in
-            self?.loadUserAds()
-            
-            DispatchQueue.main.async {
-                self?.tableView.reloadData()
-            }
-        }
     }
     
     // set up empty array view
@@ -291,25 +275,49 @@ class EndedAdsView: UITableViewController {
         }
     }
     
-    // return converted images
-    func convertImages(urls: [String], completion: @escaping ([String: Data?]) -> Void) {
-        var images = [String: Data?]()
+    // convert URLs into dictionary Data
+    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
+        var images = [String: Data]()
         
         let links = urls.sorted(by: <).map {URL(string: $0)}
         
         for (index, url) in links.enumerated() {
-            let task = URLSession.shared.dataTask(with: url!) { (data, response, error) in
+            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
                 if let data = data {
-                    print("index:\(index)")
                     images["image\(index)"] = data
                 }
 
+                guard images.keys.count == links.count else { return }
                 completion(images)
             }
-            
+
             task.resume()
         }
+    }
+    
+    // download ended ads from Firebase
+    func getEndedAds(completion: @escaping ([String: [String: Any]]) -> Void) {
+        var fixedItems = [String: [String: Any]]()
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
         
+        reference.child(fixedMail).child("endedItems").observeSingleEvent(of: .value) { [weak self] snapshot in
+            if let data = snapshot.value as? [String: [String: Any]] {
+                fixedItems = data
+                for (key, value) in data {
+                    let photos = value["photos"] as! [String: String]
+                    let date = value["date"] as! String
+                    
+                    let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+                    
+                    self?.convertImages(urls: fixedUrls) { images in
+                        fixedItems[key]?["photos"] = images
+                        fixedItems[key]?["date"] = date
+                        
+                        completion(fixedItems)
+                    }
+                }
+            }
+        }
     }
     
     // convert dictionary to [Item] model
@@ -317,11 +325,10 @@ class EndedAdsView: UITableViewController {
         var result = [Item]()
         
         for item in dict {
-            
             let dictPhotos = item.value["photos"] as! [String: Data]
-            print(dictPhotos.count)
+            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
+            let arrayPhotos = sorted.map {$0.value}
             
-            let arrayPhotos = dictPhotos.map {$0.value}
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int
             let category = item.value["category"] as? String
@@ -342,31 +349,5 @@ class EndedAdsView: UITableViewController {
         return result
     }
     
-    // download ended ads from Firebase
-    func getEndedAds(completion: @escaping ([String: [String: Any]]) -> Void) {
-        var fixedItems = [String: [String: Any]]()
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
-        
-        self.reference.child(fixedMail).child("endedItems").observeSingleEvent(of: .value) { snapshot in
-            if let data = snapshot.value as? [String: [String: Any]] {
-                fixedItems = data
-                for (key, value) in data {
-                    let photos = value["photos"] as! [String: String]
-                    let date = value["date"] as! String
-                    
-                    let fixedUrls = photos.values.map {String($0)}
-                    
-                    self.convertImages(urls: fixedUrls) { images in
-                        print(images)
-                        fixedItems[key]?["photos"] = images
-                        fixedItems[key]?["date"] = date.toDate().toString()
-                        
-                        completion(fixedItems)
-                    }
-
-                }
-            }
-        }
-    }
     
 }

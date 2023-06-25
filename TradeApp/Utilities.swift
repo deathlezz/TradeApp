@@ -143,7 +143,7 @@ class Utilities {
         newAd.setValue(item.title, forKey: "title")
         newAd.setValue(item.price, forKey: "price")
         newAd.setValue(item.location, forKey: "location")
-        newAd.setValue(item.date, forKey: "date")
+        newAd.setValue(item.date.toDate(), forKey: "date")
         newAd.setValue(item.id, forKey: "id")
 
         AppDelegate.sharedAppDelegate.coreDataStack.saveContext()

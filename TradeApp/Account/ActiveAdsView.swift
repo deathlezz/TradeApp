@@ -30,12 +30,12 @@ class ActiveAdsView: UITableViewController {
         tableView.sectionHeaderTopPadding = 0
         tableView.separatorInset.left = 17
         
-        NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name("reloadActiveAds"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loadUserAds), name: NSNotification.Name("reloadActiveAds"), object: nil)
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         addEmptyArrayView()
-        loadData()
+        loadUserAds()
     }
     
     // set number of sections
@@ -208,21 +208,18 @@ class ActiveAdsView: UITableViewController {
         isArrayEmpty()
     }
     
-    // load user active ads
-    @objc func loadData() {
+    // load user's active ads
+    @objc func loadUserAds() {
         DispatchQueue.global().async { [weak self] in
-            self?.loadUserAds()
-            
-            DispatchQueue.main.async {
-                self?.tableView.reloadData()
+            self?.getActiveAds() { dict in
+                self?.activeAds = self?.toItemModel(dict: dict) ?? [Item]()
+                
+                DispatchQueue.main.async {
+                    self?.isArrayEmpty()
+                    self?.tableView.reloadData()
+                }
             }
         }
-    }
-    
-    // load user's active ads
-    func loadUserAds() {
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        activeAds = AppStorage.shared.users[index].activeItems
     }
     
     // set up empty array view
@@ -279,6 +276,80 @@ class ActiveAdsView: UITableViewController {
                 }
             }
         }
+    }
+    
+    // convert URLs into dictionary Data
+    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
+        var images = [String: Data]()
+        
+        let links = urls.sorted(by: <).map {URL(string: $0)}
+        
+        for (index, url) in links.enumerated() {
+            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+                if let data = data {
+                    images["image\(index)"] = data
+                }
+
+                guard images.keys.count == links.count else { return }
+                completion(images)
+            }
+
+            task.resume()
+        }
+    }
+    
+    // download active ads from Firebase
+    func getActiveAds(completion: @escaping ([String: [String: Any]]) -> Void) {
+        var fixedItems = [String: [String: Any]]()
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        
+        reference.child(fixedMail).child("activeItems").observeSingleEvent(of: .value) { [weak self] snapshot in
+            if let data = snapshot.value as? [String: [String: Any]] {
+                fixedItems = data
+                for (key, value) in data {
+                    let photos = value["photos"] as! [String: String]
+                    let date = value["date"] as! String
+                    
+                    let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+                    
+                    self?.convertImages(urls: fixedUrls) { images in
+                        fixedItems[key]?["photos"] = images
+                        fixedItems[key]?["date"] = date
+                        
+                        completion(fixedItems)
+                    }
+                }
+            }
+        }
+    }
+    
+    // convert dictionary to [Item] model
+    func toItemModel(dict: [String: [String: Any]]) -> [Item] {
+        var result = [Item]()
+        
+        for item in dict {
+            let dictPhotos = item.value["photos"] as! [String: Data]
+            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
+            let arrayPhotos = sorted.map {$0.value}
+            
+            let title = item.value["title"] as? String
+            let price = item.value["price"] as? Int
+            let category = item.value["category"] as? String
+            let location = item.value["location"] as? String
+            let description = item.value["description"] as? String
+            let date = item.value["date"] as? String
+            let views = item.value["views"] as? Int
+            let saved = item.value["saved"] as? Int
+            let lat = item.value["lat"] as? Double
+            let long = item.value["long"] as? Double
+            let id = item.value["id"] as? Int
+            
+            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!, views: views!, saved: saved!, lat: lat!, long: long!, id: id!)
+            
+            result.append(model)
+        }
+        
+        return result
     }
     
 }

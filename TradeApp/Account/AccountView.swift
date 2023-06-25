@@ -9,13 +9,6 @@ import UIKit
 import Firebase
 import FirebaseStorage
 
-extension Dictionary {
-    // Designed for use with Dictionary and Array types
-    var jsonData: Data? {
-        return try? JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
-    }
-}
-
 class AccountView: UITableViewController {
     
     let sections = ["User", "Your ads", "Settings", "Sign out"]
@@ -25,6 +18,8 @@ class AccountView: UITableViewController {
     
     var active: Int!
     var ended: Int!
+    
+    var willLoadAds = true
     
     var reference: DatabaseReference!
 
@@ -39,45 +34,6 @@ class AccountView: UITableViewController {
         tableView.separatorStyle = .none
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AccountCell")
         
-        reference.child("mail@wp_pl").child("activeItems").child("\(36033610)").observeSingleEvent(of: .value, with: { snapshot in
-            print("ok")
-            if let data = snapshot.value as? [String: Any] {
-                // change urls to [UIImage] as data
-                // create whole data model
-                // convert data to custom model
-//                var fixedData = String(describing: data)
-//                let array = fixedData["photos"]
-//                let dataImages = convertPhotos(urls: array)
-//                print(array)
-                
-//                print("before")
-//                let stringPhotos = data["photos"] as! [String]
-//                let arrayPhotos = stringPhotos.map {String(describing: $0)}
-//                let stringDate = String(describing: data["date"])
-//                let dataPhotos = self.convertPhotos(urls: arrayPhotos)
-//                print("after")
-                
-                let dateFormatter = DateFormatter()
-                dateFormatter.locale = Locale(identifier: "en")
-                dateFormatter.dateFormat = "d MMM, HH:mm"
-                
-//                let date = dateFormatter.date(from: stringDate)
-//                let dta = self.convertPhotos(urls: arrayPhotos)
-//
-//                fixedData["photos"] = dta
-//                fixedData["date"] = date
-                
-//                guard let json = fixedData.jsonData else { return }
-//
-//                do {
-//                    let people = try JSONDecoder().decode([Item].self, from: json)
-//
-//                    print(people)
-//                } catch let decodeError {
-//                    print(decodeError)
-//                }
-            }
-        })
     }
     
     // set number of sections
@@ -121,6 +77,7 @@ class AccountView: UITableViewController {
             accountCell.isUserInteractionEnabled = false
             accountCell.selectionStyle = .none
             accountCell.accessoryType = .none
+            accountCell.imageView?.image = nil
             return accountCell
             
         case "Your ads":
@@ -209,7 +166,7 @@ class AccountView: UITableViewController {
             // remove user from database
             guard let fixedMail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
             self?.reference.child(fixedMail).removeValue()
-            self?.deleteImages(user: fixedMail)
+            self?.deleteUser(user: fixedMail)
             self?.showAlert(title: "Success", message: "Your account has been deleted")
         })
         
@@ -242,6 +199,7 @@ class AccountView: UITableViewController {
     func pushToChangeUnitView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeUnitView") as? ChangeUnitView {
             vc.hidesBottomBarWhenPushed = true
+            willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -251,6 +209,7 @@ class AccountView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeNumberView") as? ChangeNumberView {
             vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
+            willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -260,6 +219,7 @@ class AccountView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeEmailView") as? ChangeEmailView {
             vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
+            willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -269,6 +229,7 @@ class AccountView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangePasswordView") as? ChangePasswordView {
             vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
+            willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -286,31 +247,12 @@ class AccountView: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
-        print(loggedUser)
-        updateSection()
-    }
-    
-    // load number of active/ended items
-    func loadItemsNumber() {
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
-        active = AppStorage.shared.users[index].activeItems.count
-        ended = AppStorage.shared.users[index].endedItems.count
-    }
-    
-    // update user ads section
-    func updateSection() {
-        DispatchQueue.global().async { [weak self] in
-            self?.loadItemsNumber()
-            
-            DispatchQueue.main.async {
-                let indexSet = IndexSet(integer: 1)
-                self?.tableView.reloadSections(indexSet, with: .automatic)
-            }
-        }
+        loadAdsData()
+        willLoadAds = true
     }
     
     // delete user images from Firebase Storage
-    func deleteImages(user: String) {
+    func deleteUser(user: String) {
         guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
         let activeItems = AppStorage.shared.users[index].activeItems
         let endedItems = AppStorage.shared.users[index].endedItems
@@ -321,26 +263,44 @@ class AccountView: UITableViewController {
             guard let itemID = item?.id else { return }
             for i in 0..<photosCount {
                 let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(i)")
-                storageRef.delete() { _ in }
+                storageRef.delete(completion: nil)
             }
         }
+        
+        // remove all user's items from the app
+        AppStorage.shared.items = AppStorage.shared.items.filter { item in !items.contains(where: { $0?.id == item.id }) }
+        AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter { item in !items.contains(where: { $0?.id == item.id }) }
         
         AppStorage.shared.users.remove(at: index)
         Utilities.setUser(nil)
     }
     
-    // convert images urls to data array
-    func convertPhotos(urls: [String]) -> [Data?] {
-        var dataPhotos = [Data]()
+    // download user's ads amount
+    func loadAdsData() {
+        guard willLoadAds else { return }
         
-        for url in urls {
-            DispatchQueue.global().async {
-                let url = URL(string: url)
-                let data = try? Data(contentsOf: url!)
-                dataPhotos.append(data!)
+        let fixedMail = loggedUser.replacingOccurrences(of: ".", with: "_")
+        let userItems = ["activeItems", "endedItems"]
+        
+        DispatchQueue.global().async { [weak self] in
+            for item in userItems {
+                self?.reference.child(fixedMail).child(item).observeSingleEvent(of: .value) { snapshot in
+                    
+                    if item == userItems[0] {
+                        self?.active = Int(snapshot.childrenCount)
+                    } else {
+                        self?.ended = Int(snapshot.childrenCount)
+                    }
+                    
+                    DispatchQueue.main.async {
+                        let indexSet = IndexSet(integer: 1)
+                        self?.tableView.reloadSections(indexSet, with: .automatic)
+                    }
+                }
             }
         }
-        return dataPhotos
+        
+        
     }
     
 }

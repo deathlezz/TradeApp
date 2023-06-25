@@ -7,6 +7,12 @@
 
 import UIKit
 import CoreData
+import Firebase
+
+enum SaveAction {
+    case save
+    case remove
+}
 
 class DetailView: UITableViewController, Index, Coordinates {
     
@@ -23,6 +29,8 @@ class DetailView: UITableViewController, Index, Coordinates {
     var latitude: Double!
     var longitude: Double!
     
+    var reference: DatabaseReference!
+    
     var item: Item!
     let sectionTitles = ["Image", "Title", "Tags", "Description", "Location", "Views"]
     
@@ -32,6 +40,8 @@ class DetailView: UITableViewController, Index, Coordinates {
         navigationController?.isToolbarHidden = false
         navigationItem.backButtonTitle = " "
         navigationController?.hidesBarsOnSwipe = false
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         actionButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareTapped))
         
@@ -50,7 +60,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         loadPhoneNumber()
         isSaved()
         setToolbar()
-        tableView.reloadData()
+        increaseViews()
     }
     
     // set number of sections
@@ -159,6 +169,7 @@ class DetailView: UITableViewController, Index, Coordinates {
             navigationItem.rightBarButtonItems = [removeButton, actionButton]
         }
         
+        updateSaved(action: .save)
         Utilities.saveItem(item)
     }
     
@@ -166,6 +177,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     @objc func removeTapped() {
         guard let index = savedItems.firstIndex(where: {$0.id == item.id}) else { return }
         Utilities.removeItems([savedItems[index]])
+        updateSaved(action: .remove)
         savedItems.remove(at: index)
         navigationItem.rightBarButtonItems = [saveButton, actionButton]
     }
@@ -342,6 +354,48 @@ class DetailView: UITableViewController, Index, Coordinates {
             for activeItem in user.activeItems {
                 if activeItem?.id == item?.id {
                     phone = user.phoneNumber ?? 0
+                }
+            }
+        }
+    }
+    
+    // increase number of views
+    func increaseViews() {
+        let users = AppStorage.shared.users
+        let itemID = item.id
+        
+        for user in users {
+            for activeItem in user.activeItems {
+                if activeItem?.id == item?.id {
+                    let mail = user.mail.replacingOccurrences(of: ".", with: "_")
+                    reference.child(mail).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
+                        if let views = snapshot.value as? Int {
+                            self.reference.child(mail).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // update number of saved
+    func updateSaved(action: SaveAction) {
+        let users = AppStorage.shared.users
+        let itemID = item.id
+        
+        for user in users {
+            for activeItem in user.activeItems {
+                if activeItem?.id == item?.id {
+                    let mail = user.mail.replacingOccurrences(of: ".", with: "_")
+                    reference.child(mail).child("activeItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
+                        if let views = snapshot.value as? Int {
+                            if action == .save {
+                                self.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").setValue(views + 1)
+                            } else {
+                                self.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").setValue(views - 1)
+                            }
+                        }
+                    }
                 }
             }
         }
