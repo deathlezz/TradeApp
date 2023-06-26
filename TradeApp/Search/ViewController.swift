@@ -44,7 +44,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         checkConnection()
-        addEmptyArrayView()
+//        addEmptyArrayView()
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
@@ -78,13 +78,16 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             self?.mail = Utilities.loadUser()
             self?.currentUnit = Utilities.loadDistanceUnit()
 //            self?.loadData()
-            self?.loadItems()
-            self?.loadRecentItems()
-//            self?.getData()
+//            self?.loadItems()
             
-            DispatchQueue.main.async {
-                self?.isArrayEmpty()
-                self?.collectionView.reloadData()
+            self?.getData() { dict in
+                AppStorage.shared.items = self?.toItemModel(dict: dict) ?? [Item]()
+                self?.loadRecentItems()
+                
+                DispatchQueue.main.async {
+//                    self?.isArrayEmpty()
+                    self?.collectionView.reloadData()
+                }
             }
         }
     }
@@ -185,14 +188,14 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         currentUnit = Utilities.loadDistanceUnit()
         changeTitle()
         hideButtons()
-        isArrayEmpty()
+//        isArrayEmpty()
         collectionView.reloadData()
     }
     
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
         refreshControl.beginRefreshing()
-        loadItems()
+//        loadItems()
         applyFilters()
         loadRecentItems()
         refreshControl.endRefreshing()
@@ -306,16 +309,16 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     }
     
     // load all active items
-    func loadItems() {
-        AppStorage.shared.items.removeAll()
-        let users = AppStorage.shared.users
-        
-        for user in users {
-            for item in user.activeItems {
-                AppStorage.shared.items.append(item!)
-            }
-        }
-    }
+//    func loadItems() {
+//        AppStorage.shared.items.removeAll()
+//        let users = AppStorage.shared.users
+//
+//        for user in users {
+//            for item in user.activeItems {
+//                AppStorage.shared.items.append(item!)
+//            }
+//        }
+//    }
     
     // apply all filters
     func applyFilters() {
@@ -471,13 +474,11 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     func loadRecentItems() {
         AppStorage.shared.recentlyAdded.removeAll()
         
-        for user in AppStorage.shared.users {
-            for item in user.activeItems {
-                guard let item = item else { return }
-                
-                if isItemRecent(item.date.toDate()) {
-                    AppStorage.shared.recentlyAdded.append(item)
-                }
+        for item in AppStorage.shared.items {
+            AppStorage.shared.recentlyAdded.append(item)
+            print(item.date.toDate())
+            if isItemRecent(item.date.toDate()) {
+                print(item.date.toDate())
             }
         }
         
@@ -542,18 +543,96 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     }
     
     // send data to firebase
-    func sendData() {
-        reference.child("user_id").setValue("New data")
+//    func sendData() {
+//        reference.child("user_id").setValue("New data")
+//    }
+    
+    // convert URLs into dictionary Data
+    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
+        var images = [String: Data]()
+        
+        let links = urls.sorted(by: <).map {URL(string: $0)}
+        
+        for (index, url) in links.enumerated() {
+            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+                if let data = data {
+                    images["image\(index)"] = data
+                }
+
+                guard images.keys.count == links.count else { return }
+                print("converted images")
+                completion(images)
+            }
+
+            task.resume()
+        }
     }
     
-    // get data from firebase
-    func getData() {
-        reference.observeSingleEvent(of: .value, with: { snapshot in
-            if let data = snapshot.value as? [String: Any] {
-                print("The value from the database: \(data)")
+    // download all active items from firebase & convert images urls to data array
+    func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
+        var items = [String: [String: Any]]()
+        
+        reference.observeSingleEvent(of: .value) { [weak self] snapshot in
+            if let data = snapshot.value as? [String: [String: Any]] {
+                for user in data {
+                    let fixedMail = user.key.replacingOccurrences(of: ".", with: "_")
+                    let activeItems = data[fixedMail]?["activeItems"] as! [String: [String: Any]]
+                    
+                    for item in activeItems {
+                        items["\(item.key)"] = item.value
+                    }
+                    
+                    for (key, value) in items {
+                        let photos = value["photos"] as! [String: String]
+                        let date = value["date"] as! String
+                        
+                        let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+                        
+                        self?.convertImages(urls: fixedUrls) { images in
+                            items[key]?["photos"] = images
+                            items[key]?["date"] = date
+                            
+                            print("converted urls")
+                            completion(items)
+                        }
+                    }
+                }
             }
-        })
+        }
     }
+    
+    // convert dictionary to [Item] model
+    func toItemModel(dict: [String: [String: Any]]) -> [Item] {
+        var result = [Item]()
+        
+        for item in dict {
+            let dictPhotos = item.value["photos"] as! [String: Data]
+            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
+            let arrayPhotos = sorted.map {$0.value}
+            
+            let title = item.value["title"] as? String
+            let price = item.value["price"] as? Int
+            let category = item.value["category"] as? String
+            let location = item.value["location"] as? String
+            let description = item.value["description"] as? String
+            let date = item.value["date"] as? String
+            let views = item.value["views"] as? Int
+            let saved = item.value["saved"] as? Int
+            let lat = item.value["lat"] as? Double
+            let long = item.value["long"] as? Double
+            let id = item.value["id"] as? Int
+            
+            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!, views: views!, saved: saved!, lat: lat!, long: long!, id: id!)
+            
+            result.append(model)
+        }
+        
+        print("converted to item model")
+        
+        return result
+    }
+    
+    
     
 }
 

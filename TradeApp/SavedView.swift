@@ -161,7 +161,6 @@ class SavedView: UICollectionViewController {
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
         refreshControl.beginRefreshing()
-        loadItems()
         updateSavedItems()
         collectionView.reloadData()
         refreshControl.endRefreshing()
@@ -342,18 +341,6 @@ class SavedView: UICollectionViewController {
                 // remove that item from Core Data
                 Utilities.removeItems([item])
                 savedItems.removeAll(where: {$0.id == item.id})
-            }
-        }
-    }
-    
-    // load all active items
-    func loadItems() {
-        AppStorage.shared.items.removeAll()
-        let users = AppStorage.shared.users
-        
-        for user in users {
-            for item in user.activeItems {
-                AppStorage.shared.items.append(item!)
             }
         }
     }
