@@ -14,12 +14,13 @@ struct Item {
     var category: String?
     var location: String
     var description: String?
-    var date: String
+    var date: Date
     var views: Int?
     var saved: Int?
     var lat: Double?
     var long: Double?
     var id: Int
+    var owner: String
     
     // convert custom model to Any object
     func toAnyObject(urls: [String: String]) -> [String: Any] {
@@ -30,12 +31,13 @@ struct Item {
             "category": category!,
             "location": location,
             "description": description!,
-            "date": date,
+            "date": date.toString(shortened: false),
             "views": views!,
             "saved": saved!,
             "lat": lat!,
             "long": long!,
-            "id": id
+            "id": id,
+            "owner": owner
         ]
     }
 }

@@ -22,6 +22,7 @@ extension SavedAd {
     @NSManaged public var location: String?
     @NSManaged public var date: Date?
     @NSManaged public var id: Int32
+    @NSManaged public var owner: String
 
 }
 

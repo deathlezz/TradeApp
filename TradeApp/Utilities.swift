@@ -12,11 +12,17 @@ import CoreData
 
 // convert date to string
 extension Date {
-    func toString() -> String {
+    func toString(shortened: Bool) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.calendar = .current
         dateFormatter.locale = Locale(identifier: "en")
-        dateFormatter.dateFormat = "d MMM, HH:mm"
+        
+        if shortened {
+            dateFormatter.dateFormat = "d MMM, HH:mm"
+        } else {
+            dateFormatter.dateFormat = "d MMM yyyy, HH:mm"
+        }
+        
         return dateFormatter.string(from: self)
     }
 }
@@ -27,7 +33,7 @@ extension String {
         let dateFormatter = DateFormatter()
         dateFormatter.calendar = .current
         dateFormatter.locale = Locale(identifier: "en")
-        dateFormatter.dateFormat = "d MMM, HH:mm"
+        dateFormatter.dateFormat = "d MMM yyyy, HH:mm"
         return dateFormatter.date(from: self)!
     }
 }
@@ -143,7 +149,7 @@ class Utilities {
         newAd.setValue(item.title, forKey: "title")
         newAd.setValue(item.price, forKey: "price")
         newAd.setValue(item.location, forKey: "location")
-        newAd.setValue(item.date.toDate(), forKey: "date")
+        newAd.setValue(item.date, forKey: "date")
         newAd.setValue(item.id, forKey: "id")
 
         AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
@@ -188,7 +194,7 @@ class Utilities {
             var items = [Item]()
             
             for result in results {
-                let item = Item(photos: [result.image], title: result.title!, price: Int(result.price), location: result.location!, date: result.date!.toString(), id: Int(result.id))
+                let item = Item(photos: [result.image], title: result.title!, price: Int(result.price), location: result.location!, date: result.date!, id: Int(result.id), owner: result.owner)
                 items.append(item)
             }
             return items

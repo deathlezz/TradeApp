@@ -74,9 +74,10 @@ class EndedAdsView: UITableViewController {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "endedAdCell", for: indexPath) as? AdCell {
             let thumbnail = UIImage(data: (endedAds[indexPath.row].photos[0])!)
             cell.thumbnail.image = thumbnail
+            cell.thumbnail.layer.cornerRadius = 7
             cell.title.text = endedAds[indexPath.row].title
             cell.price.text = "£\(endedAds[indexPath.row].price)"
-            cell.availability.text = setExpiryDate(endedAds[indexPath.row].date.toDate())
+            cell.availability.text = setExpiryDate(endedAds[indexPath.row].date)
             cell.views.setTitle(endedAds[indexPath.row].views?.description, for: .normal)
             cell.views.isUserInteractionEnabled = false
             cell.saved.setTitle(endedAds[indexPath.row].saved?.description, for: .normal)
@@ -204,7 +205,7 @@ class EndedAdsView: UITableViewController {
         guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         guard let itemIndex = endedAds.firstIndex(where: {$0.id == sender.tag}) else { return }
         
-        endedAds[itemIndex].date = Date().toString()
+        endedAds[itemIndex].date = Date()
         AppStorage.shared.users[index].activeItems.append(endedAds[itemIndex])
         AppStorage.shared.items.append(endedAds[itemIndex])
         
@@ -322,6 +323,7 @@ class EndedAdsView: UITableViewController {
     
     // convert dictionary to [Item] model
     func toItemModel(dict: [String: [String: Any]]) -> [Item] {
+        let owner = mail.replacingOccurrences(of: ".", with: "_")
         var result = [Item]()
         
         for item in dict {
@@ -341,7 +343,7 @@ class EndedAdsView: UITableViewController {
             let long = item.value["long"] as? Double
             let id = item.value["id"] as? Int
             
-            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!, views: views!, saved: saved!, lat: lat!, long: long!, id: id!)
+            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner)
             
             result.append(model)
         }

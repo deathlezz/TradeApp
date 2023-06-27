@@ -334,7 +334,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     @objc func submitTapped(_ sender: UIButton) {
         sender.isUserInteractionEnabled = false
         
-        var photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
+        let owner = loggedUser.replacingOccurrences(of: ".", with: "_")
+        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
             
         guard let title = textFieldCells[0].textField.text else { return }
         guard let price = textFieldCells[1].textField.text else { return }
@@ -354,7 +355,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             // edit active item
                             if self?.isAdActive == true {
                                 guard let itemIndex = AppStorage.shared.users[userIndex].activeItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date().toString(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!)
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: owner)
                                 AppStorage.shared.users[userIndex].activeItems[itemIndex] = newItem
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
@@ -369,7 +370,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             } else {
                                 // edit ended item
                                 guard let itemIndex = AppStorage.shared.users[userIndex].endedItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date().toString(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!)
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: owner)
                                 AppStorage.shared.users[userIndex].endedItems[itemIndex] = newItem
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
@@ -385,17 +386,21 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                         } else {
                             guard let userIndex = AppStorage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
                             
-                            let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date().toString(), views: 0, saved: 0, lat: lat, long: long, id: (self?.itemID())!)
-                            AppStorage.shared.users[userIndex].activeItems.append(newItem)
-                            AppStorage.shared.items.append(newItem)
-                            
-                            self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-                                guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
-                                self?.saveItem(user: mail, item: newItem, urls: urls)
+                            self?.createItemID() { id in
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: owner)
+                                AppStorage.shared.users[userIndex].activeItems.append(newItem)
+                                AppStorage.shared.items.append(newItem)
+                                
+                                self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
+                                    guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+                                    self?.saveItem(user: mail, item: newItem, urls: urls)
+                                }
+                                
+                                sender.isUserInteractionEnabled = true
+                                self?.showAlert(.success)
                             }
                             
-                            sender.isUserInteractionEnabled = true
-                            self?.showAlert(.success)
+                            
                         }
                     }
                     
@@ -560,20 +565,27 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // create unique item ID
-    func itemID() -> Int {
+    func createItemID(completion: @escaping (Int) -> Void) {
         var uniqueID: Int!
-        let usedIDs = AppStorage.shared.items.map {$0.id}
         let range = 10000000...99999999
         
-        while uniqueID == nil {
-            let random = range.randomElement()
-            
-            if !usedIDs.contains(random!) {
-                uniqueID = random
-                break
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.observeSingleEvent(of: .value) { snapshot, arg  in
+                if let data = snapshot.value as? [String: Int] {
+                    let usedIDs = data.values.map {$0}
+                    
+                    while uniqueID == nil {
+                        let random = range.randomElement()
+                        
+                        if !usedIDs.contains(random!) {
+                            uniqueID = random
+                            completion(uniqueID)
+                            break
+                        }
+                    }
+                }
             }
         }
-        return uniqueID
     }
     
     // sign out current user

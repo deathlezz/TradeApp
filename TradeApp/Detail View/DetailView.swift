@@ -25,6 +25,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     var removeButton: UIBarButtonItem!
     
     var phone: Int!
+    var views: Int!
     
     var latitude: Double!
     var longitude: Double!
@@ -55,11 +56,11 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
         
+        setToolbar()
         loggedUser = Utilities.loadUser()
         savedItems = Utilities.loadItems()
         loadPhoneNumber()
         isSaved()
-        setToolbar()
         increaseViews()
     }
     
@@ -107,7 +108,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         case "Tags":
             let cell = tableView.dequeueReusableCell(withIdentifier: "Text", for: indexPath)
             cell.textLabel?.numberOfLines = 0
-            cell.textLabel?.text = "\(item.category!) | \(item.location) | Added on \(item.date)"
+            cell.textLabel?.text = "\(item.category!) | \(item.location) | Added on \(item.date.toString(shortened: true))"
             cell.textLabel?.font = UIFont.systemFont(ofSize: 12)
             cell.isUserInteractionEnabled = false
             return cell
@@ -138,7 +139,7 @@ class DetailView: UITableViewController, Index, Coordinates {
             
         case "Views":
             let cell = tableView.dequeueReusableCell(withIdentifier: "Text", for: indexPath)
-            cell.textLabel?.text = "Views: \(item.views!)"
+            cell.textLabel?.text = "Views: \(views ?? item.views!)"
             cell.backgroundColor = .systemGray6
             cell.textLabel?.textAlignment = .center
             cell.textLabel?.font = UIFont.systemFont(ofSize: 12)
@@ -199,8 +200,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         NotificationCenter.default.post(name: NSNotification.Name("pushLocation"), object: nil, userInfo: ["location": item.location])
         
-        print(item.id)
-        
         for savedItem in savedItems {
             print(savedItem.id)
         }
@@ -210,7 +209,6 @@ class DetailView: UITableViewController, Index, Coordinates {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        item.views! += 1
         navigationController?.isNavigationBarHidden = false
         navigationController?.isToolbarHidden = false
     }
@@ -241,6 +239,9 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set action for message button
     @objc func messageTapped() {
+        
+        // push to Chat View or open chat as Segue
+        
         print("message will be send here")
     }
 
@@ -348,12 +349,12 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // load item's phone number
     func loadPhoneNumber() {
-        let users = AppStorage.shared.users
+        let mail = item.owner.replacingOccurrences(of: ".", with: "_")
         
-        for user in users {
-            for activeItem in user.activeItems {
-                if activeItem?.id == item?.id {
-                    phone = user.phoneNumber ?? 0
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(mail).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
+                if let number = snapshot.value as? Int {
+                    self?.phone = number
                 }
             }
         }
@@ -361,16 +362,25 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // increase number of views
     func increaseViews() {
-        let users = AppStorage.shared.users
+        let owner = item.owner.replacingOccurrences(of: "_", with: ".")
+        guard loggedUser != owner else { return }
+        
         let itemID = item.id
         
-        for user in users {
-            for activeItem in user.activeItems {
-                if activeItem?.id == item?.id {
-                    let mail = user.mail.replacingOccurrences(of: ".", with: "_")
-                    reference.child(mail).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
+        DispatchQueue.global().async { [weak self] in
+            for item in AppStorage.shared.items {
+                if item.id == itemID {
+                    let mail = item.owner.replacingOccurrences(of: ".", with: "_")
+                    
+                    self?.reference.child(mail).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
                         if let views = snapshot.value as? Int {
-                            self.reference.child(mail).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
+                            self?.reference.child(mail).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
+                            self?.views = views + 1
+                            
+                            DispatchQueue.main.async {
+                                let indexSet = IndexSet(integer: 5)
+                                self?.tableView.reloadSections(indexSet, with: .automatic)
+                            }
                         }
                     }
                 }
@@ -380,19 +390,21 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // update number of saved
     func updateSaved(action: SaveAction) {
-        let users = AppStorage.shared.users
+        guard loggedUser != item.owner else { return }
+        
         let itemID = item.id
         
-        for user in users {
-            for activeItem in user.activeItems {
-                if activeItem?.id == item?.id {
-                    let mail = user.mail.replacingOccurrences(of: ".", with: "_")
-                    reference.child(mail).child("activeItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
-                        if let views = snapshot.value as? Int {
+        DispatchQueue.global().async { [weak self] in
+            for item in AppStorage.shared.items {
+                if item.id == itemID {
+                    let mail = item.owner.replacingOccurrences(of: ".", with: "_")
+                    
+                    self?.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
+                        if let saved = snapshot.value as? Int {
                             if action == .save {
-                                self.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").setValue(views + 1)
+                                self?.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").setValue(saved + 1)
                             } else {
-                                self.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").setValue(views - 1)
+                                self?.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").setValue(saved - 1)
                             }
                         }
                     }

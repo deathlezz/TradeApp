@@ -84,6 +84,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                 AppStorage.shared.items = self?.toItemModel(dict: dict) ?? [Item]()
                 self?.loadRecentItems()
                 
+                
                 DispatchQueue.main.async {
 //                    self?.isArrayEmpty()
                     self?.collectionView.reloadData()
@@ -113,7 +114,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         cell.title.text = AppStorage.shared.filteredItems[indexPath.item].title
         cell.price.text = "£\(AppStorage.shared.filteredItems[indexPath.item].price)"
         cell.location.text = AppStorage.shared.filteredItems[indexPath.item].location
-        cell.date.text = AppStorage.shared.filteredItems[indexPath.item].date
+        cell.date.text = AppStorage.shared.filteredItems[indexPath.item].date.toString(shortened: true)
         cell.layer.borderWidth = 0.2
         cell.layer.borderColor = UIColor.lightGray.cgColor
         cell.layer.cornerRadius = 10
@@ -213,33 +214,33 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     }
     
     // load data in the background
-    func loadData() {
-        let car = UIImage(systemName: "car")?.pngData()
-        let plus = UIImage(systemName: "plus")?.pngData()
-        
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
-        
-        var items = [Item]()
-        
-        for _ in 0...3 {
-            let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date().toString(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
-            let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date().toString(), views: 2234, saved: 6, lat: 56.116524, long: -3.936903, id: itemID())
-            let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date().toString(), views: 5654, saved: 28, lat: 55.864239, long: -4.251806, id: itemID())
-            
-            AppStorage.shared.users[index].activeItems.append(tesla)
-            AppStorage.shared.users[index].activeItems.append(bmw)
-            AppStorage.shared.users[index].activeItems.append(fiat)
-            
-            items.append(tesla)
-            items.append(bmw)
-            items.append(fiat)
-        }
+//    func loadData() {
+//        let car = UIImage(systemName: "car")?.pngData()
+//        let plus = UIImage(systemName: "plus")?.pngData()
+//        
+//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
+//        
+//        var items = [Item]()
+//        
+//        for _ in 0...3 {
+//            let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
+//            let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date(), views: 2234, saved: 6, lat: 56.116524, long: -3.936903, id: itemID())
+//            let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date(), views: 5654, saved: 28, lat: 55.864239, long: -4.251806, id: itemID())
+//            
+//            AppStorage.shared.users[index].activeItems.append(tesla)
+//            AppStorage.shared.users[index].activeItems.append(bmw)
+//            AppStorage.shared.users[index].activeItems.append(fiat)
+//            
+//            items.append(tesla)
+//            items.append(bmw)
+//            items.append(fiat)
+//        }
         
 //        let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
 //
 //        reference.child("mail@wp_pl").setValue(tesla.category)
         
-    }
+//    }
     
     // sort items in the array
     @objc func sort() {
@@ -338,21 +339,21 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     }
     
     // create unique item ID
-    func itemID() -> Int {
-        var uniqueID: Int!
-        let usedIDs = AppStorage.shared.items.map {$0.id}
-        let range = 10000000...99999999
-        
-        while uniqueID == nil {
-            let random = range.randomElement()
-            
-            if !usedIDs.contains(random!) {
-                uniqueID = random
-                break
-            }
-        }
-        return uniqueID
-    }
+//    func itemID() -> Int {
+//        var uniqueID: Int!
+//        let usedIDs = AppStorage.shared.items.map {$0.id}
+//        let range = 10000000...99999999
+//        
+//        while uniqueID == nil {
+//            let random = range.randomElement()
+//            
+//            if !usedIDs.contains(random!) {
+//                uniqueID = random
+//                break
+//            }
+//        }
+//        return uniqueID
+//    }
     
     // check search and category filter
     func checkMainFilters() {
@@ -475,10 +476,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         AppStorage.shared.recentlyAdded.removeAll()
         
         for item in AppStorage.shared.items {
-            AppStorage.shared.recentlyAdded.append(item)
-            print(item.date.toDate())
-            if isItemRecent(item.date.toDate()) {
-                print(item.date.toDate())
+            if isItemRecent(item.date) {
+                AppStorage.shared.recentlyAdded.append(item)
             }
         }
         
@@ -542,11 +541,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         print(AppStorage.shared.users[index].chats)
     }
     
-    // send data to firebase
-//    func sendData() {
-//        reference.child("user_id").setValue("New data")
-//    }
-    
     // convert URLs into dictionary Data
     func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
         var images = [String: Data]()
@@ -560,7 +554,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                 }
 
                 guard images.keys.count == links.count else { return }
-                print("converted images")
                 completion(images)
             }
 
@@ -591,8 +584,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                         self?.convertImages(urls: fixedUrls) { images in
                             items[key]?["photos"] = images
                             items[key]?["date"] = date
-                            
-                            print("converted urls")
+
                             completion(items)
                         }
                     }
@@ -603,6 +595,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // convert dictionary to [Item] model
     func toItemModel(dict: [String: [String: Any]]) -> [Item] {
+        let owner = mail.replacingOccurrences(of: ".", with: "_")
         var result = [Item]()
         
         for item in dict {
@@ -622,12 +615,10 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             let long = item.value["long"] as? Double
             let id = item.value["id"] as? Int
             
-            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!, views: views!, saved: saved!, lat: lat!, long: long!, id: id!)
+            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner)
             
             result.append(model)
         }
-        
-        print("converted to item model")
         
         return result
     }
