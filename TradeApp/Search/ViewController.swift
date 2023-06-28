@@ -547,6 +547,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     // download all active items from firebase & convert images urls to data array
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
         var items = [String: [String: Any]]()
+        var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.observeSingleEvent(of: .value) { snapshot in
@@ -559,34 +560,32 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                             items["\(item.key)"] = item.value
                             
                             let photos = item.value["photos"] as! [String: String]
-                            let date = item.value["date"] as! String
+//                            let date = item.value["date"] as! String
                             
                             let fixedUrls = photos.values.sorted(by: <).map {String($0)}
                             
                             self?.convertImages(urls: fixedUrls) { images in
                                 items[item.key]?["photos"] = images
-                                items[item.key]?["date"] = date
+//                                items[item.key]?["date"] = date
                                 
+                                if let _ = items[item.key]?["photos"] as? [String: Data] {
+                                    adsReady += 1
+                                }
                                 
-//                                guard let newPhotos = items[item.key]?["photos"] as? [String: Data] else { return }
-//                                print(newPhotos)
+                                guard adsReady == items.count else { return }
                                 completion(items)
                             }
                         }
-                        
                     }
                 }
             }
         }
-        
     }
     
     // convert dictionary to [Item] model
     func toItemModel(dict: [String: [String: Any]]) -> [Item] {
         let owner = mail.replacingOccurrences(of: ".", with: "_")
         var result = [Item]()
-        
-        print(dict)
         
         for item in dict {
             let dictPhotos = item.value["photos"] as! [String: Data]

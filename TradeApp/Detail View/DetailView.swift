@@ -390,7 +390,8 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // update number of saved
     func updateSaved(action: SaveAction) {
-        guard loggedUser != item.owner else { return }
+        let owner = item.owner.replacingOccurrences(of: "_", with: ".")
+        guard loggedUser != owner else { return }
         
         let itemID = item.id
         
