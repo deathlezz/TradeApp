@@ -399,8 +399,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 sender.isUserInteractionEnabled = true
                                 self?.showAlert(.success)
                             }
-                            
-                            
                         }
                     }
                     
@@ -566,19 +564,29 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // create unique item ID
     func createItemID(completion: @escaping (Int) -> Void) {
+        var usedIDs = [Int]()
         var uniqueID: Int!
         let range = 10000000...99999999
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.observeSingleEvent(of: .value) { snapshot, arg  in
-                if let data = snapshot.value as? [String: Int] {
-                    let usedIDs = data.values.map {$0}
+            self?.reference.observeSingleEvent(of: .value) { snapshot in
+                
+                if let data = snapshot.value as? [String: [String: Any]] {
+                    for user in data {
+                        let fixedMail = user.key.replacingOccurrences(of: ".", with: "_")
+                        let activeItems = data[fixedMail]?["activeItems"] as! [String: [String: Any]]
+                        
+                        for item in activeItems {
+                            usedIDs.append(Int(item.key)!)
+                        }
+                    }
                     
                     while uniqueID == nil {
                         let random = range.randomElement()
-                        
+
                         if !usedIDs.contains(random!) {
                             uniqueID = random
+                            print(uniqueID!)
                             completion(uniqueID)
                             break
                         }

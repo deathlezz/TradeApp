@@ -338,23 +338,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         return viewController != tabBarController.selectedViewController
     }
     
-    // create unique item ID
-//    func itemID() -> Int {
-//        var uniqueID: Int!
-//        let usedIDs = AppStorage.shared.items.map {$0.id}
-//        let range = 10000000...99999999
-//        
-//        while uniqueID == nil {
-//            let random = range.randomElement()
-//            
-//            if !usedIDs.contains(random!) {
-//                uniqueID = random
-//                break
-//            }
-//        }
-//        return uniqueID
-//    }
-    
     // check search and category filter
     func checkMainFilters() {
         if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
@@ -565,38 +548,45 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
         var items = [String: [String: Any]]()
         
-        reference.observeSingleEvent(of: .value) { [weak self] snapshot in
-            if let data = snapshot.value as? [String: [String: Any]] {
-                for user in data {
-                    let fixedMail = user.key.replacingOccurrences(of: ".", with: "_")
-                    let activeItems = data[fixedMail]?["activeItems"] as! [String: [String: Any]]
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.observeSingleEvent(of: .value) { snapshot in
+                if let data = snapshot.value as? [String: [String: Any]] {
                     
-                    for item in activeItems {
-                        items["\(item.key)"] = item.value
-                    }
-                    
-                    for (key, value) in items {
-                        let photos = value["photos"] as! [String: String]
-                        let date = value["date"] as! String
+                    for user in data {
+                        let activeItems = data[user.key]?["activeItems"] as! [String: [String: Any]]
                         
-                        let fixedUrls = photos.values.sorted(by: <).map {String($0)}
-                        
-                        self?.convertImages(urls: fixedUrls) { images in
-                            items[key]?["photos"] = images
-                            items[key]?["date"] = date
-
-                            completion(items)
+                        for item in activeItems {
+                            items["\(item.key)"] = item.value
+                            
+                            let photos = item.value["photos"] as! [String: String]
+                            let date = item.value["date"] as! String
+                            
+                            let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+                            
+                            self?.convertImages(urls: fixedUrls) { images in
+                                items[item.key]?["photos"] = images
+                                items[item.key]?["date"] = date
+                                
+                                
+//                                guard let newPhotos = items[item.key]?["photos"] as? [String: Data] else { return }
+//                                print(newPhotos)
+                                completion(items)
+                            }
                         }
+                        
                     }
                 }
             }
         }
+        
     }
     
     // convert dictionary to [Item] model
     func toItemModel(dict: [String: [String: Any]]) -> [Item] {
         let owner = mail.replacingOccurrences(of: ".", with: "_")
         var result = [Item]()
+        
+        print(dict)
         
         for item in dict {
             let dictPhotos = item.value["photos"] as! [String: Data]
