@@ -7,16 +7,19 @@
 
 import UIKit
 import Network
+import Firebase
 
 class SavedView: UICollectionViewController {
     
     var savedItems = [Item]()
+    var loggedUser: String!
     
     let monitor = NWPathMonitor()
     var isPushed = false
     var isDetailShown = false
     
     var emptyArrayView: UIView!
+    var reference: DatabaseReference!
     
     var selectButton: UIBarButtonItem!
     var cancelButton: UIBarButtonItem!
@@ -45,6 +48,10 @@ class SavedView: UICollectionViewController {
         refreshControl.tintColor = .lightGray
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
+        
+        loggedUser = Utilities.loadUser()
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // number of sections
@@ -241,6 +248,7 @@ class SavedView: UICollectionViewController {
             }) { finished in
                 self.selectedCells.removeAll()
                 Utilities.removeItems(self.selectedItems)
+                self.removeFromSaved()
                 self.updateHeader()
                 self.isArrayEmpty()
             }
@@ -367,6 +375,22 @@ class SavedView: UICollectionViewController {
             emptyArrayView.isHidden = true
         } else {
             emptyArrayView.isHidden = false
+        }
+    }
+    
+    // update number of saved in Firebase
+    func removeFromSaved() {
+        for item in selectedItems {
+            let owner = item.owner.replacingOccurrences(of: "_", with: ".")
+            guard loggedUser != owner else { return }
+            
+            DispatchQueue.global().async { [weak self] in
+                self?.reference.child(item.owner).child("activeItems").child("\(item.id)").child("saved").observeSingleEvent(of: .value) { snapshot in
+                    if let saved = snapshot.value as? Int {
+                        self?.reference.child(item.owner).child("activeItems").child("\(item.id)").child("saved").setValue(saved - 1)
+                    }
+                }
+            }
         }
     }
     

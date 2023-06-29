@@ -217,7 +217,7 @@ class AccountView: UITableViewController {
     // push vc to ChangeEmailView
     func pushToChangeEmailView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeEmailView") as? ChangeEmailView {
-            vc.mail = loggedUser
+            vc.loggedUser = loggedUser
             vc.hidesBottomBarWhenPushed = true
             willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)

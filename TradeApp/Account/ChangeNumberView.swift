@@ -40,13 +40,7 @@ class ChangeNumberView: UITableViewController {
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
-        DispatchQueue.global().async { [weak self] in
-            self?.loadCurrentNumber()
-            
-            DispatchQueue.main.async {
-                self?.setCurrentNumber()
-            }
-        }
+        loadCurrentNumber()
     }
     
     // set number of sections
@@ -182,8 +176,19 @@ class ChangeNumberView: UITableViewController {
     
     // load user's current phone number
     func loadCurrentNumber() {
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        currentNumber = AppStorage.shared.users[index].phoneNumber
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(fixedMail).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
+                if let number = snapshot.value as? String {
+                    self?.currentNumber = Int(number)
+                    
+                    DispatchQueue.main.async {
+                        self?.updateRows()
+                    }
+                }
+            }
+        }
     }
     
     // update table view rows

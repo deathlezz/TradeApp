@@ -56,9 +56,9 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
         
-        setToolbar()
         loggedUser = Utilities.loadUser()
         savedItems = Utilities.loadItems()
+        setToolbar()
         loadPhoneNumber()
         isSaved()
         increaseViews()
@@ -349,7 +349,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // load item's phone number
     func loadPhoneNumber() {
-        let mail = item.owner.replacingOccurrences(of: ".", with: "_")
+        let mail = item.owner
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(mail).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
@@ -370,11 +370,10 @@ class DetailView: UITableViewController, Index, Coordinates {
         DispatchQueue.global().async { [weak self] in
             for item in AppStorage.shared.items {
                 if item.id == itemID {
-                    let mail = item.owner.replacingOccurrences(of: ".", with: "_")
                     
-                    self?.reference.child(mail).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
+                    self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
                         if let views = snapshot.value as? Int {
-                            self?.reference.child(mail).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
+                            self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
                             self?.views = views + 1
                             
                             DispatchQueue.main.async {
@@ -398,14 +397,13 @@ class DetailView: UITableViewController, Index, Coordinates {
         DispatchQueue.global().async { [weak self] in
             for item in AppStorage.shared.items {
                 if item.id == itemID {
-                    let mail = item.owner.replacingOccurrences(of: ".", with: "_")
                     
-                    self?.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
+                    self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
                         if let saved = snapshot.value as? Int {
                             if action == .save {
-                                self?.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").setValue(saved + 1)
+                                self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("saved").setValue(saved + 1)
                             } else {
-                                self?.reference.child(mail).child("activeItems").child("\(itemID)").child("saved").setValue(saved - 1)
+                                self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("saved").setValue(saved - 1)
                             }
                         }
                     }

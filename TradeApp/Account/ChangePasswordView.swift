@@ -132,34 +132,46 @@ class ChangePasswordView: UITableViewController {
         guard let newPassword = cells[1].textField.text else { return }
         guard let repeatPassword = cells[2].textField.text else { return }
         
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
         
-        guard currentPassword == AppStorage.shared.users[index].password else {
-            for cell in cells {
-                cell.textField.text = nil
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(fixedMail).child("password").observeSingleEvent(of: .value) { snapshot,<#arg#>  in
+                if let pass = snapshot.value as? String {
+                    
+                    DispatchQueue.main.async {
+                        guard currentPassword == pass else {
+                            for cell in self!.cells {
+                                cell.textField.text = nil
+                            }
+                            return self?.showAlert(title: "Error", message: "Wrong current password")
+                        }
+                        
+                        guard newPassword != currentPassword else {
+                            self?.cells[1].textField.text = nil
+                            self?.cells[2].textField.text = nil
+                            return self?.showAlert(title: "Error", message: "New password can't be the same as the old one")
+                        }
+                        
+                        guard self.isPasswordValid() else {
+                            self.cells[1].textField.text = nil
+                            self.cells[2].textField.text = nil
+                            return self.showAlert(title: "Error", message: "Wrong new password format")
+                        }
+                        
+                        guard repeatPassword == newPassword else {
+                            self.cells[2].textField.text = nil
+                            return self.showAlert(title: "Error", message: "Password repeated incorrectly")
+                        }
+                    }
+                    
+                    
+                    self.changePassword(to: newPassword)
+                    self.savePassword(password: newPassword)
+                    
+                }
             }
-            return showAlert(title: "Error", message: "Wrong current password")
         }
         
-        guard newPassword != currentPassword else {
-            cells[1].textField.text = nil
-            cells[2].textField.text = nil
-            return showAlert(title: "Error", message: "New password can't be the same as the old one")
-        }
-        
-        guard isPasswordValid() else {
-            cells[1].textField.text = nil
-            cells[2].textField.text = nil
-            return showAlert(title: "Error", message: "Wrong new password format")
-        }
-        
-        guard repeatPassword == newPassword else {
-            cells[2].textField.text = nil
-            return showAlert(title: "Error", message: "Password repeated incorrectly")
-        }
-        
-        changePassword(to: newPassword)
-        savePassword(password: newPassword)
     }
     
     // set password change function

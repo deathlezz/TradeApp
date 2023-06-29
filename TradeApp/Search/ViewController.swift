@@ -560,13 +560,11 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                             items["\(item.key)"] = item.value
                             
                             let photos = item.value["photos"] as! [String: String]
-//                            let date = item.value["date"] as! String
                             
                             let fixedUrls = photos.values.sorted(by: <).map {String($0)}
                             
                             self?.convertImages(urls: fixedUrls) { images in
                                 items[item.key]?["photos"] = images
-//                                items[item.key]?["date"] = date
                                 
                                 if let _ = items[item.key]?["photos"] as? [String: Data] {
                                     adsReady += 1
@@ -584,7 +582,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // convert dictionary to [Item] model
     func toItemModel(dict: [String: [String: Any]]) -> [Item] {
-        let owner = mail.replacingOccurrences(of: ".", with: "_")
+//        let owner = mail.replacingOccurrences(of: ".", with: "_")
         var result = [Item]()
         
         for item in dict {
@@ -603,8 +601,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             let lat = item.value["lat"] as? Double
             let long = item.value["long"] as? Double
             let id = item.value["id"] as? Int
+            let owner = item.value["owner"] as? String
             
-            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner)
+            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
             
             result.append(model)
         }

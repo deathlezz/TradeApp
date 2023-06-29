@@ -303,21 +303,27 @@ class ActiveAdsView: UITableViewController {
     func getActiveAds(completion: @escaping ([String: [String: Any]]) -> Void) {
         var fixedItems = [String: [String: Any]]()
         let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        var adsReady = 0
         
-        reference.child(fixedMail).child("activeItems").observeSingleEvent(of: .value) { [weak self] snapshot in
-            if let data = snapshot.value as? [String: [String: Any]] {
-                fixedItems = data
-                for (key, value) in data {
-                    let photos = value["photos"] as! [String: String]
-                    let date = value["date"] as! String
-                    
-                    let fixedUrls = photos.values.sorted(by: <).map {String($0)}
-                    
-                    self?.convertImages(urls: fixedUrls) { images in
-                        fixedItems[key]?["photos"] = images
-                        fixedItems[key]?["date"] = date
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(fixedMail).child("activeItems").observeSingleEvent(of: .value) { snapshot in
+                if let data = snapshot.value as? [String: [String: Any]] {
+                    fixedItems = data
+                    for (key, value) in data {
+                        let photos = value["photos"] as! [String: String]
                         
-                        completion(fixedItems)
+                        let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+                        
+                        self?.convertImages(urls: fixedUrls) { images in
+                            fixedItems[key]?["photos"] = images
+                            
+                            if let _ = fixedItems[key]?["photos"] as? [String: Data] {
+                                adsReady += 1
+                            }
+                            
+                            guard adsReady == fixedItems.count else { return }
+                            completion(fixedItems)
+                        }
                     }
                 }
             }
@@ -326,7 +332,7 @@ class ActiveAdsView: UITableViewController {
     
     // convert dictionary to [Item] model
     func toItemModel(dict: [String: [String: Any]]) -> [Item] {
-        let owner = mail.replacingOccurrences(of: ".", with: "_")
+//        let owner = mail.replacingOccurrences(of: ".", with: "_")
         var result = [Item]()
         
         for item in dict {
@@ -345,8 +351,9 @@ class ActiveAdsView: UITableViewController {
             let lat = item.value["lat"] as? Double
             let long = item.value["long"] as? Double
             let id = item.value["id"] as? Int
+            let owner = item.value["owner"] as? String
             
-            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner)
+            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
             
             result.append(model)
         }
