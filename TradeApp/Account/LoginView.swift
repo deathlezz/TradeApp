@@ -348,7 +348,7 @@ class LoginView: UITableViewController {
         let newUser = User(mail: mail, password: password)
         let userMail = mail.replacingOccurrences(of: ".", with: "_")
         
-        AppStorage.shared.users.append(newUser)
+//        AppStorage.shared.users.append(newUser)
         reference.child(userMail).setValue(newUser.toAnyObject())
     }
     

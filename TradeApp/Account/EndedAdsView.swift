@@ -202,16 +202,10 @@ class EndedAdsView: UITableViewController {
     
     // activate the ad
     func activateAd(_ sender: UIButton) {
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         guard let itemIndex = endedAds.firstIndex(where: {$0.id == sender.tag}) else { return }
         
-        endedAds[itemIndex].date = Date()
-        AppStorage.shared.users[index].activeItems.append(endedAds[itemIndex])
-        AppStorage.shared.items.append(endedAds[itemIndex])
-        
-        moveItem(itemID: sender.tag)
-
-        AppStorage.shared.users[index].endedItems.removeAll(where: {$0?.id == sender.tag})
+        let date = Date().toString(shortened: false)
+        moveItem(itemID: sender.tag, date: date)
         endedAds.remove(at: itemIndex)
         
         let indexPath = IndexPath(row: itemIndex, section: 0)
@@ -246,13 +240,14 @@ class EndedAdsView: UITableViewController {
     }
     
     // move item from endedItems to activeItems folder in Firebase
-    func moveItem(itemID: Int) {
+    func moveItem(itemID: Int, date: String) {
         let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
                 if let value = snapshot.value as? [String: Any] {
                     self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").setValue(value)
+                    self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").child("date").setValue(date)
                     self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").removeValue()
                 }
             }

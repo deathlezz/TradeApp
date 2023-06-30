@@ -132,63 +132,61 @@ class ChangePasswordView: UITableViewController {
         guard let newPassword = cells[1].textField.text else { return }
         guard let repeatPassword = cells[2].textField.text else { return }
         
+        guard !currentPassword.isEmpty && !newPassword.isEmpty && !repeatPassword.isEmpty else {
+            return showAlert(title: "Empty field", message: "All text fields have to be filled")
+        }
+        
+        guard isPasswordValid() else {
+            return showAlert(title: "Error", message: "Incorrect password format")
+        }
+        
+        guard newPassword != currentPassword else {
+            cells[1].textField.text = nil
+            cells[2].textField.text = nil
+            return showAlert(title: "Error", message: "New password can't be the same as the old one")
+        }
+        
+        guard repeatPassword == newPassword else {
+            cells[2].textField.text = nil
+            return showAlert(title: "Error", message: "Password repeated incorrectly")
+        }
+        
         let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).child("password").observeSingleEvent(of: .value) { snapshot,<#arg#>  in
+            self?.reference.child(fixedMail).child("password").observeSingleEvent(of: .value) { snapshot in
                 if let pass = snapshot.value as? String {
                     
                     DispatchQueue.main.async {
                         guard currentPassword == pass else {
-                            for cell in self!.cells {
+                            for cell in (self?.cells)! {
                                 cell.textField.text = nil
                             }
-                            return self?.showAlert(title: "Error", message: "Wrong current password")
+                            return self?.showAlert(title: "Error", message: "Wrong current password") ?? ()
                         }
                         
-                        guard newPassword != currentPassword else {
-                            self?.cells[1].textField.text = nil
-                            self?.cells[2].textField.text = nil
-                            return self?.showAlert(title: "Error", message: "New password can't be the same as the old one")
-                        }
-                        
-                        guard self.isPasswordValid() else {
-                            self.cells[1].textField.text = nil
-                            self.cells[2].textField.text = nil
-                            return self.showAlert(title: "Error", message: "Wrong new password format")
-                        }
-                        
-                        guard repeatPassword == newPassword else {
-                            self.cells[2].textField.text = nil
-                            return self.showAlert(title: "Error", message: "Password repeated incorrectly")
+                        DispatchQueue.global().async {
+                            self?.changePassword(to: newPassword)
                         }
                     }
-                    
-                    
-                    self.changePassword(to: newPassword)
-                    self.savePassword(password: newPassword)
-                    
                 }
             }
         }
-        
     }
     
     // set password change function
     func changePassword(to: String) {
-        guard let mail = mail else { return }
-        guard let password = cells[1].textField.text else { return }
-        
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-        
-        AppStorage.shared.users[index].password = password
+        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        reference.child(fixedMail).child("password").setValue(to)
         Utilities.setUser(nil)
         
-        let ac = UIAlertController(title: "Password has been changed", message: "You can sign in now", preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            self?.navigationController?.popToRootViewController(animated: true)
-        })
-        present(ac, animated: true)
+        DispatchQueue.main.async { [weak self] in
+            let ac = UIAlertController(title: "Password has been changed", message: "You can sign in now", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+                self?.navigationController?.popToRootViewController(animated: true)
+            })
+            self?.present(ac, animated: true)
+        }
         
     }
     
@@ -198,12 +196,6 @@ class ChangePasswordView: UITableViewController {
         let passRegEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$"
         let passPred = NSPredicate(format:"SELF MATCHES %@", passRegEx)
         return passPred.evaluate(with: cells[1].textField.text)
-    }
-    
-    // save password to Firebase Database
-    func savePassword(password: String) {
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
-        reference.child(fixedMail).child("password").setValue(password)
     }
 
 }
