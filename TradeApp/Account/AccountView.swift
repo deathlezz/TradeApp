@@ -165,7 +165,6 @@ class AccountView: UITableViewController {
             
             // remove user from database
             guard let fixedMail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
-            self?.reference.child(fixedMail).removeValue()
             self?.deleteUser(user: fixedMail)
             self?.showAlert(title: "Success", message: "Your account has been deleted")
         })
@@ -253,26 +252,52 @@ class AccountView: UITableViewController {
     
     // delete user images from Firebase Storage
     func deleteUser(user: String) {
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
-        let activeItems = AppStorage.shared.users[index].activeItems
-        let endedItems = AppStorage.shared.users[index].endedItems
-        let items = activeItems + endedItems
+//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
+//        let activeItems = AppStorage.shared.users[index].activeItems
+//        let endedItems = AppStorage.shared.users[index].endedItems
+//        let items = activeItems + endedItems
         
-        for item in items {
-            guard let photosCount = item?.photos.count else { return }
-            guard let itemID = item?.id else { return }
-            for i in 0..<photosCount {
-                let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(i)")
-                storageRef.delete(completion: nil)
+        print("before ref")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(user).observeSingleEvent(of: .value) { snapshot in
+                print("after ref")
+                print(snapshot.value)
+                if let data = snapshot.value as? [String: [String: Any]] {
+                    print("after data")
+                    let active = data["activeItems"] as! [String: [String: Any]]
+                    let ended = data["endedItems"] as! [String: [String: Any]]
+                    let items = [active, ended]
+                    
+                    for item in items {
+                        print(item["photos"]?.count)
+                        print(item["id"]?.values)
+                        guard let photosCount = item["photos"]?.count else { return }
+                        guard let itemID = item["id"]?.values as? String else { return }
+                        
+                        
+                        
+                        for i in 0..<photosCount {
+                            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child(itemID).child("image\(i)")
+                            storageRef.delete(completion: nil)
+                        }
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self?.reference.child(user).removeValue()
+                        Utilities.setUser(nil)
+                    }
+
+                }
             }
         }
         
         // remove all user's items from the app
-        AppStorage.shared.items = AppStorage.shared.items.filter { item in !items.contains(where: { $0?.id == item.id }) }
-        AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter { item in !items.contains(where: { $0?.id == item.id }) }
+//        AppStorage.shared.items = AppStorage.shared.items.filter { item in !active(where: { $0?.id == item.id }) }
+//        AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter { item in !items.contains(where: { $0?.id == item.id }) }
         
-        AppStorage.shared.users.remove(at: index)
-        Utilities.setUser(nil)
+//        AppStorage.shared.users.remove(at: index)
+        
     }
     
     // download user's ads amount
@@ -299,8 +324,6 @@ class AccountView: UITableViewController {
                 }
             }
         }
-        
-        
     }
     
 }

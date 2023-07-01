@@ -136,7 +136,6 @@ class ChangeEmailView: UITableViewController {
             return showAlert(title: "Error", message: "Incorrect new email format")
         }
         
-//        changeEmail(to: newMailText)
         saveEmail(email: newMailText)
     }
     
@@ -146,21 +145,6 @@ class ChangeEmailView: UITableViewController {
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
     }
-    
-    // set email change function
-//    func changeEmail(to: String) {
-////        guard let mail = loggedUser else { return }
-////        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
-//
-////        AppStorage.shared.users[index].mail = newEmail.textField.text!
-//        Utilities.setUser(nil)
-//
-//        let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)
-//        ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-//            self?.navigationController?.popToRootViewController(animated: true)
-//        })
-//        present(ac, animated: true)
-//    }
     
     // save mail to Firebase Database
     func saveEmail(email: String) {
