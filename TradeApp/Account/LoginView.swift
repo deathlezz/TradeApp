@@ -163,50 +163,60 @@ class LoginView: UITableViewController {
     @objc func submitTapped() {
         guard let mail = email.textField.text else { return }
         guard let passText = password.textField.text else { return }
-                
-        if segment.segment.selectedSegmentIndex == 0 {
-            if let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) {
-                
-                guard AppStorage.shared.users[index].password == passText else {
-                    password.textField.text = nil
-                    return showAlert(title: "Error", message: "Wrong password")
+        
+        guard !mail.isEmpty && !passText.isEmpty else {
+            return showAlert(title: "Error", message: "Empty text field")
+        }
+        
+        DispatchQueue.global().async { [weak self] in
+            let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+            
+            self?.reference.child(fixedMail).observeSingleEvent(of: .value) { snapshot in
+                DispatchQueue.main.async {
+                    // user exists
+                    if let value = snapshot.value as? [String: Any] {
+                        if self?.segment.segment.selectedSegmentIndex == 0 {
+                            let pass = value["password"] as? String
+                            
+                            guard passText == pass else {
+                                return self?.showAlert(title: "Error", message: "Wrong password") ?? ()
+                            }
+                            
+                            self?.resetView(.login)
+                            Utilities.setUser(mail)
+                            self?.loggedUser = mail
+                            self?.loginPush(after: .signIn)
+                            
+                        } else {
+                            self?.showAlert(title: "Error", message: "This email is already used")
+                        }
+                        
+                    // user doesn't exist
+                    } else {
+                        if self?.segment.segment.selectedSegmentIndex == 0 {
+                            self?.showAlert(title: "Error", message: "You have to sign up first")
+                        } else {
+                            let rePassText = self?.repeatPassword.textField.text
+                            
+                            guard self?.isEmailValid() ?? Bool() else {
+                                return self?.showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*") ?? ()
+                            }
+                            
+                            guard self?.isPasswordValid() ?? Bool() else {
+                                self?.password.textField.text = nil
+                                self?.repeatPassword.textField.text = nil
+                                return self?.showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*") ?? ()
+                            }
+                            
+                            guard passText == rePassText else {
+                                self?.repeatPassword.textField.text = nil
+                                return self?.showAlert(title: "Error", message: "Password repeated incorrectly") ?? ()
+                            }
+                            
+                            self?.createUser(mail: mail, password: passText)
+                        }
+                    }
                 }
-                
-                resetView(.login)
-                Utilities.setUser(mail)
-                loggedUser = mail
-                loginPush(after: .signIn)
-                
-            } else {
-                showAlert(title: "Error", message: "Wrong email address")
-            }
-            
-        } else {
-            let rePassText = repeatPassword.textField.text
-            
-            guard isEmailValid() else {
-                return showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*")
-            }
-            
-            guard isPasswordValid() else {
-                password.textField.text = nil
-                repeatPassword.textField.text = nil
-                return showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*")
-            }
-            
-            guard passText == rePassText else {
-                repeatPassword.textField.text = nil
-                return showAlert(title: "Password repeated incorrectly", message: "Re-enter password again")
-            }
-            
-            // user already exist alert
-            if let _ = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) {
-                showAlert(title: "Error", message: "This email is already used")
-                
-            } else {
-                // new user account created
-                createUser(mail: mail, password: passText)
-                accountCreatedAlert()
             }
         }
     }
@@ -345,11 +355,16 @@ class LoginView: UITableViewController {
     
     // save user to Firebase database
     func createUser(mail: String, password: String) {
-        let newUser = User(mail: mail, password: password)
         let userMail = mail.replacingOccurrences(of: ".", with: "_")
         
-//        AppStorage.shared.users.append(newUser)
-        reference.child(userMail).setValue(newUser.toAnyObject())
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(userMail).child("password").setValue(password)
+            
+            DispatchQueue.main.async {
+                self?.accountCreatedAlert()
+            }
+        }
+        
     }
     
 }

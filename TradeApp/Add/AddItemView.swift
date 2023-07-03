@@ -343,20 +343,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         guard let location = textFieldCells[3].textField.text?.capitalized else { return }
         guard let description = textViewCell?.textView.text else { return }
         
-        Utilities.isCityValid(location) { [weak self] valid in
-            if !photos.isEmpty && !title.isEmpty && !price.isEmpty && !category.isEmpty && !location.isEmpty && !description.isEmpty {
-                
+        if !photos.isEmpty && !title.isEmpty && !price.isEmpty && !category.isEmpty && !location.isEmpty && !description.isEmpty {
+            Utilities.isCityValid(location) { [weak self] valid in
                 if valid {
                     Utilities.forwardGeocoding(address: location) { (lat, long) in
-                        
                         if self?.isEditMode != nil {
-                            guard let userIndex = AppStorage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
-                            
                             // edit active item
                             if self?.isAdActive == true {
-                                guard let itemIndex = AppStorage.shared.users[userIndex].activeItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
                                 let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: owner)
-                                AppStorage.shared.users[userIndex].activeItems[itemIndex] = newItem
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
                                     guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
@@ -368,10 +362,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 self?.showAlert(.edit)
                                 
                             } else {
-                                // edit ended item
-                                guard let itemIndex = AppStorage.shared.users[userIndex].endedItems.firstIndex(where: {$0?.id == self?.item?.id}) else { return }
                                 let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: owner)
-                                AppStorage.shared.users[userIndex].endedItems[itemIndex] = newItem
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
                                     guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
@@ -384,11 +375,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             }
                             
                         } else {
-                            guard let userIndex = AppStorage.shared.users.firstIndex(where: {$0.mail == self?.loggedUser}) else { return }
-                            
                             self?.createItemID() { id in
                                 let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: owner)
-                                AppStorage.shared.users[userIndex].activeItems.append(newItem)
                                 AppStorage.shared.items.append(newItem)
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
@@ -406,11 +394,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                     sender.isUserInteractionEnabled = true
                     self?.showAlert(.cityError)
                 }
-                
-            } else {
-                sender.isUserInteractionEnabled = true
-                self?.showAlert(.emptyField)
             }
+            
+        } else {
+            sender.isUserInteractionEnabled = true
+            showAlert(.emptyField)
         }
     }
     
@@ -574,11 +562,17 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 if let data = snapshot.value as? [String: [String: Any]] {
                     for user in data {
                         let fixedMail = user.key.replacingOccurrences(of: ".", with: "_")
-                        let activeItems = data[fixedMail]?["activeItems"] as! [String: [String: Any]]
+                        let activeItems = data[fixedMail]?["activeItems"] as? [String: [String: Any]] ?? [:]
                         
                         for item in activeItems {
                             usedIDs.append(Int(item.key)!)
                         }
+                    }
+                    
+                    guard !usedIDs.isEmpty else {
+                        let random = range.randomElement()
+                        completion(Int(random!))
+                        return
                     }
                     
                     while uniqueID == nil {
@@ -586,7 +580,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
 
                         if !usedIDs.contains(random!) {
                             uniqueID = random
-                            print(uniqueID!)
                             completion(uniqueID)
                             break
                         }

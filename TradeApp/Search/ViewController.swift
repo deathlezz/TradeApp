@@ -72,18 +72,13 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         DispatchQueue.global().async { [weak self] in
             self?.resetFilters()
-            let newUser = User(mail: "mail@wp.pl", password: "passWord123", phoneNumber: 998978778)
-            AppStorage.shared.users.append(newUser)
-            self?.loadChats()
+//            self?.loadChats()
             self?.mail = Utilities.loadUser()
             self?.currentUnit = Utilities.loadDistanceUnit()
-//            self?.loadData()
-//            self?.loadItems()
             
             self?.getData() { dict in
                 AppStorage.shared.items = self?.toItemModel(dict: dict) ?? [Item]()
                 self?.loadRecentItems()
-                
                 
                 DispatchQueue.main.async {
 //                    self?.isArrayEmpty()
@@ -196,10 +191,23 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
         refreshControl.beginRefreshing()
-//        loadItems()
-        applyFilters()
-        loadRecentItems()
-        refreshControl.endRefreshing()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.getData() { dict in
+                AppStorage.shared.items = self?.toItemModel(dict: dict) ?? [Item]()
+
+                DispatchQueue.main.async {
+                    if self?.currentFilters.isEmpty ?? Bool() {
+                        self?.loadRecentItems()
+                    } else {
+                        self?.applyFilters()
+                    }
+                    
+                    self?.collectionView.reloadData()
+                    refreshControl.endRefreshing()
+                }
+            }
+        }
     }
     
     // show or hide filter and sort buttons
@@ -212,35 +220,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             sortButton.isHidden = true
         }
     }
-    
-    // load data in the background
-//    func loadData() {
-//        let car = UIImage(systemName: "car")?.pngData()
-//        let plus = UIImage(systemName: "plus")?.pngData()
-//        
-//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
-//        
-//        var items = [Item]()
-//        
-//        for _ in 0...3 {
-//            let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
-//            let bmw = Item(photos: [car, plus], title: "BMW E36 2.0 LPG", price: 500, category: "Vehicles", location: "Stirling", description: "E36 for sale", date: Date(), views: 2234, saved: 6, lat: 56.116524, long: -3.936903, id: itemID())
-//            let fiat = Item(photos: [car, plus], title: "Fiat Punto 1.9 TDI", price: 1200, category: "Vehicles", location: "Glasgow", description: "Punto for sale", date: Date(), views: 5654, saved: 28, lat: 55.864239, long: -4.251806, id: itemID())
-//            
-//            AppStorage.shared.users[index].activeItems.append(tesla)
-//            AppStorage.shared.users[index].activeItems.append(bmw)
-//            AppStorage.shared.users[index].activeItems.append(fiat)
-//            
-//            items.append(tesla)
-//            items.append(bmw)
-//            items.append(fiat)
-//        }
-        
-//        let tesla = Item(photos: [car, plus], title: "Tesla Model X", price: 6000, category: "Vehicles", location: "London", description: "Tesla for sale", date: Date(), views: 111, saved: 2, lat: 51.50334660, long: -0.07939650, id: itemID())
-//
-//        reference.child("mail@wp_pl").setValue(tesla.category)
-        
-//    }
     
     // sort items in the array
     @objc func sort() {
@@ -308,18 +287,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             tabBar.isHidden = hidden
         })
     }
-    
-    // load all active items
-//    func loadItems() {
-//        AppStorage.shared.items.removeAll()
-//        let users = AppStorage.shared.users
-//
-//        for user in users {
-//            for item in user.activeItems {
-//                AppStorage.shared.items.append(item!)
-//            }
-//        }
-//    }
     
     // apply all filters
     func applyFilters() {
@@ -501,28 +468,28 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     }
     
     // fetch user chats from server
-    func loadChats() {
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
-        
-        let currentUser = Sender(senderId: "self", displayName: "dzz")
-        let otherUser = Sender(senderId: "other", displayName: "john smith")
-        
-        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"] = []
-        
-        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
-
-        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
-
-        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "2", sentDate: Date().addingTimeInterval(-60000), kind: .text("Here is a long reply. Here is a long reply. Here is a long reply.")))
-
-        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "3", sentDate: Date().addingTimeInterval(-50000), kind: .text("Look it works")))
-
-        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "4", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
-
-        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
-        
-        print(AppStorage.shared.users[index].chats)
-    }
+//    func loadChats() {
+//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
+//
+//        let currentUser = Sender(senderId: "self", displayName: "dzz")
+//        let otherUser = Sender(senderId: "other", displayName: "john smith")
+//
+//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"] = []
+//
+//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
+//
+//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
+//
+//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "2", sentDate: Date().addingTimeInterval(-60000), kind: .text("Here is a long reply. Here is a long reply. Here is a long reply.")))
+//
+//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "3", sentDate: Date().addingTimeInterval(-50000), kind: .text("Look it works")))
+//
+//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "4", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
+//
+//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
+//
+//        print(AppStorage.shared.users[index].chats)
+//    }
     
     // convert URLs into dictionary Data
     func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
@@ -554,7 +521,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                 if let data = snapshot.value as? [String: [String: Any]] {
                     
                     for user in data {
-                        let activeItems = data[user.key]?["activeItems"] as! [String: [String: Any]]
+                        guard let activeItems = data[user.key]?["activeItems"] as? [String: [String: Any]] else { return }
                         
                         for item in activeItems {
                             items["\(item.key)"] = item.value
@@ -582,7 +549,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     
     // convert dictionary to [Item] model
     func toItemModel(dict: [String: [String: Any]]) -> [Item] {
-//        let owner = mail.replacingOccurrences(of: ".", with: "_")
         var result = [Item]()
         
         for item in dict {
@@ -611,7 +577,5 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         return result
     }
     
-    
-    
-}
 
+}
