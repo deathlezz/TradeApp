@@ -24,7 +24,7 @@ struct Message: MessageType {
             "sender": sender.senderId,
             "messageId": messageId,
             "sentDate": sentDate.toString(shortened: false),
-            "kind": "\(kind)"
+            "kind": kind.getMessageText()
         ]
     }
 }

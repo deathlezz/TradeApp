@@ -9,6 +9,17 @@ import Foundation
 import UIKit
 import CoreLocation
 import CoreData
+import MessageKit
+
+// convert message kind text into string
+extension MessageKind {
+    func getMessageText() -> String {
+        if case .text(let value) = self {
+            return value
+        }
+        return ""
+    }
+}
 
 // convert date to string
 extension Date {

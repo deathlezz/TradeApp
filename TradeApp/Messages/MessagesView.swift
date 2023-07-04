@@ -7,6 +7,7 @@
 
 import UIKit
 import MessageKit
+import Firebase
 
 class MessagesView: UITableViewController {
     
@@ -14,7 +15,9 @@ class MessagesView: UITableViewController {
     
     var loggedUser: String!
     
-    var chats = [String: [MessageType]]()
+    var chats = [String: [Message]]()
+    
+    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +28,8 @@ class MessagesView: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "messageCell")
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
                 
         loadChats()
         addEmptyArrayView()
@@ -126,8 +131,38 @@ class MessagesView: UITableViewController {
     
     // load user chats
     func loadChats() {
-        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
-        chats = AppStorage.shared.users[index].chats
+        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(mail).child("chats").observeSingleEvent(of: .value) { snapshot in
+                if let conversations = snapshot.value as? [String: [String: Any]] {
+                    for (id, buyer) in conversations {
+                        
+                        guard let buyer = buyer as? [String: [String: String]] else { return }
+                        
+                        for chat in buyer {
+                            guard let messages = chat as? [String: [String: String]] else { return }
+                            
+                            for message in messages {
+                                let sender = Sender(senderId: message.value["sender"]!, displayName: "")
+                                let messageId = message.value["messageId"]!
+                                let sentDate = message.value["sentDate"]!.toDate()
+                                let kind = message.value["kind"]!
+                                
+                                let msg = Message(sender: sender, messageId: messageId, sentDate: sentDate, kind: .text(kind))
+                                
+                                self?.chats[id]?.append(msg)
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+        
+        
+//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
+//        chats = AppStorage.shared.users[index].chats
     }
 
 }
