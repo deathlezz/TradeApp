@@ -237,10 +237,15 @@ class DetailView: UITableViewController, Index, Coordinates {
         present(ac, animated: true)
     }
     
+    
+    
+    
     // set action for message button
-    @objc func messageTapped() {
-        
-        // push to Chat View or open chat as Segue
+    @objc func messageTapped(sender: Any) {
+        // present Chat View
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
+            present(vc, animated: true)
+        }
         
         print("message will be send here")
     }

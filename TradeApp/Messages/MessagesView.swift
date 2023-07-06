@@ -31,7 +31,6 @@ class MessagesView: UITableViewController {
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
                 
-        loadChats()
         addEmptyArrayView()
     }
     
@@ -84,6 +83,7 @@ class MessagesView: UITableViewController {
     // set empty array view before view appears
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        loadChats()
         isArrayEmpty()
     }
     
