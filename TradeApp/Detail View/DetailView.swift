@@ -8,13 +8,14 @@
 import UIKit
 import CoreData
 import Firebase
+import InputBarAccessoryView
 
 enum SaveAction {
     case save
     case remove
 }
 
-class DetailView: UITableViewController, Index, Coordinates {
+class DetailView: UITableViewController, Index, Coordinates, InputBarAccessoryViewDelegate {
     
     var loggedUser: String!
     
@@ -237,15 +238,15 @@ class DetailView: UITableViewController, Index, Coordinates {
         present(ac, animated: true)
     }
     
-    
-    
-    
     // set action for message button
     @objc func messageTapped(sender: Any) {
         // present Chat View
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
-            present(vc, animated: true)
-        }
+//        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
+//            vc.loggedUser = loggedUser
+//            vc.title = item.title
+//            present(vc, animated: true)
+//        }
+        
         
         print("message will be send here")
     }
@@ -415,6 +416,11 @@ class DetailView: UITableViewController, Index, Coordinates {
                 }
             }
         }
+    }
+    
+    // set action for pressed "send" button
+    func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
+        print("sent")
     }
     
 }
