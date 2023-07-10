@@ -15,11 +15,13 @@ enum SaveAction {
     case remove
 }
 
-class DetailView: UITableViewController, Index, Coordinates, InputBarAccessoryViewDelegate {
-    
+class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate {
+
     var loggedUser: String!
     
     var savedItems = [Item]()
+    
+    var messageTextField: UITextField!
     
     var actionButton: UIBarButtonItem!
     var saveButton: UIBarButtonItem!
@@ -197,6 +199,8 @@ class DetailView: UITableViewController, Index, Coordinates, InputBarAccessoryVi
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+//        addToolbarToKeyboard()
+        
         NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
         
         NotificationCenter.default.post(name: NSNotification.Name("pushLocation"), object: nil, userInfo: ["location": item.location])
@@ -239,7 +243,7 @@ class DetailView: UITableViewController, Index, Coordinates, InputBarAccessoryVi
     }
     
     // set action for message button
-    @objc func messageTapped(sender: Any) {
+    @objc func messageTapped() {
         // present Chat View
 //        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
 //            vc.loggedUser = loggedUser
@@ -247,7 +251,11 @@ class DetailView: UITableViewController, Index, Coordinates, InputBarAccessoryVi
 //            present(vc, animated: true)
 //        }
         
-        
+//        sender.becomeFirstResponder()
+        let msgTextFieldButton = UIBarButtonItem(customView: messageTextField)
+        toolbarItems = [msgTextFieldButton]
+        messageTextField.becomeFirstResponder()
+        print(messageTextField.isEditing)
         print("message will be send here")
     }
 
@@ -336,6 +344,13 @@ class DetailView: UITableViewController, Index, Coordinates, InputBarAccessoryVi
         messageFrame.layer.borderWidth = 0.2
         let messageButton = UIBarButtonItem(customView: messageFrame)
         
+        let textField = UITextField(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width - 50, height: 30))
+        textField.returnKeyType = .send
+        textField.clearButtonMode = .whileEditing
+        textField.placeholder = "Enter your message here"
+        textField.addTarget(self, action: #selector(sendMessage), for: .primaryActionTriggered)
+        messageTextField = textField
+        
         if loggedUser == nil && phone == 0 {
             // show disabled message button only
             messageButton.customView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 20, height: 50)
@@ -418,9 +433,31 @@ class DetailView: UITableViewController, Index, Coordinates, InputBarAccessoryVi
         }
     }
     
-    // set action for pressed "send" button
-    func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        print("sent")
+    // set keyboard toolbar
+    func addToolbarToKeyboard() {
+        let toolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        toolbar.barStyle = .default
+        
+        let textField = UITextField(frame: CGRect.init(x: 0, y: 0, width: toolbar.bounds.width - 50, height: 30))
+        textField.inputAccessoryView = toolbar
+        textField.returnKeyType = .send
+        textField.clearButtonMode = .whileEditing
+        textField.placeholder = "Enter your message here"
+        textField.addTarget(self, action: #selector(sendMessage), for: .primaryActionTriggered)
+        messageTextField = textField
+        view.addSubview(textField)
+        let textFieldButton = UIBarButtonItem(customView: textField)
+
+        let items = [textFieldButton]
+        toolbar.items = items
+        toolbar.sizeToFit()
+        
+        textField.inputAccessoryView = toolbar
+//        textField.removeFromSuperview()
+    }
+    
+    @objc func sendMessage() {
+        print(messageTextField.text)
     }
     
 }
