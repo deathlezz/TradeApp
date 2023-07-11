@@ -188,6 +188,8 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
     
     // set action for action button
     @objc func shareTapped() {
+        messageTextField.resignFirstResponder()
+        
         let title = item.title
         
         let vc = UIActivityViewController(activityItems: [title], applicationActivities: [])
@@ -198,8 +200,6 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
     // set location and map after view appeared
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-//        addToolbarToKeyboard()
         
         NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
         
@@ -216,6 +216,12 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
         
         navigationController?.isNavigationBarHidden = false
         navigationController?.isToolbarHidden = false
+    }
+    
+    // show keyboard before view disappeared
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        messageTextField.resignFirstResponder()
     }
     
     // show save alert
@@ -244,19 +250,8 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
     
     // set action for message button
     @objc func messageTapped() {
-        // present Chat View
-//        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
-//            vc.loggedUser = loggedUser
-//            vc.title = item.title
-//            present(vc, animated: true)
-//        }
-        
-//        sender.becomeFirstResponder()
-        let msgTextFieldButton = UIBarButtonItem(customView: messageTextField)
-        toolbarItems = [msgTextFieldButton]
+        addToolbarToKeyboard()
         messageTextField.becomeFirstResponder()
-        print(messageTextField.isEditing)
-        print("message will be send here")
     }
 
     // get current image index and push view controller
@@ -435,7 +430,7 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
     
     // set keyboard toolbar
     func addToolbarToKeyboard() {
-        let toolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        let toolbar = UIToolbar(frame: CGRect.init(x: UIScreen.main.bounds.height, y: 0, width: UIScreen.main.bounds.width, height: 50))
         toolbar.barStyle = .default
         
         let textField = UITextField(frame: CGRect.init(x: 0, y: 0, width: toolbar.bounds.width - 50, height: 30))
@@ -443,21 +438,20 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
         textField.returnKeyType = .send
         textField.clearButtonMode = .whileEditing
         textField.placeholder = "Enter your message here"
+        textField.inputAccessoryView = toolbar
         textField.addTarget(self, action: #selector(sendMessage), for: .primaryActionTriggered)
         messageTextField = textField
-        view.addSubview(textField)
+        view.addSubview(toolbar)
         let textFieldButton = UIBarButtonItem(customView: textField)
 
         let items = [textFieldButton]
         toolbar.items = items
         toolbar.sizeToFit()
-        
-        textField.inputAccessoryView = toolbar
-//        textField.removeFromSuperview()
     }
     
+    // send message function
     @objc func sendMessage() {
-        print(messageTextField.text)
+        messageTextField.resignFirstResponder()
     }
     
 }
