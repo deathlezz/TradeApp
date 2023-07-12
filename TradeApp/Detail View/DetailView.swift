@@ -8,14 +8,13 @@
 import UIKit
 import CoreData
 import Firebase
-import InputBarAccessoryView
 
 enum SaveAction {
     case save
     case remove
 }
 
-class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate {
+class DetailView: UITableViewController, Index, Coordinates {
 
     var loggedUser: String!
     
@@ -282,6 +281,8 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
         guard let lat = latitude else { return }
         guard let long = longitude else { return }
         
+        messageTextField.resignFirstResponder()
+        
         let appleMaps = URL(string: "maps://")!
         let googleMaps = URL(string: "comgooglemaps://")!
         
@@ -338,13 +339,6 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
         messageFrame.layer.borderColor = UIColor.lightGray.cgColor
         messageFrame.layer.borderWidth = 0.2
         let messageButton = UIBarButtonItem(customView: messageFrame)
-        
-        let textField = UITextField(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width - 50, height: 30))
-        textField.returnKeyType = .send
-        textField.clearButtonMode = .whileEditing
-        textField.placeholder = "Enter your message here"
-        textField.addTarget(self, action: #selector(sendMessage), for: .primaryActionTriggered)
-        messageTextField = textField
         
         if loggedUser == nil && phone == 0 {
             // show disabled message button only
@@ -433,7 +427,11 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
         let toolbar = UIToolbar(frame: CGRect.init(x: UIScreen.main.bounds.height, y: 0, width: UIScreen.main.bounds.width, height: 50))
         toolbar.barStyle = .default
         
-        let textField = UITextField(frame: CGRect.init(x: 0, y: 0, width: toolbar.bounds.width - 50, height: 30))
+        let backButton = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: #selector(hideKeyboard))
+        
+        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        
+        let textField = UITextField(frame: CGRect.init(x: 0, y: 0, width: toolbar.bounds.width - 60, height: 30))
         textField.inputAccessoryView = toolbar
         textField.returnKeyType = .send
         textField.clearButtonMode = .whileEditing
@@ -444,13 +442,29 @@ class DetailView: UITableViewController, Index, Coordinates, UITextFieldDelegate
         view.addSubview(toolbar)
         let textFieldButton = UIBarButtonItem(customView: textField)
 
-        let items = [textFieldButton]
+        let items = [backButton, spacer, textFieldButton]
         toolbar.items = items
         toolbar.sizeToFit()
     }
     
     // send message function
     @objc func sendMessage() {
+        guard !messageTextField.text!.isEmpty else { return }
+        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+        
+        // add message to firebase
+        DispatchQueue.global().async { [weak self] in
+            guard let owner = self?.item.owner else { return }
+            guard let itemID = self?.item.id else { return }
+            
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).child("0").setValue(self?.messageTextField.text)
+        }
+        
+        messageTextField.resignFirstResponder()
+    }
+    
+    // hide keyboard
+    @objc func hideKeyboard() {
         messageTextField.resignFirstResponder()
     }
     
