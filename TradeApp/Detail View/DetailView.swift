@@ -8,6 +8,7 @@
 import UIKit
 import CoreData
 import Firebase
+import MessageKit
 
 enum SaveAction {
     case save
@@ -457,10 +458,19 @@ class DetailView: UITableViewController, Index, Coordinates {
             guard let owner = self?.item.owner else { return }
             guard let itemID = self?.item.id else { return }
             
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).child("0").setValue(self?.messageTextField.text)
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observeSingleEvent(of: .value) { snapshot in
+                
+                let sender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
+                
+                let message = Message(sender: sender, messageId: "\(snapshot.childrenCount)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                
+                self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).child("\(snapshot.childrenCount)").setValue(message.toAnyObject())
+                
+                DispatchQueue.main.async {
+                    self?.messageTextField.resignFirstResponder()
+                }
+            }
         }
-        
-        messageTextField.resignFirstResponder()
     }
     
     // hide keyboard
