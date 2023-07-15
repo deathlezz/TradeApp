@@ -221,6 +221,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     // show keyboard before view disappeared
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        guard messageTextField != nil else { return }
         messageTextField.resignFirstResponder()
     }
     
@@ -453,21 +454,53 @@ class DetailView: UITableViewController, Index, Coordinates {
         guard !messageTextField.text!.isEmpty else { return }
         let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
-        // add message to firebase
         DispatchQueue.global().async { [weak self] in
             guard let owner = self?.item.owner else { return }
             guard let itemID = self?.item.id else { return }
             
             self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observeSingleEvent(of: .value) { snapshot in
                 
-                let sender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
+                var chat = [Message]()
                 
-                let message = Message(sender: sender, messageId: "\(snapshot.childrenCount)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
-                
-                self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).child("\(snapshot.childrenCount)").setValue(message.toAnyObject())
-                
-                DispatchQueue.main.async {
-                    self?.messageTextField.resignFirstResponder()
+                if let messages = snapshot.value as? [[String: String]] {
+                    for message in messages {
+                        let sender = Sender(senderId: message["sender"]!, displayName: message["sender"]!.components(separatedBy: "_")[0])
+                        
+                        let msg = Message(sender: sender, messageId: message["messageId"]!, sentDate: (message["sentDate"]?.toDate())!, kind: .text(message["kind"]!))
+                        
+                        chat.append(msg)
+                    }
+                    
+                    // add new message to array
+                    let sender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
+                    
+                    let newMessage = Message(sender: sender, messageId: "\(snapshot.childrenCount)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                    
+                    chat.append(newMessage)
+                    
+                    let anyChat = chat.map {$0.toAnyObject()}
+                    
+                    // send array to firebase
+                    self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).setValue(anyChat)
+                    
+                    DispatchQueue.main.async {
+                        self?.messageTextField.resignFirstResponder()
+                    }
+                    
+                } else {
+                    let sender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
+                    
+                    let newMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                    
+                    chat.append(newMessage)
+                    
+                    let anyChat = chat.map {$0.toAnyObject()}
+                    
+                    self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).setValue(anyChat)
+                    
+                    DispatchQueue.main.async {
+                        self?.messageTextField.resignFirstResponder()
+                    }
                 }
             }
         }
@@ -476,6 +509,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     // hide keyboard
     @objc func hideKeyboard() {
         messageTextField.resignFirstResponder()
+        messageTextField.removeFromSuperview()
     }
     
 }
