@@ -27,6 +27,8 @@ class DetailView: UITableViewController, Index, Coordinates {
     var saveButton: UIBarButtonItem!
     var removeButton: UIBarButtonItem!
     
+    var messageSent = false
+    
     var phone: Int!
     var views: Int!
     
@@ -61,10 +63,11 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         loggedUser = Utilities.loadUser()
         savedItems = Utilities.loadItems()
-        setToolbar()
+        checkForMessage()
         loadPhoneNumber()
         isSaved()
         increaseViews()
+    
     }
     
     // set number of sections
@@ -251,8 +254,20 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set action for message button
     @objc func messageTapped() {
-        addToolbarToKeyboard()
-        messageTextField.becomeFirstResponder()
+//        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+//
+//        print(mail)
+//        print(item.owner)
+//        guard mail != item.owner else { return }
+        
+        if messageSent {
+            if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
+                present(vc, animated: true)
+            }
+        } else {
+            addToolbarToKeyboard()
+            messageTextField.becomeFirstResponder()
+        }
     }
 
     // get current image index and push view controller
@@ -333,7 +348,14 @@ class DetailView: UITableViewController, Index, Coordinates {
         let callButton = UIBarButtonItem(customView: callFrame)
         
         let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
-        let message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+        var message = UIImage()
+        
+        if messageSent {
+            message = UIImage(systemName: "checkmark.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))!
+        } else {
+            message = UIImage(systemName: "ellipsis.message.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))!
+        }
+        
         messageFrame.setImage(message, for: .normal)
         messageFrame.addTarget(self, action: #selector(messageTapped), for: .touchUpInside)
         messageFrame.backgroundColor = .white
@@ -354,6 +376,14 @@ class DetailView: UITableViewController, Index, Coordinates {
             // show message button only
             messageButton.customView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 20, height: 50)
             callButton.isHidden = true
+        }
+        
+        if loggedUser != nil {
+            let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+            
+            if mail == item.owner {
+                messageButton.isEnabled = false
+            }
         }
         
         toolbarItems = [callButton, messageButton]
@@ -454,54 +484,23 @@ class DetailView: UITableViewController, Index, Coordinates {
         guard !messageTextField.text!.isEmpty else { return }
         let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
+        let sender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
+        
+        let newMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((messageTextField.text)!))
+        
+        let chat = [newMessage]
+        let anyChat = chat.map {$0.toAnyObject()}
+        
         DispatchQueue.global().async { [weak self] in
             guard let owner = self?.item.owner else { return }
             guard let itemID = self?.item.id else { return }
             
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observeSingleEvent(of: .value) { snapshot in
-                
-                var chat = [Message]()
-                
-                if let messages = snapshot.value as? [[String: String]] {
-                    for message in messages {
-                        let sender = Sender(senderId: message["sender"]!, displayName: message["sender"]!.components(separatedBy: "_")[0])
-                        
-                        let msg = Message(sender: sender, messageId: message["messageId"]!, sentDate: (message["sentDate"]?.toDate())!, kind: .text(message["kind"]!))
-                        
-                        chat.append(msg)
-                    }
-                    
-                    // add new message to array
-                    let sender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
-                    
-                    let newMessage = Message(sender: sender, messageId: "\(snapshot.childrenCount)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
-                    
-                    chat.append(newMessage)
-                    
-                    let anyChat = chat.map {$0.toAnyObject()}
-                    
-                    // send array to firebase
-                    self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).setValue(anyChat)
-                    
-                    DispatchQueue.main.async {
-                        self?.messageTextField.resignFirstResponder()
-                    }
-                    
-                } else {
-                    let sender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
-                    
-                    let newMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
-                    
-                    chat.append(newMessage)
-                    
-                    let anyChat = chat.map {$0.toAnyObject()}
-                    
-                    self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).setValue(anyChat)
-                    
-                    DispatchQueue.main.async {
-                        self?.messageTextField.resignFirstResponder()
-                    }
-                }
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).setValue(anyChat)
+            
+            DispatchQueue.main.async {
+                self?.messageSent = true
+                self?.setToolbar()
+                self?.messageTextField.resignFirstResponder()
             }
         }
     }
@@ -510,6 +509,33 @@ class DetailView: UITableViewController, Index, Coordinates {
     @objc func hideKeyboard() {
         messageTextField.resignFirstResponder()
         messageTextField.removeFromSuperview()
+    }
+    
+    // check if message was sent
+    func checkForMessage() {
+        guard loggedUser != nil else {
+            setToolbar()
+            return
+        }
+        
+        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+        
+        DispatchQueue.global().async { [weak self] in
+            guard let owner = self?.item.owner else { return }
+            guard let itemID = self?.item.id else { return }
+            
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observeSingleEvent(of: .value) { snapshot in
+                if let _ = snapshot.value as? [[String: String]] {
+                    self?.messageSent = true
+                } else {
+                    self?.messageSent = false
+                }
+                
+                DispatchQueue.main.async {
+                    self?.setToolbar()
+                }
+            }
+        }
     }
     
 }
