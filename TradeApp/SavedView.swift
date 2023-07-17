@@ -247,8 +247,9 @@ class SavedView: UICollectionViewController {
                 cell.transform = .identity
             }) { finished in
                 self.selectedCells.removeAll()
-                Utilities.removeItems(self.selectedItems)
                 self.removeFromSaved()
+                Utilities.removeItems(self.selectedItems)
+                self.selectedItems.removeAll()
                 self.updateHeader()
                 self.isArrayEmpty()
             }
@@ -357,7 +358,7 @@ class SavedView: UICollectionViewController {
     func addAmptyArrayView() {
         let screenSize = UIScreen.main.bounds.size
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
-        myView.backgroundColor = .systemGray6
+        myView.backgroundColor = .clear
         let label = UILabel(frame: CGRect(x: (screenSize.width / 2) - 100, y: (screenSize.height / 2) - 25, width: 200, height: 50))
         label.text = "Nothing to show here"
         label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
@@ -381,9 +382,6 @@ class SavedView: UICollectionViewController {
     // update number of saved in Firebase
     func removeFromSaved() {
         for item in selectedItems {
-            let owner = item.owner.replacingOccurrences(of: "_", with: ".")
-            guard loggedUser != owner else { return }
-            
             DispatchQueue.global().async { [weak self] in
                 self?.reference.child(item.owner).child("activeItems").child("\(item.id)").child("saved").observeSingleEvent(of: .value) { snapshot in
                     if let saved = snapshot.value as? Int {

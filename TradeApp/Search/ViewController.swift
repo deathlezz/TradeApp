@@ -446,7 +446,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     func addEmptyArrayView() {
         let screenSize = UIScreen.main.bounds.size
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
-        myView.backgroundColor = .systemGray6
+        myView.backgroundColor = .clear
         let label = UILabel(frame: CGRect(x: (screenSize.width / 2) - 100, y: (screenSize.height / 2) - 25, width: 200, height: 50))
         label.text = "Nothing to show here"
         label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
@@ -466,30 +466,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             emptyArrayView.isHidden = false
         }
     }
-    
-    // fetch user chats from server
-//    func loadChats() {
-//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == "mail@wp.pl"}) else { return }
-//
-//        let currentUser = Sender(senderId: "self", displayName: "dzz")
-//        let otherUser = Sender(senderId: "other", displayName: "john smith")
-//
-//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"] = []
-//
-//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "0", sentDate: Date().addingTimeInterval(-186400), kind: .text("Hello World")))
-//
-//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "1", sentDate: Date().addingTimeInterval(-70000), kind: .text("How is it going?")))
-//
-//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "2", sentDate: Date().addingTimeInterval(-60000), kind: .text("Here is a long reply. Here is a long reply. Here is a long reply.")))
-//
-//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "3", sentDate: Date().addingTimeInterval(-50000), kind: .text("Look it works")))
-//
-//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: currentUser, messageId: "4", sentDate: Date().addingTimeInterval(-40000), kind: .text("I love making apps. I love making apps. I love making apps.")))
-//
-//        AppStorage.shared.users[index].chats["BMW E36 2.0 LPG"]?.append(Message(sender: otherUser, messageId: "5", sentDate: Date().addingTimeInterval(-20000), kind: .text("And this is the last message")))
-//
-//        print(AppStorage.shared.users[index].chats)
-//    }
     
     // convert URLs into dictionary Data
     func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {

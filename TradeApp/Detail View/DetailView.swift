@@ -254,12 +254,6 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set action for message button
     @objc func messageTapped() {
-//        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
-//
-//        print(mail)
-//        print(item.owner)
-//        guard mail != item.owner else { return }
-        
         if messageSent {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
                 present(vc, animated: true)
@@ -298,7 +292,9 @@ class DetailView: UITableViewController, Index, Coordinates {
         guard let lat = latitude else { return }
         guard let long = longitude else { return }
         
-        messageTextField.resignFirstResponder()
+        if messageTextField != nil {
+            messageTextField.resignFirstResponder()
+        }
         
         let appleMaps = URL(string: "maps://")!
         let googleMaps = URL(string: "comgooglemaps://")!
@@ -391,10 +387,10 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // load item's phone number
     func loadPhoneNumber() {
-        let mail = item.owner
+        let owner = item.owner
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(mail).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(owner).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
                 if let number = snapshot.value as? Int {
                     self?.phone = number
                 }
@@ -404,25 +400,23 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // increase number of views
     func increaseViews() {
-        let owner = item.owner.replacingOccurrences(of: "_", with: ".")
-        guard loggedUser != owner else { return }
-        
+        let owner = item.owner
         let itemID = item.id
         
         DispatchQueue.global().async { [weak self] in
-            for item in AppStorage.shared.items {
-                if item.id == itemID {
+            self?.reference.child(owner).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
+                if let views = snapshot.value as? Int {
                     
-                    self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
-                        if let views = snapshot.value as? Int {
-                            self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
-                            self?.views = views + 1
-                            
-                            DispatchQueue.main.async {
-                                let indexSet = IndexSet(integer: 5)
-                                self?.tableView.reloadSections(indexSet, with: .automatic)
-                            }
-                        }
+                    if self?.loggedUser == nil {
+                        self?.reference.child(owner).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
+                        self?.views = views + 1
+                    } else {
+                        self?.views = views
+                    }
+                    
+                    DispatchQueue.main.async {
+                        let indexSet = IndexSet(integer: 5)
+                        self?.tableView.reloadSections(indexSet, with: .automatic)
                     }
                 }
             }
@@ -431,23 +425,16 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // update number of saved
     func updateSaved(action: SaveAction) {
-        let owner = item.owner.replacingOccurrences(of: "_", with: ".")
-        guard loggedUser != owner else { return }
-        
+        let owner = item.owner
         let itemID = item.id
         
         DispatchQueue.global().async { [weak self] in
-            for item in AppStorage.shared.items {
-                if item.id == itemID {
-                    
-                    self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
-                        if let saved = snapshot.value as? Int {
-                            if action == .save {
-                                self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("saved").setValue(saved + 1)
-                            } else {
-                                self?.reference.child(item.owner).child("activeItems").child("\(itemID)").child("saved").setValue(saved - 1)
-                            }
-                        }
+            self?.reference.child(owner).child("activeItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
+                if let saved = snapshot.value as? Int {
+                    if action == .save {
+                        self?.reference.child(owner).child("activeItems").child("\(itemID)").child("saved").setValue(saved + 1)
+                    } else {
+                        self?.reference.child(owner).child("activeItems").child("\(itemID)").child("saved").setValue(saved - 1)
                     }
                 }
             }

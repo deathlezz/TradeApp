@@ -162,9 +162,9 @@ class Utilities {
         newAd.setValue(item.location, forKey: "location")
         newAd.setValue(item.date, forKey: "date")
         newAd.setValue(item.id, forKey: "id")
+        newAd.setValue(item.owner, forKey: "owner")
 
         AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
-        print("Item saved")
     }
     
     // remove saved items
@@ -178,7 +178,6 @@ class Utilities {
             for result in results {
                 for item in items {
                     if result.id == item.id {
-                        print("Removed: \(result.id)")
                         managedContext.delete(result)
                         break
                     }
