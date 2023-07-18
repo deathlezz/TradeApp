@@ -194,6 +194,7 @@ class SavedView: UICollectionViewController {
     // set action for select button
     @objc func selectTapped() {
         guard !savedItems.isEmpty else { return }
+        guard monitor.currentPath.status == .satisfied else { return }
         collectionView.allowsMultipleSelection = true
         navigationItem.rightBarButtonItems = [cancelButton, deleteButton]
         deleteButton.isEnabled = false
@@ -335,23 +336,46 @@ class SavedView: UICollectionViewController {
     
     // update items on load
     func updateSavedItems() {
-        for item in savedItems {
-            if let first = AppStorage.shared.items.first(where: {$0.id == item.id}) {
-                // check if these items are equal
-                if first.photos[0] != item.photos[0] || first.title != item.title || first.price != item.price ||
-                    first.date != item.date || first.location != item.location {
-                    guard let index = savedItems.firstIndex(where: {$0.id == item.id}) else { return }
-                    Utilities.removeItems([item])
-                    savedItems.remove(at: index)
-                    Utilities.saveItem(first)
-                    savedItems.insert(first, at: index)
+        DispatchQueue.global().async { [weak self] in
+            var existedItems = [String: [String: Any]]()
+            var removedItems = [Item]()
+            
+            for item in self!.savedItems {
+                self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
+                    if let value = snapshot.value as? [String: [String: Any]] {
+                        // add item to existed items
+                        
+                        
+                    } else {
+                        // add item to removed items
+                        removedItems.append(item)
+                    }
                 }
-            } else {
-                // remove that item from Core Data
-                Utilities.removeItems([item])
-                savedItems.removeAll(where: {$0.id == item.id})
             }
+            
+            // convert
         }
+        
+        
+        
+        
+//        for item in savedItems {
+//            if let first = AppStorage.shared.items.first(where: {$0.id == item.id}) {
+//                // check if these items are equal
+//                if first.photos[0] != item.photos[0] || first.title != item.title || first.price != item.price ||
+//                    first.date != item.date || first.location != item.location {
+//                    guard let index = savedItems.firstIndex(where: {$0.id == item.id}) else { return }
+//                    Utilities.removeItems([item])
+//                    savedItems.remove(at: index)
+//                    Utilities.saveItem(first)
+//                    savedItems.insert(first, at: index)
+//                }
+//            } else {
+//                // remove that item from Core Data
+//                Utilities.removeItems([item])
+//                savedItems.removeAll(where: {$0.id == item.id})
+//            }
+//        }
     }
     
     // set up empty array view

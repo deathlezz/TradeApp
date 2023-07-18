@@ -164,6 +164,7 @@ class Utilities {
         newAd.setValue(item.id, forKey: "id")
         newAd.setValue(item.owner, forKey: "owner")
 
+        print("item saved")
         AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
     }
     
@@ -178,6 +179,7 @@ class Utilities {
             for result in results {
                 for item in items {
                     if result.id == item.id {
+                        print("item \(result.id) removed")
                         managedContext.delete(result)
                         break
                     }
@@ -197,22 +199,27 @@ class Utilities {
         let sortByDate = NSSortDescriptor(key: "date", ascending: false)
         adsFetch.sortDescriptors = [sortByDate]
         
+        var items = [Item]()
+        
         do {
             let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
             let results = try managedContext.fetch(adsFetch)
             
-            var items = [Item]()
+//            var items = [Item]()
             
             for result in results {
                 let item = Item(photos: [result.image], title: result.title!, price: Int(result.price), location: result.location!, date: result.date!, id: Int(result.id), owner: result.owner)
                 items.append(item)
             }
-            return items
+            print("items loaded: \(items)")
+//            return items
+            
 
         } catch let error as NSError {
             print("Fetch error: \(error) description: \(error.userInfo)")
         }
-        return [Item]()
+        
+        return items
     }
     
     // save applied filters
