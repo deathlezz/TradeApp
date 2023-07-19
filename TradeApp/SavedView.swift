@@ -49,9 +49,15 @@ class SavedView: UICollectionViewController {
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
         
-        loggedUser = Utilities.loadUser()
-        
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.loggedUser = Utilities.loadUser()
+            
+            self?.getData() { dict in
+                
+            }
+        }
     }
     
     // number of sections
@@ -336,15 +342,18 @@ class SavedView: UICollectionViewController {
     
     // update items on load
     func updateSavedItems() {
+        var existedItems = [String: [String: Any]]()
+        var removedItems = [Item]()
+        
         DispatchQueue.global().async { [weak self] in
-            var existedItems = [String: [String: Any]]()
-            var removedItems = [Item]()
-            
             for item in self!.savedItems {
                 self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
                     if let value = snapshot.value as? [String: [String: Any]] {
                         // add item to existed items
+                        existedItems["\(item.id)"] = value
                         
+                        let photos = value["photos"] as! [String: String]
+                        let fixedUrls = photos.values.sorted(by: <).map {String($0)}
                         
                     } else {
                         // add item to removed items
@@ -352,6 +361,8 @@ class SavedView: UICollectionViewController {
                     }
                 }
             }
+            
+            
             
             // convert
         }
@@ -414,6 +425,117 @@ class SavedView: UICollectionViewController {
                 }
             }
         }
+    }
+    
+    // convert URLs into dictionary Data
+    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
+        var images = [String: Data]()
+        
+        let links = urls.sorted(by: <).map {URL(string: $0)}
+        
+        for (index, url) in links.enumerated() {
+            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+                if let data = data {
+                    images["image\(index)"] = data
+                }
+
+                guard images.keys.count == links.count else { return }
+                completion(images)
+            }
+
+            task.resume()
+        }
+    }
+    
+    // download active items from firebase & convert images urls to data array
+    func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
+        var existedItems = [String: [String: Any]]()
+        var adsReady = 0
+        
+        DispatchQueue.global().async { [weak self] in
+            for item in self!.savedItems {
+                self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
+                    if let value = snapshot.value as? [String: Any] {
+                        // add item to existed items
+                        existedItems["\(item.id)"] = value
+                        
+                        let photos = value["photos"] as! [String: String]
+                        let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+                        
+                        self?.convertImages(urls: fixedUrls) { images in
+                            existedItems["\(item.id)"]?["photos"] = images
+                        }
+                        
+                        if let _ = existedItems["\(item.id)"]?["photos"] as? [String: Data] {
+                            adsReady += 1
+                        }
+                        
+                        guard adsReady == existedItems.count else { return }
+                        completion(existedItems)
+                    }
+                }
+            }
+        }
+        
+//        DispatchQueue.global().async { [weak self] in
+//            self?.reference.observeSingleEvent(of: .value) { snapshot in
+//                if let data = snapshot.value as? [String: [String: Any]] {
+//
+//                    for user in data {
+//                        guard let activeItems = data[user.key]?["activeItems"] as? [String: [String: Any]] else { return }
+//
+//                        for item in activeItems {
+//                            items["\(item.key)"] = item.value
+//
+//                            let photos = item.value["photos"] as! [String: String]
+//
+//                            let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+//
+//                            self?.convertImages(urls: fixedUrls) { images in
+//                                items[item.key]?["photos"] = images
+//
+//                                if let _ = items[item.key]?["photos"] as? [String: Data] {
+//                                    adsReady += 1
+//                                }
+//
+//                                guard adsReady == items.count else { return }
+//                                completion(items)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+    }
+    
+    // convert dictionary to [Item] model
+    func toItemModel(dict: [String: [String: Any]]) -> [Item] {
+        var result = [Item]()
+        
+        for item in dict {
+            let dictPhotos = item.value["photos"] as! [String: Data]
+            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
+            let arrayPhotos = sorted.map {$0.value}
+            
+            let title = item.value["title"] as? String
+            let price = item.value["price"] as? Int
+            let category = item.value["category"] as? String
+            let location = item.value["location"] as? String
+            let description = item.value["description"] as? String
+            let date = item.value["date"] as? String
+            let views = item.value["views"] as? Int
+            let saved = item.value["saved"] as? Int
+            let lat = item.value["lat"] as? Double
+            let long = item.value["long"] as? Double
+            let id = item.value["id"] as? Int
+            let owner = item.value["owner"] as? String
+            
+            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
+            
+            result.append(model)
+        }
+        
+        return result
     }
     
 }
