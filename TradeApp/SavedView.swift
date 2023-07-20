@@ -51,13 +51,7 @@ class SavedView: UICollectionViewController {
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
-        DispatchQueue.global().async { [weak self] in
-            self?.loggedUser = Utilities.loadUser()
-            
-            self?.getData() { dict in
-                
-            }
-        }
+        loggedUser = Utilities.loadUser()
     }
     
     // number of sections
@@ -186,9 +180,11 @@ class SavedView: UICollectionViewController {
         navigationController?.isToolbarHidden = true
         isDetailShown = false
         savedItems = Utilities.loadItems()
-        updateSavedItems()
-        isArrayEmpty()
-        collectionView.reloadData()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.updateSavedItems()
+            
+        }
     }
     
     // cancel selection after view disappeared
@@ -258,7 +254,7 @@ class SavedView: UICollectionViewController {
                 Utilities.removeItems(self.selectedItems)
                 self.selectedItems.removeAll()
                 self.updateHeader()
-                self.isArrayEmpty()
+//                self.isArrayEmpty()
             }
         }
     }
@@ -342,51 +338,22 @@ class SavedView: UICollectionViewController {
     
     // update items on load
     func updateSavedItems() {
-        var existedItems = [String: [String: Any]]()
-        var removedItems = [Item]()
-        
-        DispatchQueue.global().async { [weak self] in
-            for item in self!.savedItems {
-                self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
-                    if let value = snapshot.value as? [String: [String: Any]] {
-                        // add item to existed items
-                        existedItems["\(item.id)"] = value
-                        
-                        let photos = value["photos"] as! [String: String]
-                        let fixedUrls = photos.values.sorted(by: <).map {String($0)}
-                        
-                    } else {
-                        // add item to removed items
-                        removedItems.append(item)
-                    }
+        getData() { [weak self] dict in
+            guard let saved = self?.savedItems else { return }
+            self?.savedItems = self?.toItemModel(dict: dict) ?? [Item]()
+
+            DispatchQueue.main.async {
+                Utilities.removeItems(saved)
+                
+                for item in saved {
+                    Utilities.saveItem(item)
                 }
+                
+                print("reloaded")
+                self?.collectionView.reloadData()
+//                self?.isArrayEmpty()
             }
-            
-            
-            
-            // convert
         }
-        
-        
-        
-        
-//        for item in savedItems {
-//            if let first = AppStorage.shared.items.first(where: {$0.id == item.id}) {
-//                // check if these items are equal
-//                if first.photos[0] != item.photos[0] || first.title != item.title || first.price != item.price ||
-//                    first.date != item.date || first.location != item.location {
-//                    guard let index = savedItems.firstIndex(where: {$0.id == item.id}) else { return }
-//                    Utilities.removeItems([item])
-//                    savedItems.remove(at: index)
-//                    Utilities.saveItem(first)
-//                    savedItems.insert(first, at: index)
-//                }
-//            } else {
-//                // remove that item from Core Data
-//                Utilities.removeItems([item])
-//                savedItems.removeAll(where: {$0.id == item.id})
-//            }
-//        }
     }
     
     // set up empty array view
@@ -400,6 +367,7 @@ class SavedView: UICollectionViewController {
         label.textColor = .lightGray
         label.textAlignment = .center
         label.backgroundColor = .systemGray6
+        myView.isHidden = true
         myView.addSubview(label)
         view.addSubview(myView)
         emptyArrayView = myView
@@ -453,7 +421,9 @@ class SavedView: UICollectionViewController {
         var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
-            for item in self!.savedItems {
+            guard let saved = self?.savedItems else { return }
+            
+            for item in saved {
                 self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
                     if let value = snapshot.value as? [String: Any] {
                         // add item to existed items
@@ -464,48 +434,18 @@ class SavedView: UICollectionViewController {
                         
                         self?.convertImages(urls: fixedUrls) { images in
                             existedItems["\(item.id)"]?["photos"] = images
+                            
+                            if let _ = existedItems["\(item.id)"]?["photos"] as? [String: Data] {
+                                adsReady += 1
+                            }
+                            
+                            guard adsReady == existedItems.count else { return }
+                            completion(existedItems)
                         }
-                        
-                        if let _ = existedItems["\(item.id)"]?["photos"] as? [String: Data] {
-                            adsReady += 1
-                        }
-                        
-                        guard adsReady == existedItems.count else { return }
-                        completion(existedItems)
                     }
                 }
             }
         }
-        
-//        DispatchQueue.global().async { [weak self] in
-//            self?.reference.observeSingleEvent(of: .value) { snapshot in
-//                if let data = snapshot.value as? [String: [String: Any]] {
-//
-//                    for user in data {
-//                        guard let activeItems = data[user.key]?["activeItems"] as? [String: [String: Any]] else { return }
-//
-//                        for item in activeItems {
-//                            items["\(item.key)"] = item.value
-//
-//                            let photos = item.value["photos"] as! [String: String]
-//
-//                            let fixedUrls = photos.values.sorted(by: <).map {String($0)}
-//
-//                            self?.convertImages(urls: fixedUrls) { images in
-//                                items[item.key]?["photos"] = images
-//
-//                                if let _ = items[item.key]?["photos"] as? [String: Data] {
-//                                    adsReady += 1
-//                                }
-//
-//                                guard adsReady == items.count else { return }
-//                                completion(items)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
     
     // convert dictionary to [Item] model
