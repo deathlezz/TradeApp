@@ -169,7 +169,6 @@ class SavedView: UICollectionViewController {
     @objc func refresh(refreshControl: UIRefreshControl) {
         refreshControl.beginRefreshing()
         updateSavedItems()
-        collectionView.reloadData()
         refreshControl.endRefreshing()
     }
     
@@ -184,6 +183,10 @@ class SavedView: UICollectionViewController {
         DispatchQueue.global().async { [weak self] in
             self?.updateSavedItems()
             
+            DispatchQueue.main.async {
+                self?.isArrayEmpty()
+                self?.collectionView.reloadData()
+            }
         }
     }
     
@@ -254,7 +257,7 @@ class SavedView: UICollectionViewController {
                 Utilities.removeItems(self.selectedItems)
                 self.selectedItems.removeAll()
                 self.updateHeader()
-//                self.isArrayEmpty()
+                self.isArrayEmpty()
             }
         }
     }
@@ -349,9 +352,8 @@ class SavedView: UICollectionViewController {
                     Utilities.saveItem(item)
                 }
                 
-                print("reloaded")
+                self?.isArrayEmpty()
                 self?.collectionView.reloadData()
-//                self?.isArrayEmpty()
             }
         }
     }
@@ -418,6 +420,7 @@ class SavedView: UICollectionViewController {
     // download active items from firebase & convert images urls to data array
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
         var existedItems = [String: [String: Any]]()
+        var removedItems = [Item]()
         var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
@@ -441,6 +444,18 @@ class SavedView: UICollectionViewController {
                             
                             guard adsReady == existedItems.count else { return }
                             completion(existedItems)
+                        }
+                        
+                    } else {
+                        removedItems.append(item)
+                        
+                        guard removedItems.count == self?.savedItems.count else { return }
+                        
+                        DispatchQueue.main.async {
+                            Utilities.removeItems(removedItems)
+                            self?.savedItems.removeAll()
+                            self?.isArrayEmpty()
+                            self?.collectionView.reloadData()
                         }
                     }
                 }

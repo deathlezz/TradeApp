@@ -184,8 +184,8 @@ class DetailView: UITableViewController, Index, Coordinates {
     @objc func removeTapped() {
         guard let index = savedItems.firstIndex(where: {$0.id == item.id}) else { return }
         Utilities.removeItems([savedItems[index]])
-        updateSaved(action: .remove)
         savedItems.remove(at: index)
+        updateSaved(action: .remove)
         navigationItem.rightBarButtonItems = [saveButton, actionButton]
     }
     
