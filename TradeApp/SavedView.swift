@@ -35,7 +35,7 @@ class SavedView: UICollectionViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         checkConnection()
-        addAmptyArrayView()
+        addEmptyArrayView()
         
         selectButton = UIBarButtonItem(title: "Select", style: .plain, target: self, action: #selector(selectTapped))
         cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelTapped))
@@ -359,7 +359,7 @@ class SavedView: UICollectionViewController {
     }
     
     // set up empty array view
-    func addAmptyArrayView() {
+    func addEmptyArrayView() {
         let screenSize = UIScreen.main.bounds.size
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
         myView.backgroundColor = .clear
@@ -368,8 +368,9 @@ class SavedView: UICollectionViewController {
         label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         label.textColor = .lightGray
         label.textAlignment = .center
-        label.backgroundColor = .systemGray6
+        label.backgroundColor = .clear
         myView.isHidden = true
+        myView.isUserInteractionEnabled = false
         myView.addSubview(label)
         view.addSubview(myView)
         emptyArrayView = myView
@@ -491,6 +492,14 @@ class SavedView: UICollectionViewController {
         }
         
         return result
+    }
+    
+    // update empty array view y position
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let safeAreaTop = view.safeAreaInsets.top
+        let offset = -scrollView.contentOffset.y - safeAreaTop
+        let screenSize = UIScreen.main.bounds.size
+        emptyArrayView.frame = CGRect(x: 0, y: offset, width: screenSize.width, height: screenSize.height)
     }
     
 }

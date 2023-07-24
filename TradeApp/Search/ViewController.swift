@@ -44,7 +44,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         checkConnection()
-//        addEmptyArrayView()
+        addEmptyArrayView()
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
@@ -81,7 +81,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                 self?.loadRecentItems()
                 
                 DispatchQueue.main.async {
-//                    self?.isArrayEmpty()
+                    self?.isArrayEmpty()
                     self?.collectionView.reloadData()
                 }
             }
@@ -184,7 +184,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         currentUnit = Utilities.loadDistanceUnit()
         changeTitle()
         hideButtons()
-//        isArrayEmpty()
+        isArrayEmpty()
         collectionView.reloadData()
     }
     
@@ -204,10 +204,10 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                     }
                     
                     self?.collectionView.reloadData()
-                    refreshControl.endRefreshing()
                 }
             }
         }
+        refreshControl.endRefreshing()
     }
     
     // show or hide filter and sort buttons
@@ -452,7 +452,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         label.textColor = .lightGray
         label.textAlignment = .center
-        label.backgroundColor = .systemGray6
+        label.backgroundColor = .clear
+        myView.isHidden = true
+        myView.isUserInteractionEnabled = false
         myView.addSubview(label)
         view.addSubview(myView)
         emptyArrayView = myView
@@ -551,6 +553,14 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         }
         
         return result
+    }
+    
+    // update empty array view y position
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let safeAreaTop = view.safeAreaInsets.top
+        let offset = -scrollView.contentOffset.y - safeAreaTop
+        let screenSize = UIScreen.main.bounds.size
+        emptyArrayView.frame = CGRect(x: 0, y: offset, width: screenSize.width, height: screenSize.height)
     }
     
 
