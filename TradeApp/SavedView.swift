@@ -168,7 +168,16 @@ class SavedView: UICollectionViewController {
     // set action for "pull to refresh"
     @objc func refresh(refreshControl: UIRefreshControl) {
         refreshControl.beginRefreshing()
-        updateSavedItems()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.updateSavedItems()
+            
+            DispatchQueue.main.async {
+                guard self?.savedItems.count == 0 else { return }
+                self?.isArrayEmpty()
+            }
+        }
+        
         refreshControl.endRefreshing()
     }
     
@@ -184,8 +193,8 @@ class SavedView: UICollectionViewController {
             self?.updateSavedItems()
             
             DispatchQueue.main.async {
+                guard self?.savedItems.count == 0 else { return }
                 self?.isArrayEmpty()
-                self?.collectionView.reloadData()
             }
         }
     }
@@ -342,7 +351,7 @@ class SavedView: UICollectionViewController {
     // update items on load
     func updateSavedItems() {
         getData() { [weak self] dict in
-            guard let saved = self?.savedItems else { return }
+            let saved = self?.savedItems ?? [Item]()
             self?.savedItems = self?.toItemModel(dict: dict) ?? [Item]()
 
             DispatchQueue.main.async {
