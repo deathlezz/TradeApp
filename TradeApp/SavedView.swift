@@ -20,6 +20,7 @@ class SavedView: UICollectionViewController {
     
     var emptyArrayView: UIView!
     var reference: DatabaseReference!
+    var refreshControl: UIRefreshControl!
     
     var selectButton: UIBarButtonItem!
     var cancelButton: UIBarButtonItem!
@@ -44,7 +45,7 @@ class SavedView: UICollectionViewController {
         navigationItem.rightBarButtonItems = [selectButton]
         
         // pull to refresh
-        let refreshControl = UIRefreshControl()
+        refreshControl = UIRefreshControl()
         refreshControl.tintColor = .lightGray
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
@@ -52,6 +53,15 @@ class SavedView: UICollectionViewController {
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         loggedUser = Utilities.loadUser()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.updateSavedItems() { _ in }
+            
+            DispatchQueue.main.async {
+                guard self?.savedItems.count == 0 else { return }
+                self?.isArrayEmpty()
+            }
+        }
     }
     
     // number of sections
@@ -170,15 +180,16 @@ class SavedView: UICollectionViewController {
         refreshControl.beginRefreshing()
         
         DispatchQueue.global().async { [weak self] in
-            self?.updateSavedItems()
+            self?.updateSavedItems() { _ in
+                refreshControl.endRefreshing()
+            }
             
             DispatchQueue.main.async {
                 guard self?.savedItems.count == 0 else { return }
                 self?.isArrayEmpty()
+                refreshControl.endRefreshing()
             }
         }
-        
-        refreshControl.endRefreshing()
     }
     
     // refresh collection view before view appeared
@@ -188,15 +199,6 @@ class SavedView: UICollectionViewController {
         navigationController?.isToolbarHidden = true
         isDetailShown = false
         savedItems = Utilities.loadItems()
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.updateSavedItems()
-            
-            DispatchQueue.main.async {
-                guard self?.savedItems.count == 0 else { return }
-                self?.isArrayEmpty()
-            }
-        }
     }
     
     // cancel selection after view disappeared
@@ -349,7 +351,7 @@ class SavedView: UICollectionViewController {
     }
     
     // update items on load
-    func updateSavedItems() {
+    func updateSavedItems(completion: @escaping (Bool) -> Void) {
         getData() { [weak self] dict in
             let saved = self?.savedItems ?? [Item]()
             self?.savedItems = self?.toItemModel(dict: dict) ?? [Item]()
@@ -361,6 +363,7 @@ class SavedView: UICollectionViewController {
                     Utilities.saveItem(item)
                 }
                 
+                completion(true)
                 self?.isArrayEmpty()
                 self?.collectionView.reloadData()
             }
@@ -506,7 +509,15 @@ class SavedView: UICollectionViewController {
     // update empty array view y position
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let safeAreaTop = view.safeAreaInsets.top
-        let offset = -scrollView.contentOffset.y - safeAreaTop
+        let refreshHeight = refreshControl.bounds.height
+        var offset = CGFloat()
+        
+        if refreshControl.isRefreshing {
+            offset = -scrollView.contentOffset.y - safeAreaTop + refreshHeight
+        } else {
+            offset = -scrollView.contentOffset.y - safeAreaTop
+        }
+
         let screenSize = UIScreen.main.bounds.size
         emptyArrayView.frame = CGRect(x: 0, y: offset, width: screenSize.width, height: screenSize.height)
     }

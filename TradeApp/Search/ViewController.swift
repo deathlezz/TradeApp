@@ -17,6 +17,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     var radiusStages = [0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 175, 200]
     
     var emptyArrayView: UIView!
+    var refreshControl: UIRefreshControl!
     
     let monitor = NWPathMonitor()
     var isPushed = false
@@ -65,7 +66,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         filterButton.isHidden = true
         
         // pull to refresh
-        let refreshControl = UIRefreshControl()
+        refreshControl = UIRefreshControl()
         refreshControl.tintColor = .lightGray
         refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
         collectionView.refreshControl = refreshControl
@@ -194,6 +195,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         DispatchQueue.global().async { [weak self] in
             self?.getData() { dict in
+                
                 AppStorage.shared.items = self?.toItemModel(dict: dict) ?? [Item]()
 
                 DispatchQueue.main.async {
@@ -202,12 +204,13 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
                     } else {
                         self?.applyFilters()
                     }
-                    
+
+                    refreshControl.endRefreshing()
+                    self?.isArrayEmpty()
                     self?.collectionView.reloadData()
                 }
             }
         }
-        refreshControl.endRefreshing()
     }
     
     // show or hide filter and sort buttons
@@ -558,7 +561,15 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
     // update empty array view y position
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let safeAreaTop = view.safeAreaInsets.top
-        let offset = -scrollView.contentOffset.y - safeAreaTop
+        let refreshHeight = refreshControl.bounds.height
+        var offset = CGFloat()
+        
+        if refreshControl.isRefreshing {
+            offset = -scrollView.contentOffset.y - safeAreaTop + refreshHeight
+        } else {
+            offset = -scrollView.contentOffset.y - safeAreaTop
+        }
+
         let screenSize = UIScreen.main.bounds.size
         emptyArrayView.frame = CGRect(x: 0, y: offset, width: screenSize.width, height: screenSize.height)
     }
