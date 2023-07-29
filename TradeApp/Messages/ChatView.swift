@@ -13,14 +13,15 @@ import Firebase
 class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate, InputBarAccessoryViewDelegate {
     
     var chatTitle: String!
-    var itemID: Int!
     var loggedUser: String!
+    var itemID: Int!
+    
     var buyer: String!
+    var seller: String!
+    
+    var isPushedByChats: Bool!
     
     var reference: DatabaseReference!
-    
-    let currentUser = Sender(senderId: "self", displayName: "dzz")
-    let otherUser = Sender(senderId: "other", displayName: "john smith")
     
     var messages = [MessageType]()
     
@@ -45,7 +46,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // return current sender
     func currentSender() -> SenderType {
-        return currentUser
+        return Sender(senderId: loggedUser, displayName: "")
     }
     
     // set collection view cell
@@ -72,9 +73,12 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         print(text)
         
-        let message = Message(sender: currentUser, messageId: "\(messages.count)", sentDate: Date(), kind: .text(text))
+        let currentBuyer = Sender(senderId: buyer, displayName: "")
+//        let currentSeller = Sender(senderId: seller, displayName: "")
+        
+        let message = Message(sender: currentBuyer, messageId: "\(messages.count)", sentDate: Date(), kind: .text(text))
         messages.append(message)
-        saveMessage(user: loggedUser, buyer: "dzz@wp.pl", itemID: 65886733, message: message)
+        saveMessage(seller: seller, buyer: buyer, itemID: itemID, message: message)
         
         var indexPath = IndexPath()
         
@@ -128,11 +132,36 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     }
     
     // save message to Firebase Database
-    func saveMessage(user: String, buyer: String, itemID: Int, message: Message) {
-        let fixedUser = user.replacingOccurrences(of: ".", with: "_")
+    func saveMessage(seller: String, buyer: String, itemID: Int, message: Message) {
+        let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
         let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
         let msg = message.toAnyObject()
-        reference.child(fixedUser).child("chats").child("\(itemID)").child(fixedBuyer).child(message.messageId).setValue(msg)
+        reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).child(message.messageId).setValue(msg)
+    }
+    
+    // load chat before view appears
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        getChat()
+    }
+    
+    // load current chat
+    func getChat() {
+        guard !isPushedByChats else { return }
+        
+        let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
+        let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
+        
+        DispatchQueue.global().async { [weak self] in
+            guard let itemID = self?.itemID else { return }
+            
+            self?.reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).observeSingleEvent(of: .value) { snapshot in
+                if let value = snapshot.value as? [String] {
+                    print(value)
+                }
+            }
+        }
     }
     
 }

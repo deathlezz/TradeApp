@@ -256,6 +256,12 @@ class DetailView: UITableViewController, Index, Coordinates {
     @objc func messageTapped() {
         if messageSent {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
+                vc.chatTitle = item.title
+                vc.loggedUser = loggedUser
+                vc.isPushedByChats = false
+                vc.buyer = loggedUser
+                vc.seller = item.owner
+                vc.itemID = item.id
                 present(vc, animated: true)
             }
         } else {
@@ -377,9 +383,9 @@ class DetailView: UITableViewController, Index, Coordinates {
         if loggedUser != nil {
             let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
             
-            if mail == item.owner {
-                messageButton.isEnabled = false
-            }
+//            if mail == item.owner {
+//                messageButton.isEnabled = false
+//            }
         }
         
         toolbarItems = [callButton, messageButton]
