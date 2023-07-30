@@ -19,7 +19,7 @@ struct Message: MessageType {
     var sentDate: Date
     var kind: MessageKind
     
-    func toAnyObject() -> [String: Any]{
+    func toAnyObject() -> [String: Any] {
         return [
             "sender": sender.senderId,
             "messageId": messageId,

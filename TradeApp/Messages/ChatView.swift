@@ -23,7 +23,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     var reference: DatabaseReference!
     
-    var messages = [MessageType]()
+    var messages = [Message]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,26 +71,26 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // set "send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        print(text)
+        let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
+        let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
         
-        let currentBuyer = Sender(senderId: buyer, displayName: "")
-//        let currentSeller = Sender(senderId: seller, displayName: "")
+        let currentSender = Sender(senderId: fixedBuyer, displayName: "")
         
-        let message = Message(sender: currentBuyer, messageId: "\(messages.count)", sentDate: Date(), kind: .text(text))
-        messages.append(message)
-        saveMessage(seller: seller, buyer: buyer, itemID: itemID, message: message)
-        
-        var indexPath = IndexPath()
-        
-        if messages.count > 0 {
-            indexPath = IndexPath(index: messages.count - 1)
-        } else {
-            indexPath = IndexPath(index: 0)
+        sendMessage(seller: fixedSeller, buyer: fixedBuyer, itemID: itemID, text: text) { [weak self] in
+            guard let messagesCount = self?.messages.count else { return }
+            
+            var indexPath = IndexPath()
+            
+            if messagesCount > 0 {
+                indexPath = IndexPath(index: messagesCount - 1)
+            } else {
+                indexPath = IndexPath(index: 0)
+            }
+            
+            self?.messagesCollectionView.insertItems(at: [indexPath])
+            inputBar.inputTextView.text = nil
+            self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
         }
-        
-        messagesCollectionView.insertItems(at: [indexPath])
-        inputBar.inputTextView.text = nil
-        messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
     }
     
     // set message bottom label as date
@@ -132,23 +132,50 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     }
     
     // save message to Firebase Database
-    func saveMessage(seller: String, buyer: String, itemID: Int, message: Message) {
+    func sendMessage(seller: String, buyer: String, itemID: Int, text: String, completion: @escaping () -> Void) {
         let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
         let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
-        let msg = message.toAnyObject()
-        reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).child(message.messageId).setValue(msg)
+        
+        let sender = loggedUser.replacingOccurrences(of: ".", with: "_")
+        
+        let currentSender = Sender(senderId: sender, displayName: "")
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).observeSingleEvent(of: .value) { snapshot in
+                let messagesCount = snapshot.childrenCount
+                
+                let message = Message(sender: currentSender, messageId: "\(messagesCount)", sentDate: Date(), kind: .text(text))
+                self?.messages.append(message)
+                
+                let msg = message.toAnyObject()
+                self?.reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).child(message.messageId).setValue(msg)
+                
+                completion()
+            }
+        }
     }
     
     // load chat before view appears
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        getChat()
+        DispatchQueue.global().async { [weak self] in
+            self?.getChat() { chat in
+                self?.messages = chat
+                
+                DispatchQueue.main.async {
+                    self?.messagesCollectionView.reloadData()
+                    self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
+                }
+            }
+        }
     }
     
     // load current chat
-    func getChat() {
+    func getChat(completion: @escaping ([Message]) -> Void) {
         guard !isPushedByChats else { return }
+        
+        var currentChat = [Message]()
         
         let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
         let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
@@ -157,8 +184,14 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
             guard let itemID = self?.itemID else { return }
             
             self?.reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).observeSingleEvent(of: .value) { snapshot in
-                if let value = snapshot.value as? [String] {
-                    print(value)
+                if let chats = snapshot.value as? [[String: String]] {
+                    for chat in chats {
+                        let sender = Sender(senderId: chat["sender"]!, displayName: "")
+                        let message = Message(sender: sender, messageId: chat["messageId"]!, sentDate: chat["sentDate"]!.toDate(), kind: .text(chat["kind"]!))
+                        currentChat.append(message)
+                    }
+                    
+                    completion(currentChat)
                 }
             }
         }
