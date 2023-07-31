@@ -46,7 +46,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // return current sender
     func currentSender() -> SenderType {
-        return Sender(senderId: loggedUser, displayName: "")
+        let fixedUser = loggedUser.replacingOccurrences(of: ".", with: "_")
+        return Sender(senderId: fixedUser, displayName: "")
     }
     
     // set collection view cell
@@ -69,12 +70,14 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         return avatarView.isHidden = true
     }
     
+    
+    
     // set "send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
         let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
         
-        let currentSender = Sender(senderId: fixedBuyer, displayName: "")
+//        let currentSender = Sender(senderId: fixedBuyer, displayName: "")
         
         sendMessage(seller: fixedSeller, buyer: fixedBuyer, itemID: itemID, text: text) { [weak self] in
             guard let messagesCount = self?.messages.count else { return }
@@ -90,6 +93,12 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
             self?.messagesCollectionView.insertItems(at: [indexPath])
             inputBar.inputTextView.text = nil
             self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
+        }
+    }
+    
+    func inputBar(_ inputBar: InputBarAccessoryView, didChangeIntrinsicContentTo size: CGSize) {
+        if inputBar.isHidden {
+            inputBar.isHidden = false
         }
     }
     
@@ -168,6 +177,20 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                     self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
                 }
             }
+        }
+    }
+    
+    // do not hide input bar when scroll view is on top
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if !isMovingFromParent {
+            print("we still here")
+            
+            messageInputBar.isHidden = false
+            
+            print(messageInputBar.isHidden)
+            
         }
     }
     
