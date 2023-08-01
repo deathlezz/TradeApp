@@ -70,14 +70,10 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         return avatarView.isHidden = true
     }
     
-    
-    
     // set "send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
         let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
-        
-//        let currentSender = Sender(senderId: fixedBuyer, displayName: "")
         
         sendMessage(seller: fixedSeller, buyer: fixedBuyer, itemID: itemID, text: text) { [weak self] in
             guard let messagesCount = self?.messages.count else { return }
@@ -93,12 +89,6 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
             self?.messagesCollectionView.insertItems(at: [indexPath])
             inputBar.inputTextView.text = nil
             self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
-        }
-    }
-    
-    func inputBar(_ inputBar: InputBarAccessoryView, didChangeIntrinsicContentTo size: CGSize) {
-        if inputBar.isHidden {
-            inputBar.isHidden = false
         }
     }
     
@@ -181,18 +171,26 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     }
     
     // do not hide input bar when scroll view is on top
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
-        if !isMovingFromParent {
-            print("we still here")
-            
-            messageInputBar.isHidden = false
-            
-            print(messageInputBar.isHidden)
-            
+        if !self.isFirstResponder {
+            self.becomeFirstResponder()
+            let notificationCenter = NotificationCenter.default
+//            notificationCenter.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+            notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         }
     }
+    
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//
+//        if !isMovingFromParent {
+//            let notificationCenter = NotificationCenter.default
+//            notificationCenter.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+//            notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+//        }
+//    }
     
     // load current chat
     func getChat(completion: @escaping ([Message]) -> Void) {
