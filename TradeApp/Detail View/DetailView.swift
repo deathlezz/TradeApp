@@ -67,7 +67,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         loadPhoneNumber()
         isSaved()
         increaseViews()
-    
     }
     
     // set number of sections
@@ -207,10 +206,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         NotificationCenter.default.post(name: NSNotification.Name("restoreMap"), object: nil)
         
         NotificationCenter.default.post(name: NSNotification.Name("pushLocation"), object: nil, userInfo: ["location": item.location])
-        
-        for savedItem in savedItems {
-            print(savedItem.id)
-        }
     }
     
     // show tab bar and navigation bar before view appeared
@@ -262,7 +257,7 @@ class DetailView: UITableViewController, Index, Coordinates {
                 vc.buyer = loggedUser
                 vc.seller = item.owner
                 vc.itemID = item.id
-                present(vc, animated: true)
+                navigationController?.present(vc, animated: true)
             }
         } else {
             addToolbarToKeyboard()

@@ -42,6 +42,17 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         setLayout()
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.getChat() { chat in
+                self?.messages = chat
+                
+                DispatchQueue.main.async {
+                    self?.messagesCollectionView.reloadData()
+                    self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
+                }
+            }
+        }
     }
     
     // return current sender
@@ -154,43 +165,24 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         }
     }
     
-    // load chat before view appears
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.getChat() { chat in
-                self?.messages = chat
-                
-                DispatchQueue.main.async {
-                    self?.messagesCollectionView.reloadData()
-                    self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
-                }
-            }
-        }
-    }
-    
     // do not hide input bar when scroll view is on top
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         if !self.isFirstResponder {
             self.becomeFirstResponder()
-            let notificationCenter = NotificationCenter.default
-//            notificationCenter.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-            notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         }
     }
     
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//
-//        if !isMovingFromParent {
-//            let notificationCenter = NotificationCenter.default
-//            notificationCenter.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-//            notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-//        }
-//    }
+    // add observer if not moving from parent
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        if !isMovingFromParent {
+            let notificationCenter = NotificationCenter.default
+            notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        }
+    }
     
     // load current chat
     func getChat(completion: @escaping ([Message]) -> Void) {
