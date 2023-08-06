@@ -9,6 +9,7 @@ import UIKit
 import CoreData
 import Firebase
 import MessageKit
+import UserNotifications
 
 enum SaveAction {
     case save
@@ -257,7 +258,7 @@ class DetailView: UITableViewController, Index, Coordinates {
                 vc.buyer = loggedUser
                 vc.seller = item.owner
                 vc.itemID = item.id
-                navigationController?.present(vc, animated: true)
+                present(vc, animated: true)
             }
         } else {
             addToolbarToKeyboard()
@@ -484,6 +485,20 @@ class DetailView: UITableViewController, Index, Coordinates {
             guard let itemID = self?.item.id else { return }
             
             self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).setValue(anyChat)
+
+            // show notification when get message
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observe(.childAdded) { snapshot in
+                if let value = snapshot.value as? [String: String] {
+                    guard value["sender"] != mail else { return }
+                    
+                    // notify ChatView about the message
+                    NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
+                    
+                    // show user notification here
+                    
+                }
+            
+            }
             
             DispatchQueue.main.async {
                 self?.messageSent = true

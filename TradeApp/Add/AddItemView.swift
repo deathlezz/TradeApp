@@ -9,6 +9,7 @@ import UIKit
 import CoreLocation
 import Firebase
 import FirebaseStorage
+import UserNotifications
 
 enum AlertType {
     case emptyField
@@ -362,6 +363,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 self?.showAlert(.edit)
                                 
                             } else {
+                                // edit ended item
                                 let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: owner)
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
@@ -375,6 +377,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             }
                             
                         } else {
+                            // create new item
                             self?.createItemID() { id in
                                 let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: owner)
                                 AppStorage.shared.items.append(newItem)
@@ -382,6 +385,23 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
                                     guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
                                     self?.saveItem(user: mail, item: newItem, urls: urls)
+                                }
+                                
+                                self?.reference.child(owner).child("chats").child("\(id)").observe(.childAdded) { snapshot in
+                                    let buyer = snapshot.key
+                                    
+                                    if let value = snapshot.value as? [String: String] {
+                    
+                                        guard value["sender"] != owner else { return }
+                                        guard value["sender"] == buyer else {
+                                            // show user notification here
+                                            return
+                                        }
+                                        
+                                        NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
+                                        
+                                    }
+                                    
                                 }
                                 
                                 sender.isUserInteractionEnabled = true

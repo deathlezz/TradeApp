@@ -36,8 +36,9 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         
-        let notificationCenter = NotificationCenter.default
-        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(insertMessage), name: NSNotification.Name("newMessage"), object: nil)
         
         setLayout()
         
@@ -208,6 +209,17 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                 }
             }
         }
+    }
+    
+    // get new message and add it to messages array
+    @objc func insertMessage(_ notification: NSNotification) {
+        guard let message = notification.userInfo!["message"] as? [String: String] else { return }
+        let sender = Sender(senderId: message["sender"]!, displayName: "")
+        let msg = Message(sender: sender, messageId: message["messageId"]!, sentDate: (message["sentDate"]?.toDate())!, kind: .text(message["kind"]!))
+
+        let indexPath = IndexPath(index: messages.count)
+        messages.append(msg)
+        messagesCollectionView.insertItems(at: [indexPath])
     }
     
 }
