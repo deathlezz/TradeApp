@@ -9,7 +9,7 @@ import Firebase
 import UIKit
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDelegate, UNUserNotificationCenterDelegate {
 
     // core data initialization
     lazy var coreDataStack: CoreDataStack = .init(modelName: "SavedAd")
@@ -24,9 +24,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDel
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
+        UNUserNotificationCenter.current().delegate = self
         FirebaseApp.configure()
         
         return true
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // Update the app interface directly.
+        
+        // Show a banner
+        completionHandler([.banner, .badge, .sound])
     }
 
     // MARK: UISceneSession Lifecycle

@@ -393,15 +393,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                     if let value = snapshot.value as? [String: String] {
                     
                                         guard value["sender"] != owner else { return }
-                                        guard value["sender"] == buyer else {
-                                            // show user notification here
-                                            return
-                                        }
+                                        guard let kind = value["kind"] else { return }
                                         
                                         NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
                                         
+                                        
+                                        
+                                        self?.showNotification(title: title, body: kind)
                                     }
-                                    
                                 }
                                 
                                 sender.isUserInteractionEnabled = true
@@ -650,5 +649,22 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         reference.child(user).child("activeItems").child("\(item.id)").setValue(newItem)
     }
     
+    // show message notification
+    func showNotification(title: String, body: String) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+            if success {
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                var content = UNMutableNotificationContent()
+                content.title = title
+                content.body = body
+                content.sound = UNNotificationSound.default
+                var request = UNNotificationRequest(identifier: UUID().uuidString , content: content, trigger: trigger)
+                UNUserNotificationCenter.current().add(request)
+                
+            } else if let error = error {
+                print(error.localizedDescription)
+            }
+        }
+    }
     
 }

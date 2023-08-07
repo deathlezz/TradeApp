@@ -473,14 +473,15 @@ class DetailView: UITableViewController, Index, Coordinates {
         guard !messageTextField.text!.isEmpty else { return }
         let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
-        let sender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
+        let newSender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
         
-        let newMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((messageTextField.text)!))
+        let newMessage = Message(sender: newSender, messageId: "0", sentDate: Date(), kind: .text((messageTextField.text)!))
         
         let chat = [newMessage]
         let anyChat = chat.map {$0.toAnyObject()}
         
         DispatchQueue.global().async { [weak self] in
+            guard let itemTitle = self?.item.title else { return }
             guard let owner = self?.item.owner else { return }
             guard let itemID = self?.item.id else { return }
             
@@ -488,13 +489,18 @@ class DetailView: UITableViewController, Index, Coordinates {
 
             // show notification when get message
             self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observe(.childAdded) { snapshot in
+                
                 if let value = snapshot.value as? [String: String] {
-                    guard value["sender"] != mail else { return }
+//                    guard value["sender"] != mail else { return }
+                    guard let kind = value["kind"] else { return }
+                    guard let sender = value["sender"] else { return }
                     
                     // notify ChatView about the message
                     NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
                     
-                    // show user notification here
+                    
+                    
+                    self?.showNotification(title: itemTitle, body: kind)
                     
                 }
             
@@ -537,6 +543,24 @@ class DetailView: UITableViewController, Index, Coordinates {
                 DispatchQueue.main.async {
                     self?.setToolbar()
                 }
+            }
+        }
+    }
+    
+    // show message notification
+    func showNotification(title: String, body: String) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+            if success {
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                var content = UNMutableNotificationContent()
+                content.title = title
+                content.body = body
+                content.sound = UNNotificationSound.default
+                var request = UNNotificationRequest(identifier: UUID().uuidString , content: content, trigger: trigger)
+                UNUserNotificationCenter.current().add(request)
+                
+            } else if let error = error {
+                print(error.localizedDescription)
             }
         }
     }
