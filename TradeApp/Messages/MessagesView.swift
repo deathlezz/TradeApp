@@ -57,8 +57,8 @@ class MessagesView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
             let chatTitle = Array(chats.keys)[indexPath.row]
             vc.chatTitle = chatTitle
-            vc.buyer = ""
-            vc.seller = ""
+            ChatView.shared.buyer = ""
+            ChatView.shared.seller = ""
             vc.isPushedByChats = true
             vc.loggedUser = loggedUser
             vc.messages = chats[chatTitle] ?? [Message]()

@@ -388,16 +388,17 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 }
                                 
                                 self?.reference.child(owner).child("chats").child("\(id)").observe(.childAdded) { snapshot in
-                                    let buyer = snapshot.key
-                                    
+                                    print("new message")
                                     if let value = snapshot.value as? [String: String] {
                     
-                                        guard value["sender"] != owner else { return }
+                                        guard let sender = value["sender"] else { return }
                                         guard let kind = value["kind"] else { return }
-                                        
+                                        guard sender != owner else { return }
+
+                                        // notify ChatView about the message
                                         NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
                                         
-                                        
+                                        guard sender != ChatView.shared.seller && sender != ChatView.shared.buyer else { return }
                                         
                                         self?.showNotification(title: title, body: kind)
                                     }
@@ -654,11 +655,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
             if success {
                 let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-                var content = UNMutableNotificationContent()
+                let content = UNMutableNotificationContent()
                 content.title = title
                 content.body = body
                 content.sound = UNNotificationSound.default
-                var request = UNNotificationRequest(identifier: UUID().uuidString , content: content, trigger: trigger)
+                let request = UNNotificationRequest(identifier: UUID().uuidString , content: content, trigger: trigger)
                 UNUserNotificationCenter.current().add(request)
                 
             } else if let error = error {

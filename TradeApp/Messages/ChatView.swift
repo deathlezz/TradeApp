@@ -16,6 +16,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     var loggedUser: String!
     var itemID: Int!
     
+    static let shared = ChatView()
     var buyer: String!
     var seller: String!
     
@@ -84,8 +85,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // set "send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
-        let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
+        let fixedBuyer = ChatView.shared.buyer.replacingOccurrences(of: ".", with: "_")
+        let fixedSeller = ChatView.shared.seller.replacingOccurrences(of: ".", with: "_")
         
         sendMessage(seller: fixedSeller, buyer: fixedBuyer, itemID: itemID, text: text) { [weak self] in
             guard let messagesCount = self?.messages.count else { return }
@@ -191,8 +192,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         
         var currentChat = [Message]()
         
-        let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
-        let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
+        let fixedSeller = ChatView.shared.seller.replacingOccurrences(of: ".", with: "_")
+        let fixedBuyer = ChatView.shared.buyer.replacingOccurrences(of: ".", with: "_")
         
         DispatchQueue.global().async { [weak self] in
             guard let itemID = self?.itemID else { return }

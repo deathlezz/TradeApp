@@ -100,6 +100,7 @@ class ActiveAdsView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = activeAds[indexPath.row]
             vc.hidesBottomBarWhenPushed = true
+            vc.loggedUser = mail
             vc.toolbarItems = []
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -108,7 +109,7 @@ class ActiveAdsView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
+//            guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
             guard let itemID = activeAds[indexPath.row]?.id else { return }
             
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
@@ -119,7 +120,7 @@ class ActiveAdsView: UITableViewController {
                 
                 self?.deleteItem(itemID: itemID)
                 
-                AppStorage.shared.users[index].activeItems.remove(at: indexPath.row)
+//                AppStorage.shared.users[index].activeItems.remove(at: indexPath.row)
                 self?.activeAds.remove(at: indexPath.row)
                 
                 tableView.deleteRows(at: [indexPath], with: .fade)
@@ -270,6 +271,8 @@ class ActiveAdsView: UITableViewController {
                         storageRef.delete() { _ in }
                     }
                     self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").removeValue()
+                    self?.reference.child(fixedMail).child("chats").child("\(itemID)").removeAllObservers()
+                    self?.reference.child(fixedMail).child("chats").child("\(itemID)").removeValue()
                 }
             }
         }

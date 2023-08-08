@@ -255,8 +255,8 @@ class DetailView: UITableViewController, Index, Coordinates {
                 vc.chatTitle = item.title
                 vc.loggedUser = loggedUser
                 vc.isPushedByChats = false
-                vc.buyer = loggedUser
-                vc.seller = item.owner
+                ChatView.shared.buyer = loggedUser
+                ChatView.shared.seller = item.owner
                 vc.itemID = item.id
                 present(vc, animated: true)
             }
@@ -409,7 +409,7 @@ class DetailView: UITableViewController, Index, Coordinates {
             self?.reference.child(owner).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
                 if let views = snapshot.value as? Int {
                     
-                    if self?.loggedUser == nil {
+                    if self?.loggedUser != owner {
                         self?.reference.child(owner).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
                         self?.views = views + 1
                     } else {
@@ -491,19 +491,17 @@ class DetailView: UITableViewController, Index, Coordinates {
             self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observe(.childAdded) { snapshot in
                 
                 if let value = snapshot.value as? [String: String] {
-//                    guard value["sender"] != mail else { return }
-                    guard let kind = value["kind"] else { return }
                     guard let sender = value["sender"] else { return }
+                    guard let kind = value["kind"] else { return }
+                    guard sender != mail else { return }
                     
                     // notify ChatView about the message
                     NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
                     
-                    
-                    
+                    guard sender != ChatView.shared.seller && sender != ChatView.shared.buyer else { return }
+                                    
                     self?.showNotification(title: itemTitle, body: kind)
-                    
                 }
-            
             }
             
             DispatchQueue.main.async {
@@ -551,12 +549,12 @@ class DetailView: UITableViewController, Index, Coordinates {
     func showNotification(title: String, body: String) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
             if success {
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-                var content = UNMutableNotificationContent()
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+                let content = UNMutableNotificationContent()
                 content.title = title
                 content.body = body
                 content.sound = UNNotificationSound.default
-                var request = UNNotificationRequest(identifier: UUID().uuidString , content: content, trigger: trigger)
+                let request = UNNotificationRequest(identifier: UUID().uuidString , content: content, trigger: trigger)
                 UNUserNotificationCenter.current().add(request)
                 
             } else if let error = error {
