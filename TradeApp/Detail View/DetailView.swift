@@ -486,6 +486,7 @@ class DetailView: UITableViewController, Index, Coordinates {
             guard let itemID = self?.item.id else { return }
             
             self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).setValue(anyChat)
+            self?.reference.child(mail).child("chats").child("\(itemID)").child(owner).setValue(anyChat)
 
             // show notification when get message
             self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observe(.childAdded) { snapshot in

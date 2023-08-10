@@ -161,6 +161,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                 
                 let msg = message.toAnyObject()
                 self?.reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).child(message.messageId).setValue(msg)
+                self?.reference.child(fixedBuyer).child("chats").child("\(itemID)").child(fixedSeller).child(message.messageId).setValue(msg)
                 
                 completion()
             }

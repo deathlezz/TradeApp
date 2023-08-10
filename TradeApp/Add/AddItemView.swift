@@ -387,20 +387,20 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                     self?.saveItem(user: mail, item: newItem, urls: urls)
                                 }
                                 
+                                // show notification if new message arrive
                                 self?.reference.child(owner).child("chats").child("\(id)").observe(.childAdded) { snapshot in
-                                    print("new message")
-                                    if let value = snapshot.value as? [String: String] {
-                    
-                                        guard let sender = value["sender"] else { return }
-                                        guard let kind = value["kind"] else { return }
-                                        guard sender != owner else { return }
-
-                                        // notify ChatView about the message
-                                        NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
+                                    
+                                    if let value = snapshot.value as? [[String: String]] {
+                                        let buyer = snapshot.key
                                         
-                                        guard sender != ChatView.shared.seller && sender != ChatView.shared.buyer else { return }
-                                        
-                                        self?.showNotification(title: title, body: kind)
+                                        self?.reference.child(owner).child("chats").child("\(id)").child("\(buyer)").observe(.childAdded) { snapshot in
+                                            
+                                            if let newMessage = snapshot.value as? [String: String] {
+                                                guard let kind = newMessage["kind"] else { return }
+                                                
+                                                self?.showNotification(title: title, body: kind)
+                                            }
+                                        }
                                     }
                                 }
                                 
