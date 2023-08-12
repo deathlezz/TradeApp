@@ -13,5 +13,4 @@ class AppStorage {
     var items = [Item]()
     var filteredItems = [Item]()
     var recentlyAdded = [Item]()
-//    var users = [User]()
 }

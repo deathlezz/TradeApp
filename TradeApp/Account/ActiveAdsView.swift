@@ -109,7 +109,6 @@ class ActiveAdsView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-//            guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
             guard let itemID = activeAds[indexPath.row]?.id else { return }
             
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
@@ -119,8 +118,6 @@ class ActiveAdsView: UITableViewController {
                 AppStorage.shared.filteredItems.removeAll(where: {$0.id == itemID})
                 
                 self?.deleteItem(itemID: itemID)
-                
-//                AppStorage.shared.users[index].activeItems.remove(at: indexPath.row)
                 self?.activeAds.remove(at: indexPath.row)
                 
                 tableView.deleteRows(at: [indexPath], with: .fade)
@@ -270,9 +267,20 @@ class ActiveAdsView: UITableViewController {
                         let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(fixedMail).child("\(itemID)").child("image\(i)")
                         storageRef.delete() { _ in }
                     }
-                    self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").removeValue()
-                    self?.reference.child(fixedMail).child("chats").child("\(itemID)").removeAllObservers()
-                    self?.reference.child(fixedMail).child("chats").child("\(itemID)").removeValue()
+                    
+                    self?.reference.child(fixedMail).child("chats").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
+                        if let buyers = snapshot.value as? [String: [String: [Any]]] {
+                            let keys = buyers.keys
+                            
+                            for key in keys {
+                                self?.reference.child(fixedMail).child("chats").child("\(itemID)").child(key).removeAllObservers()
+                            }
+                            
+                            self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").removeValue()
+                            self?.reference.child(fixedMail).child("chats").child("\(itemID)").removeAllObservers()
+                            self?.reference.child(fixedMail).child("chats").child("\(itemID)").removeValue()
+                        }
+                    }
                 }
             }
         }

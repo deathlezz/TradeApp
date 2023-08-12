@@ -491,6 +491,13 @@ class DetailView: UITableViewController, Index, Coordinates {
             // show notification when get message
             self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observe(.childAdded) { snapshot in
                 
+                // remove observer if path does not exist
+                guard snapshot.exists() else {
+                    print("item has been removed")
+                    self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).removeAllObservers()
+                    return
+                }
+                
                 if let value = snapshot.value as? [String: String] {
                     guard let sender = value["sender"] else { return }
                     guard let kind = value["kind"] else { return }

@@ -390,7 +390,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 // show notification if new message arrive
                                 self?.reference.child(owner).child("chats").child("\(id)").observe(.childAdded) { snapshot in
                                     
-                                    if let value = snapshot.value as? [[String: String]] {
+                                    if let _ = snapshot.value as? [[String: String]] {
                                         let buyer = snapshot.key
                                         
                                         self?.reference.child(owner).child("chats").child("\(id)").child("\(buyer)").observe(.childAdded) { snapshot in
