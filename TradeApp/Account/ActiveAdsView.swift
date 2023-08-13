@@ -269,7 +269,8 @@ class ActiveAdsView: UITableViewController {
                     }
                     
                     self?.reference.child(fixedMail).child("chats").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
-                        if let buyers = snapshot.value as? [String: [String: [Any]]] {
+                        
+                        if let buyers = snapshot.value as? [String: [[String: String]]] {
                             let keys = buyers.keys
                             
                             for key in keys {

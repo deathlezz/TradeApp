@@ -22,7 +22,7 @@ enum ActionType {
     case edit
 }
 
-class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextViewDelegate {
+class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextViewDelegate, UNUserNotificationCenterDelegate {
     
     var index: Int!
     var action: ActionType!
@@ -666,6 +666,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    // handle user notification action
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
     }
     
 }

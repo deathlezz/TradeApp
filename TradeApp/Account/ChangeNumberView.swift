@@ -131,23 +131,19 @@ class ChangeNumberView: UITableViewController {
     
     // set action for tapped button
     @objc func submitTapped() {
-//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
         guard let phoneNumber = newNumber.textField.text else { return }
         
         if isNumberValid() && sections.count == 2 {
-//            AppStorage.shared.users[index].phoneNumber = Int(phoneNumber)
             currentNumber = Int(phoneNumber)
             saveNumber(number: phoneNumber)
             newNumber.textField.text = nil
             updateRows()
         } else if isNumberValid() && sections.count == 3 {
-//            AppStorage.shared.users[index].phoneNumber = Int(phoneNumber)
             currentNumber = Int(phoneNumber)
             saveNumber(number: phoneNumber)
             newNumber.textField.text = nil
             updateNumberCell()
         } else if newNumber.textField.text == "" && sections.count == 3 {
-//            AppStorage.shared.users[index].phoneNumber = Int(phoneNumber)
             newNumber.textField.text = nil
             saveNumber(number: phoneNumber)
             currentNumber = nil

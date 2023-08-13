@@ -16,7 +16,7 @@ enum SaveAction {
     case remove
 }
 
-class DetailView: UITableViewController, Index, Coordinates {
+class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationCenterDelegate {
 
     var loggedUser: String!
     
@@ -487,16 +487,15 @@ class DetailView: UITableViewController, Index, Coordinates {
             
             self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).setValue(anyChat)
             self?.reference.child(mail).child("chats").child("\(itemID)").child(owner).setValue(anyChat)
+            
+            // remove observer if item has been removed
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observe(.childRemoved) { snapshot in
+                self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).removeAllObservers()
+                self?.reference.child(mail).child("chats").child("\(itemID)").child(owner).removeValue()
+            }
 
             // show notification when get message
             self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observe(.childAdded) { snapshot in
-                
-                // remove observer if path does not exist
-                guard snapshot.exists() else {
-                    print("item has been removed")
-                    self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).removeAllObservers()
-                    return
-                }
                 
                 if let value = snapshot.value as? [String: String] {
                     guard let sender = value["sender"] else { return }
@@ -569,6 +568,11 @@ class DetailView: UITableViewController, Index, Coordinates {
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    // handle user notification action
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
     }
     
 }

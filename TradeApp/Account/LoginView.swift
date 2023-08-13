@@ -364,7 +364,6 @@ class LoginView: UITableViewController {
                 self?.accountCreatedAlert()
             }
         }
-        
     }
     
 }
