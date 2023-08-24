@@ -7,6 +7,7 @@
 
 import Firebase
 import UIKit
+import UserNotifications
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDelegate, UNUserNotificationCenterDelegate {
@@ -26,8 +27,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDel
         
         UNUserNotificationCenter.current().delegate = self
         FirebaseApp.configure()
+        application.registerForRemoteNotifications()
         
         return true
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        <#code#>
+    }
+    
+    
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
+        // retrieve the root view controller (which is a tab bar controller)
+        guard let rootViewController = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController else {
+            return
+        }
+      
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+
+        // instantiate the view controller we want to show from storyboard
+        // root view controller is tab bar controller
+        // the selected tab is a navigation controller
+        // then we push the new view controller to it
+        if  let vc = storyboard.instantiateViewController(withIdentifier: "ChatView") as? ChatView,
+            let tabBarController = rootViewController as? UITabBarController,
+            let navController = tabBarController.selectedViewController as? UINavigationController {
+
+                // we can modify variable of the new view controller using notification data
+                // (eg: title of notification)
+//                vc.senderDisplayName = response.notification.request.content.title
+            vc.isPushedByChats = false
+                // you can access custom data of the push notification by using userInfo property
+                // response.notification.request.content.userInfo
+            navController.pushViewController(vc, animated: true)
+        }
+        
+        // tell the app that we have finished processing the user’s action / response
+        completionHandler()
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {

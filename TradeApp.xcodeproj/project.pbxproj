@@ -613,6 +613,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TradeApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.shopping";
+				INFOPLIST_KEY_NSCameraUsageDescription = "TradeApp would like to use your camera";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "TradeApp would like to use your current location";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "TradeApp would like to use your current location";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "TradeApp would like to use your photo library";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "TradeApp would like to use your photo library";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -645,6 +650,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TradeApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.shopping";
+				INFOPLIST_KEY_NSCameraUsageDescription = "TradeApp would like to use your camera";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "TradeApp would like to use your current location";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "TradeApp would like to use your current location";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "TradeApp would like to use your photo library";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "TradeApp would like to use your photo library";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

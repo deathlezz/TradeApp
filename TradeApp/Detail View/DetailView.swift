@@ -18,7 +18,7 @@ enum SaveAction {
 
 class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationCenterDelegate {
 
-    var loggedUser: String!
+    var loggedUser: String?
     
     var savedItems = [Item]()
     
@@ -377,7 +377,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         }
         
         if loggedUser != nil {
-            let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+            let mail = loggedUser!.replacingOccurrences(of: ".", with: "_")
             
 //            if mail == item.owner {
 //                messageButton.isEnabled = false
@@ -402,6 +402,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     
     // increase number of views
     func increaseViews() {
+        let mail = loggedUser?.replacingOccurrences(of: ".", with: "_") ?? ""
         let owner = item.owner
         let itemID = item.id
         
@@ -409,7 +410,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
             self?.reference.child(owner).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
                 if let views = snapshot.value as? Int {
                     
-                    if self?.loggedUser != owner {
+                    if mail != owner {
                         self?.reference.child(owner).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
                         self?.views = views + 1
                     } else {
@@ -471,6 +472,8 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     // send message function
     @objc func sendMessage() {
         guard !messageTextField.text!.isEmpty else { return }
+        guard let loggedUser = loggedUser else { return }
+        
         let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
         let newSender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
@@ -532,7 +535,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
             return
         }
         
-        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+        let mail = loggedUser!.replacingOccurrences(of: ".", with: "_")
         
         DispatchQueue.global().async { [weak self] in
             guard let owner = self?.item.owner else { return }
@@ -571,8 +574,11 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     }
     
     // handle user notification action
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let userInfo = response.notification.request.content.userInfo
-    }
+//    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+//        let userInfo = response.notification.request.content.userInfo
+//        
+//        
+//        
+//    }
     
 }

@@ -2,16 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>TradeApp would like to use your current location</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>TradeApp would like to use your photo library</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>TradeApp would like to use your photo library</string>
-	<key>NSCameraUsageDescription</key>
-	<string>TradeApp would like to use your camera</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>TradeApp would like to use your current location</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>comgooglemaps</string>
@@ -35,5 +25,11 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>
