@@ -86,8 +86,13 @@ class MessagesView: UITableViewController {
     // set empty array view before view appears
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadChats()
-        isArrayEmpty()
+        
+        loadChats() { conv in
+//            self.chats = conv
+//            self.isArrayEmpty()
+            print(conv)
+        }
+//        isArrayEmpty()
     }
     
     // set up empty array view
@@ -133,39 +138,45 @@ class MessagesView: UITableViewController {
     }
     
     // load user chats
-    func loadChats() {
+    func loadChats(completion: @escaping ([Message]) -> Void) {
         let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(mail).child("chats").observeSingleEvent(of: .value) { snapshot in
-                if let conversations = snapshot.value as? [String: [String: Any]] {
+                
+                if let conversations = snapshot.value as? [String: [String: [[String: String]]]] {
+                    
                     for (id, buyer) in conversations {
                         
-                        guard let buyer = buyer as? [String: [String: String]] else { return }
+//                        guard let buyer = buyer as? [String: [[String: String]]] else { return }
                         
                         for chat in buyer {
-                            guard let messages = chat as? [String: [String: String]] else { return }
+//                            guard let messages = chat as? [String: [[String: String]]] else { return }
                             
-                            for message in messages {
-                                let sender = Sender(senderId: message.value["sender"]!, displayName: "")
-                                let messageId = message.value["messageId"]!
-                                let sentDate = message.value["sentDate"]!.toDate()
-                                let kind = message.value["kind"]!
+                            var result = [Message]()
+                            
+                            for message in chat.value {
+                                let sender = Sender(senderId: message["sender"]!, displayName: "")
+                                let messageId = message["messageId"]!
+                                let sentDate = message["sentDate"]!.toDate()
+                                let kind = message["kind"]!
                                 
                                 let msg = Message(sender: sender, messageId: messageId, sentDate: sentDate, kind: .text(kind))
                                 
-                                self?.chats[id]?.append(msg)
+                                result.append(msg)
+                                print(msg)
+                                print(result)
                             }
+                            
+                            print(result.count)
+                            guard result.count == conversations.count else { return }
+                            completion(result)
                         }
                         
                     }
                 }
             }
         }
-        
-        
-//        guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == loggedUser}) else { return }
-//        chats = AppStorage.shared.users[index].chats
     }
 
 }
