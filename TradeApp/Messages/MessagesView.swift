@@ -45,7 +45,7 @@ class MessagesView: UITableViewController {
         let conf = UIImage.SymbolConfiguration(scale: .large)
         let chatKey = Array(chats.keys)[indexPath.row]
         cell.textLabel?.text = chatKey
-        cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) • \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
+        cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) • \(chats[chatKey]?.last?.sentDate.toString(shortened: true) ?? "") • \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
         cell.imageView?.image = UIImage(systemName: "photo", withConfiguration: conf)
@@ -88,11 +88,11 @@ class MessagesView: UITableViewController {
         super.viewWillAppear(animated)
         
         loadChats() { conv in
-//            self.chats = conv
-//            self.isArrayEmpty()
-            print(conv)
+            self.chats = conv
+            self.isArrayEmpty()
+            self.tableView.reloadData()
         }
-//        isArrayEmpty()
+
     }
     
     // set up empty array view
@@ -138,22 +138,20 @@ class MessagesView: UITableViewController {
     }
     
     // load user chats
-    func loadChats(completion: @escaping ([Message]) -> Void) {
+    func loadChats(completion: @escaping ([String: [Message]]) -> Void) {
         let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(mail).child("chats").observeSingleEvent(of: .value) { snapshot in
-                
                 if let conversations = snapshot.value as? [String: [String: [[String: String]]]] {
-                    
                     for (id, buyer) in conversations {
                         
-//                        guard let buyer = buyer as? [String: [[String: String]]] else { return }
+                        let children = buyer.keys
+                        
+                        print(children)
                         
                         for chat in buyer {
-//                            guard let messages = chat as? [String: [[String: String]]] else { return }
-                            
-                            var result = [Message]()
+                            var result = [String: [Message]]()
                             
                             for message in chat.value {
                                 let sender = Sender(senderId: message["sender"]!, displayName: "")
@@ -163,12 +161,14 @@ class MessagesView: UITableViewController {
                                 
                                 let msg = Message(sender: sender, messageId: messageId, sentDate: sentDate, kind: .text(kind))
                                 
-                                result.append(msg)
-                                print(msg)
-                                print(result)
+                                if result.isEmpty {
+                                    result[id] = [msg]
+                                } else {
+                                    result[id]?.append(msg)
+                                }
+                            
                             }
                             
-                            print(result.count)
                             guard result.count == conversations.count else { return }
                             completion(result)
                         }

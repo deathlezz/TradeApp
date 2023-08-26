@@ -73,7 +73,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
         
         DispatchQueue.global().async { [weak self] in
             self?.resetFilters()
-//            self?.loadChats()
             self?.mail = Utilities.loadUser()
             self?.currentUnit = Utilities.loadDistanceUnit()
             
