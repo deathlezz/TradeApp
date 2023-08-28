@@ -16,6 +16,7 @@ class MessagesView: UITableViewController {
     var loggedUser: String!
     
     var chats = [String: [Message]]()
+    var chatsData = [String: [String: String]]()
     
     var reference: DatabaseReference!
 
@@ -44,7 +45,7 @@ class MessagesView: UITableViewController {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
         let conf = UIImage.SymbolConfiguration(scale: .large)
         let chatKey = Array(chats.keys)[indexPath.row]
-        cell.textLabel?.text = chatKey
+        cell.textLabel?.text = chatsData["\(chatKey)"]?["title"]
         cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) • \(chats[chatKey]?.last?.sentDate.toString(shortened: true) ?? "") • \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
@@ -141,6 +142,8 @@ class MessagesView: UITableViewController {
     func loadChats(completion: @escaping ([String: [Message]]) -> Void) {
         let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
+        var result = [String: [Message]]()
+        
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(mail).child("chats").observeSingleEvent(of: .value) { snapshot in
                 if let conversations = snapshot.value as? [String: [String: [[String: String]]]] {
@@ -148,31 +151,71 @@ class MessagesView: UITableViewController {
                         
                         let children = buyer.keys
                         
-                        print(children)
-                        
-                        for chat in buyer {
-                            var result = [String: [Message]]()
+                        for child in children {
                             
-                            for message in chat.value {
-                                let sender = Sender(senderId: message["sender"]!, displayName: "")
-                                let messageId = message["messageId"]!
-                                let sentDate = message["sentDate"]!.toDate()
-                                let kind = message["kind"]!
+                            self?.getChatData(child: child, id: id) { data in
+                                self?.chatsData = data
                                 
-                                let msg = Message(sender: sender, messageId: messageId, sentDate: sentDate, kind: .text(kind))
-                                
-                                if result.isEmpty {
-                                    result[id] = [msg]
-                                } else {
-                                    result[id]?.append(msg)
+                                for chat in buyer {
+                                    for message in chat.value {
+                                        let sender = Sender(senderId: message["sender"]!, displayName: "")
+                                        let messageId = message["messageId"]!
+                                        let sentDate = message["sentDate"]!.toDate()
+                                        let kind = message["kind"]!
+                                        
+                                        let msg = Message(sender: sender, messageId: messageId, sentDate: sentDate, kind: .text(kind))
+                                        
+                                        if result.isEmpty {
+                                            result[id] = [msg]
+                                        } else {
+                                            result[id]?.append(msg)
+                                        }
+                                    }
+                                    
+                                    guard result.count == conversations.count else { return }
+                                    completion(result)
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // get chat title and thumbnail
+    func getChatData(child: String, id: String, completion: @escaping ([String: [String: String]]) -> Void) {
+        var result = [String: [String: String]]()
+        
+        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+        
+        let userCases = [child, mail]
+        let itemsCases = ["activeItems", "endedItems"]
+        
+        DispatchQueue.global().async { [weak self] in
+            for userCase in userCases {
+                for itemsCase in itemsCases {
+                    self?.reference.child(userCase).child(itemsCase).child(id).observeSingleEvent(of: .value) { snapshot in
+                        
+                        if let value = snapshot.value as? [String: Any] {
+                            let photos = value["photos"] as? [String: String]
+                            let title = value["title"] as? String
+                            let thumbnail = photos?["image0"]
                             
+                            print(id)
+                            
+                            if result.isEmpty {
+                                result[id] = ["title": title!, "thumbnail": thumbnail!]
+                            } else {
+                                result[id]?["title"] = title
+                                result[id]?["thumbnail"] = thumbnail
                             }
                             
-                            guard result.count == conversations.count else { return }
+//                            result[id]?["title"] = title
+//                            result[id]?["thumbnail"] = thumbnail
                             completion(result)
+                            
                         }
-                        
                     }
                 }
             }
