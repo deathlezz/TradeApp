@@ -16,7 +16,7 @@ class MessagesView: UITableViewController {
     var loggedUser: String!
     
     var chats = [String: [Message]]()
-    var chatsData = [String: [String: String]]()
+    var chatsData = [String: [String: Any]]()
     
     var reference: DatabaseReference!
 
@@ -45,24 +45,25 @@ class MessagesView: UITableViewController {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
         let conf = UIImage.SymbolConfiguration(scale: .large)
         let chatKey = Array(chats.keys)[indexPath.row]
-        cell.textLabel?.text = chatsData["\(chatKey)"]?["title"]
+        cell.textLabel?.text = chatsData["\(chatKey)"]?["title"] as? String
         cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) • \(chats[chatKey]?.last?.sentDate.toString(shortened: true) ?? "") • \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
-        cell.imageView?.image = UIImage(systemName: "photo", withConfiguration: conf)
+        cell.imageView?.image = chatsData["\(chatKey)"]?["thumbnail"] as? UIImage
+//        cell.imageView?.image = UIImage(systemName: "photo", withConfiguration: conf)
         return cell
     }
     
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
-            let chatTitle = Array(chats.keys)[indexPath.row]
-            vc.chatTitle = chatTitle
+            let chatId = Array(chats.keys)[indexPath.row]
+            vc.chatTitle = chatsData["\(chatId)"]?["title"] as? String
             ChatView.shared.buyer = ""
             ChatView.shared.seller = ""
             vc.isPushedByChats = true
             vc.loggedUser = loggedUser
-            vc.messages = chats[chatTitle] ?? [Message]()
+            vc.messages = chats[chatId] ?? [Message]()
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
@@ -184,8 +185,8 @@ class MessagesView: UITableViewController {
     }
     
     // get chat title and thumbnail
-    func getChatData(child: String, id: String, completion: @escaping ([String: [String: String]]) -> Void) {
-        var result = [String: [String: String]]()
+    func getChatData(child: String, id: String, completion: @escaping ([String: [String: Any]]) -> Void) {
+        var result = [String: [String: Any]]()
         
         let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
@@ -200,25 +201,41 @@ class MessagesView: UITableViewController {
                         if let value = snapshot.value as? [String: Any] {
                             let photos = value["photos"] as? [String: String]
                             let title = value["title"] as? String
-                            let thumbnail = photos?["image0"]
+                            let url = photos?["image0"]
                             
-                            print(id)
-                            
-                            if result.isEmpty {
-                                result[id] = ["title": title!, "thumbnail": thumbnail!]
-                            } else {
-                                result[id]?["title"] = title
-                                result[id]?["thumbnail"] = thumbnail
+                            // convert URL to UIImage here
+                            self?.getThumbnail(url: url!) { thumbnail in
+                                result[id] = ["title": title!, "thumbnail": thumbnail]
+                                completion(result)
                             }
-                            
-//                            result[id]?["title"] = title
-//                            result[id]?["thumbnail"] = thumbnail
-                            completion(result)
-                            
                         }
                     }
                 }
             }
+        }
+    }
+    
+    // convert image URL to UIImage
+    func getThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
+        DispatchQueue.global().async {
+            guard let url = URL(string: url) else { return }
+            
+            let config = URLSessionConfiguration.default
+            config.requestCachePolicy = .reloadIgnoringLocalCacheData
+            config.urlCache = nil
+            
+            let task = URLSession(configuration: config).dataTask(with: url) { (data, _, _) in
+                
+                if let data = data {
+                    DispatchQueue.main.async {
+                        guard let thumbnail = UIImage(data: data) else { return }
+                        completion(thumbnail)
+                    }
+                }
+            }
+
+            task.resume()
+            URLCache.shared.removeAllCachedResponses()
         }
     }
 
