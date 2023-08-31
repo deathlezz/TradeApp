@@ -70,7 +70,6 @@
                                         </label>
                                     </subviews>
                                 </collectionViewCellContentView>
-                                <size key="customSize" width="176" height="230"/>
                                 <connections>
                                     <outlet property="date" destination="SYI-6F-wfe" id="tFJ-Uw-Do3"/>
                                     <outlet property="image" destination="UNI-Z3-OSZ" id="o1z-cR-u05"/>
@@ -224,7 +223,6 @@
                                         </label>
                                     </subviews>
                                 </collectionViewCellContentView>
-                                <size key="customSize" width="176" height="230"/>
                                 <connections>
                                     <outlet property="date" destination="RBl-QV-qXX" id="JqS-N2-hz0"/>
                                     <outlet property="image" destination="YNG-AL-qjY" id="0pb-Ia-UXU"/>

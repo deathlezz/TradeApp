@@ -43,14 +43,12 @@ class MessagesView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
-        let conf = UIImage.SymbolConfiguration(scale: .large)
         let chatKey = Array(chats.keys)[indexPath.row]
         cell.textLabel?.text = chatsData["\(chatKey)"]?["title"] as? String
-        cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) • \(chats[chatKey]?.last?.sentDate.toString(shortened: true) ?? "") • \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
+        cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
         cell.imageView?.image = chatsData["\(chatKey)"]?["thumbnail"] as? UIImage
-//        cell.imageView?.image = UIImage(systemName: "photo", withConfiguration: conf)
         return cell
     }
     
@@ -89,12 +87,16 @@ class MessagesView: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        loadChats() { conv in
-            self.chats = conv
-            self.isArrayEmpty()
-            self.tableView.reloadData()
+        DispatchQueue.global().async { [weak self] in
+            self?.loadChats() { conv in
+                self?.chats = conv
+                
+                DispatchQueue.main.async {
+                    self?.isArrayEmpty()
+                    self?.tableView.reloadData()
+                }
+            }
         }
-
     }
     
     // set up empty array view
@@ -220,11 +222,7 @@ class MessagesView: UITableViewController {
         DispatchQueue.global().async {
             guard let url = URL(string: url) else { return }
             
-            let config = URLSessionConfiguration.default
-            config.requestCachePolicy = .reloadIgnoringLocalCacheData
-            config.urlCache = nil
-            
-            let task = URLSession(configuration: config).dataTask(with: url) { (data, _, _) in
+            let task = URLSession.shared.dataTask(with: url) { (data, _, _) in
                 
                 if let data = data {
                     DispatchQueue.main.async {
@@ -235,7 +233,6 @@ class MessagesView: UITableViewController {
             }
 
             task.resume()
-            URLCache.shared.removeAllCachedResponses()
         }
     }
 
