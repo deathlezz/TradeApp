@@ -9,7 +9,7 @@ import UIKit
 import Network
 import Firebase
 
-class SavedView: UICollectionViewController {
+class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     var savedItems = [Item]()
     var loggedUser: String!
@@ -520,6 +520,15 @@ class SavedView: UICollectionViewController {
 
         let screenSize = UIScreen.main.bounds.size
         emptyArrayView.frame = CGRect(x: 0, y: offset, width: screenSize.width, height: screenSize.height)
+    }
+    
+    // set scalable size for item cell
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let screenWidth = UIScreen.main.bounds.width
+        let cellWidth = screenWidth / 2 - 20
+        let cellHeight = cellWidth * 1.3
+        
+        return CGSize(width: cellWidth, height: cellHeight)
     }
     
 }

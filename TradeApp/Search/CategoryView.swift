@@ -79,5 +79,11 @@ class CategoryView: UITableViewController {
         Utilities.saveFilters(currentFilters)
         navigationController?.popToRootViewController(animated: true)
     }
+    
+    // set table view cell height
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let screenHeight = UIScreen.main.bounds.height
+        return screenHeight / 12
+    }
 
 }

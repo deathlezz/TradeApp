@@ -10,7 +10,7 @@ import CoreLocation
 import Network
 import Firebase
 
-class ViewController: UICollectionViewController, UITabBarControllerDelegate {
+class ViewController: UICollectionViewController, UITabBarControllerDelegate, UICollectionViewDelegateFlowLayout {
     
     let categories = ["All Ads", "Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
     
@@ -104,15 +104,11 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
             fatalError("Unable to dequeue itemCell")
         }
         let thumbnail = UIImage(data: AppStorage.shared.filteredItems[indexPath.item].photos[0]!)
-        let cellWidth = (UIScreen.main.bounds.width / 2) - 20
-        
         cell.image.image = thumbnail
         cell.title.text = AppStorage.shared.filteredItems[indexPath.item].title
         cell.price.text = "£\(AppStorage.shared.filteredItems[indexPath.item].price)"
         cell.location.text = AppStorage.shared.filteredItems[indexPath.item].location
         cell.date.text = AppStorage.shared.filteredItems[indexPath.item].date.toString(shortened: true)
-        cell.frame.size.width = cellWidth
-        cell.frame.size.height = cellWidth * 1.3
         cell.layer.borderWidth = 0.2
         cell.layer.borderColor = UIColor.lightGray.cgColor
         cell.layer.cornerRadius = 10
@@ -573,6 +569,15 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate {
 
         let screenSize = UIScreen.main.bounds.size
         emptyArrayView.frame = CGRect(x: 0, y: offset, width: screenSize.width, height: screenSize.height)
+    }
+    
+    // set scalable size for item cell
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let screenWidth = UIScreen.main.bounds.width
+        let cellWidth = screenWidth / 2 - 20
+        let cellHeight = cellWidth * 1.3
+        
+        return CGSize(width: cellWidth, height: cellHeight)
     }
     
 
