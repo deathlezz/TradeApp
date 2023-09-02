@@ -130,6 +130,10 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
+                let screenWidth = UIScreen.main.bounds.width
+                headerView.frame = CGRect(x: screenWidth / 22, y: 0, width: screenWidth - 40, height: 15)
+//                headerView.backgroundColor = .yellow
+//                headerView.textLabel.backgroundColor = .blue
                 headerView.textLabel.text = AppStorage.shared.filteredItems.count == 1 ? "Found 1 ad" : "Found \(AppStorage.shared.filteredItems.count) ads"
                 headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 14)
                 headerView.textLabel.textColor = .gray
@@ -574,10 +578,21 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     // set scalable size for item cell
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
-        let cellWidth = screenWidth / 2 - 20
+        let cellWidth = screenWidth / 2 - (screenWidth / 22) * 2
         let cellHeight = cellWidth * 1.3
         
         return CGSize(width: cellWidth, height: cellHeight)
+    }
+    
+    // set collection view edge insets
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        let screenWidth = UIScreen.main.bounds.width
+        return UIEdgeInsets(top: 10, left: screenWidth / 22, bottom: 10, right: screenWidth / 22)
+    }
+    
+    // set minimum spaces between items
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 10
     }
     
 
