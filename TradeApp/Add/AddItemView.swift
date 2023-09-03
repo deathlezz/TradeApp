@@ -151,6 +151,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             if sections[indexPath.section] == "Photos" {
                 cell.selectionStyle = .none
                 cell.delegate = self
+                cell.minX = view.readableContentGuide.layoutFrame.minX
                 return cell
             }
         }
@@ -168,7 +169,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 return cell
             case "Price":
                 cell.textField.text = item?.price.description ?? ""
-                cell.textField.placeholder = "£"
+                cell.textField.placeholder = "e.g. 2000"
                 cell.selectionStyle = .none
                 cell.textField.clearButtonMode = .whileEditing
                 cell.textField.keyboardType = .numberPad

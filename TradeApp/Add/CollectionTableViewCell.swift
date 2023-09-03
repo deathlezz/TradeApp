@@ -13,11 +13,12 @@ protocol ImagePicker {
     func pushIndex(indexPath: Int)
 }
 
-class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDragDelegate, UICollectionViewDropDelegate, UICollectionViewDelegateFlowLayout {
     
     @IBOutlet var collectionView: UICollectionView!
     
     var delegate: ImagePicker?
+    var minX: CGFloat!
     
     var images = [UIImage]()
     
@@ -141,6 +142,18 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         let itemPhotos = notification.userInfo?["images"] as! [UIImage]
         images = itemPhotos
         collectionView.reloadData()
+    }
+    
+    // set scalable size for item cell
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let viewHeight = collectionView.frame.height
+        return CGSize(width: viewHeight, height: viewHeight)
+    }
+    
+    // set collection view edge insets
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+//        let minX = collectionView.readableContentGuide.layoutFrame.minX * 2
+        return UIEdgeInsets(top: 0, left: minX, bottom: 0, right: minX)
     }
     
 }

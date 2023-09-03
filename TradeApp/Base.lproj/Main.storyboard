@@ -799,33 +799,37 @@
                                         <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" springLoaded="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Nd-Qr-WkW">
                                             <rect key="frame" x="0.0" y="6" width="393" height="128"/>
                                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" secondItem="9Nd-Qr-WkW" secondAttribute="height" multiplier="395:128" id="SeD-Hd-wfB"/>
-                                            </constraints>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="20" minimumInteritemSpacing="10" id="HDv-lw-0mN">
                                                 <size key="itemSize" width="128" height="128"/>
-                                                <size key="estimatedItemSize" width="128" height="128"/>
                                                 <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                                 <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                                <inset key="sectionInset" minX="20" minY="0.0" maxX="90" maxY="0.0"/>
+                                                <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                             </collectionViewFlowLayout>
                                             <cells>
                                                 <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="photoCell" id="1sa-aZ-eAd" customClass="PhotosCell" customModule="TradeApp" customModuleProvider="target">
-                                                    <rect key="frame" x="20" y="0.0" width="128" height="128"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
                                                         <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <subviews>
-                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QdQ-pt-y75">
-                                                                <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="QdQ-pt-y75">
+                                                                <rect key="frame" x="0.0" y="3.6666666666666643" width="128" height="120.66666666666669"/>
                                                                 <color key="tintColor" systemColor="systemGrayColor"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="width" secondItem="QdQ-pt-y75" secondAttribute="height" multiplier="1:1" id="B50-RT-6hy"/>
+                                                                </constraints>
                                                                 <imageReference key="image" image="plus" catalog="system" symbolScale="small" variableValue="0.0"/>
                                                             </imageView>
                                                         </subviews>
                                                     </view>
                                                     <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="trailing" secondItem="QdQ-pt-y75" secondAttribute="trailing" id="238-O4-Z82"/>
+                                                        <constraint firstAttribute="bottom" secondItem="QdQ-pt-y75" secondAttribute="bottom" id="8oe-Ip-24r"/>
+                                                        <constraint firstItem="QdQ-pt-y75" firstAttribute="leading" secondItem="1sa-aZ-eAd" secondAttribute="leading" id="9Ak-Q0-61m"/>
+                                                        <constraint firstItem="QdQ-pt-y75" firstAttribute="top" secondItem="1sa-aZ-eAd" secondAttribute="top" id="gpI-0L-YcM"/>
+                                                    </constraints>
                                                     <size key="customSize" width="128" height="128"/>
                                                     <connections>
                                                         <outlet property="imageView" destination="QdQ-pt-y75" id="ddv-c3-hsq"/>
@@ -836,6 +840,7 @@
                                     </subviews>
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="9Nd-Qr-WkW" secondAttribute="trailing" id="4y8-sh-cst"/>
+                                        <constraint firstItem="9Nd-Qr-WkW" firstAttribute="width" secondItem="8wQ-Rr-wEZ" secondAttribute="height" multiplier="393:140" id="76V-KK-yaj"/>
                                         <constraint firstItem="9Nd-Qr-WkW" firstAttribute="leading" secondItem="8wQ-Rr-wEZ" secondAttribute="leading" id="Afp-hn-R54"/>
                                         <constraint firstAttribute="bottom" secondItem="9Nd-Qr-WkW" secondAttribute="bottom" constant="6" id="PJR-kZ-H15"/>
                                         <constraint firstItem="9Nd-Qr-WkW" firstAttribute="top" secondItem="8wQ-Rr-wEZ" secondAttribute="top" constant="6" id="lUY-w8-DpK"/>
