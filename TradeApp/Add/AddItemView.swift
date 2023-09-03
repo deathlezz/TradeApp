@@ -110,16 +110,17 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set table view header
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerX = view.readableContentGuide.layoutFrame.minX
         let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
             
         let label = UILabel()
         
         if section == 0 {
-            label.frame = CGRect.init(x: 20, y: 12, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            label.frame = CGRect.init(x: headerX, y: 12, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         } else if section == 5 {
-            label.frame = CGRect.init(x: 20, y: -19, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            label.frame = CGRect.init(x: headerX, y: -19, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         } else {
-            label.frame = CGRect.init(x: 20, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            label.frame = CGRect.init(x: headerX, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         }
         
         label.text = section == 6 ? " " : sections[section]

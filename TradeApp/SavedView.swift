@@ -139,7 +139,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             }) { finished in
                 guard let index = self.selectedCells.firstIndex(of: cell) else { return }
                 self.selectedCells.remove(at: index)
-                self.selectedItems.remove(at: indexPath.item)
+//                self.selectedItems.remove(at: indexPath.item)
                 self.showButton()
                 self.updateHeader()
             }
@@ -151,6 +151,9 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         
         if kind == UICollectionView.elementKindSectionHeader {
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
+                let screenWidth = UIScreen.main.bounds.width
+                let headerX = view.readableContentGuide.layoutFrame.minX
+                headerView.frame = CGRect(x: headerX, y: 0, width: screenWidth / 1.5, height: 15)
                 headerView.textLabel.text = savedItems.count == 1 ? "Found 1 ad" : "Found \(savedItems.count) ads"
                 headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 14)
                 headerView.textLabel.textColor = .gray
@@ -525,10 +528,18 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     // set scalable size for item cell
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
-        let cellWidth = screenWidth / 2 - 20
+        let minX = view.readableContentGuide.layoutFrame.minX
+        
+        let cellWidth = screenWidth / 2 - minX * 1.5
         let cellHeight = cellWidth * 1.3
         
         return CGSize(width: cellWidth, height: cellHeight)
+    }
+    
+    // set collection view edge insets
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        let minX = view.readableContentGuide.layoutFrame.minX
+        return UIEdgeInsets(top: 10, left: minX, bottom: 10, right: minX)
     }
     
 }

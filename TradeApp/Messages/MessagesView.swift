@@ -70,8 +70,8 @@ class MessagesView: UITableViewController {
     
     // set table view cell height
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let screenHeight = UIScreen.main.bounds.height
-        return screenHeight / 12
+        let screenWidth = UIScreen.main.bounds.width
+        return screenWidth / 6
     }
     
     // swipe to delete cell

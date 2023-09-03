@@ -57,8 +57,9 @@ class SearchView: UITableViewController {
         let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
             
         let label = UILabel()
+        let minX = view.readableContentGuide.layoutFrame.minX
         
-        label.frame = CGRect.init(x: 20, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height)
+        label.frame = CGRect.init(x: minX, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height)
         
         label.text = recentlySearched.count == 0 ? nil : sections[section]
         label.font = .boldSystemFont(ofSize: 15)
