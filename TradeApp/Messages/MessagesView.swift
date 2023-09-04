@@ -61,6 +61,7 @@ class MessagesView: UITableViewController {
             ChatView.shared.seller = ""
             vc.isPushedByChats = true
             vc.loggedUser = loggedUser
+            vc.itemID = Int(chatId)
             vc.messages = chats[chatId] ?? [Message]()
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never

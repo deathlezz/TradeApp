@@ -145,23 +145,23 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // save message to Firebase Database
     func sendMessage(seller: String, buyer: String, itemID: Int, text: String, completion: @escaping () -> Void) {
-        let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
-        let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
+//        let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
+//        let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
         
         let sender = loggedUser.replacingOccurrences(of: ".", with: "_")
         
         let currentSender = Sender(senderId: sender, displayName: "")
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(seller).child("chats").child("\(itemID)").child(buyer).observeSingleEvent(of: .value) { snapshot in
                 let messagesCount = snapshot.childrenCount
                 
                 let message = Message(sender: currentSender, messageId: "\(messagesCount)", sentDate: Date(), kind: .text(text))
                 self?.messages.append(message)
                 
                 let msg = message.toAnyObject()
-                self?.reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).child(message.messageId).setValue(msg)
-                self?.reference.child(fixedBuyer).child("chats").child("\(itemID)").child(fixedSeller).child(message.messageId).setValue(msg)
+                self?.reference.child(seller).child("chats").child("\(itemID)").child(buyer).child(message.messageId).setValue(msg)
+                self?.reference.child(buyer).child("chats").child("\(itemID)").child(seller).child(message.messageId).setValue(msg)
                 
                 completion()
             }

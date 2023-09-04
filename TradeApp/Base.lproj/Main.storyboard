@@ -596,55 +596,61 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="filterCell" id="Zwj-RS-Nvv" customClass="FilterCell" customModule="TradeApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="55.333332061767578" width="393" height="43.666667938232422"/>
+                                <rect key="frame" x="0.0" y="55.333332061767578" width="393" height="42.333332061767578"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Zwj-RS-Nvv" id="E1X-1U-hq4">
-                                    <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="42.333332061767578"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="EjJ-Oj-2PA">
-                                            <rect key="frame" x="20" y="4" width="353" height="34"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="EjJ-Oj-2PA">
+                                            <rect key="frame" x="20" y="4" width="355.66666666666669" height="34.333333333333336"/>
                                             <color key="backgroundColor" systemColor="systemGray5Color"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <textInputTraits key="textInputTraits" returnKeyType="done"/>
                                         </textField>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="EjJ-Oj-2PA" firstAttribute="leading" secondItem="E1X-1U-hq4" secondAttribute="leadingMargin" id="2LU-gN-Gm7"/>
+                                        <constraint firstItem="EjJ-Oj-2PA" firstAttribute="trailing" secondItem="E1X-1U-hq4" secondAttribute="trailingMargin" id="2jL-nd-q0W"/>
+                                        <constraint firstItem="EjJ-Oj-2PA" firstAttribute="width" secondItem="E1X-1U-hq4" secondAttribute="height" multiplier="353:42" id="UkV-7e-XXu"/>
+                                        <constraint firstItem="EjJ-Oj-2PA" firstAttribute="centerY" secondItem="E1X-1U-hq4" secondAttribute="centerY" id="lYe-Kg-57d"/>
+                                        <constraint firstItem="EjJ-Oj-2PA" firstAttribute="top" secondItem="E1X-1U-hq4" secondAttribute="topMargin" constant="-7" id="y56-46-DWa"/>
+                                    </constraints>
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="filterTextField" destination="EjJ-Oj-2PA" id="x2o-F3-M6C"/>
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="radiusCell" id="PPW-la-LRN" customClass="RadiusCell" customModule="TradeApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="99" width="393" height="43.666667938232422"/>
+                                <rect key="frame" x="0.0" y="97.666664123535156" width="393" height="43.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="PPW-la-LRN" id="6rP-T9-H7b">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tme-9J-OZy">
-                                            <rect key="frame" x="20" y="5" width="60" height="34"/>
+                                            <rect key="frame" x="20" y="4.6666666666666661" width="65" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <buttonConfiguration key="configuration" style="plain">
+                                            <buttonConfiguration key="configuration" style="plain" buttonSize="large">
                                                 <imageReference key="image" image="minus" catalog="system" symbolScale="large"/>
                                             </buttonConfiguration>
                                         </button>
-                                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x1v-J2-C6b">
-                                            <rect key="frame" x="313" y="5" width="60" height="34"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <state key="normal" title="Button"/>
-                                            <buttonConfiguration key="configuration" style="plain">
-                                                <imageReference key="image" image="plus" catalog="system" symbolScale="large"/>
-                                            </buttonConfiguration>
-                                        </button>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="+ 200 km" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qaM-yx-JUD">
-                                            <rect key="frame" x="146" y="5" width="100" height="34"/>
+                                            <rect key="frame" x="146.33333333333334" y="4.6666666666666679" width="72.666666666666657" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x1v-J2-C6b">
+                                            <rect key="frame" x="308" y="5" width="65" height="34"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <state key="normal" title="Button"/>
+                                            <buttonConfiguration key="configuration" style="plain" buttonSize="large">
+                                                <imageReference key="image" image="plus" catalog="system" symbolScale="large"/>
+                                            </buttonConfiguration>
+                                        </button>
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
@@ -654,21 +660,21 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="priceCell" id="c82-bq-oHC" customClass="PriceCell" customModule="TradeApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="142.66666793823242" width="393" height="43.666667938232422"/>
+                                <rect key="frame" x="0.0" y="141.33333206176758" width="393" height="43.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="c82-bq-oHC" id="KNC-gx-rmx" customClass="PriceCell" customModule="TradeApp" customModuleProvider="target">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="7Y4-tg-h6d">
-                                            <rect key="frame" x="20" y="5" width="170" height="34"/>
+                                            <rect key="frame" x="20" y="4" width="172" height="34.333333333333329"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <color key="backgroundColor" systemColor="systemGray5Color"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <textInputTraits key="textInputTraits" keyboardType="numberPad" returnKeyType="done"/>
                                         </textField>
                                         <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="lBM-ew-5fc">
-                                            <rect key="frame" x="203" y="5" width="170" height="34"/>
+                                            <rect key="frame" x="201" y="4" width="172" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <color key="backgroundColor" systemColor="systemGray5Color"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -682,7 +688,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="buttonCell" rowHeight="70" id="jBI-hd-uv7" customClass="ButtonCell" customModule="TradeApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="186.33333587646484" width="393" height="70"/>
+                                <rect key="frame" x="0.0" y="185" width="393" height="70"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jBI-hd-uv7" id="6W5-KC-dED">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="70"/>
@@ -695,12 +701,11 @@
                                         </button>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="top" secondItem="6W5-KC-dED" secondAttribute="top" constant="4" id="2bU-Ww-kQc"/>
-                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="leading" secondItem="6W5-KC-dED" secondAttribute="leading" constant="20" symbolic="YES" id="9ZE-6H-xbn"/>
-                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="width" secondItem="6W5-KC-dED" secondAttribute="height" multiplier="353:70" id="QA7-PU-Yqd"/>
-                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="centerX" secondItem="6W5-KC-dED" secondAttribute="centerX" id="YmU-cP-aXy"/>
-                                        <constraint firstAttribute="trailing" secondItem="YdE-yt-D0f" secondAttribute="trailing" constant="20" symbolic="YES" id="voI-fF-PeI"/>
-                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="centerY" secondItem="6W5-KC-dED" secondAttribute="centerY" id="zaZ-ps-SPN"/>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="top" secondItem="6W5-KC-dED" secondAttribute="topMargin" constant="-7" id="955-Wm-nXo"/>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="centerY" secondItem="6W5-KC-dED" secondAttribute="centerY" id="HEB-8r-h2T"/>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="width" secondItem="6W5-KC-dED" secondAttribute="height" multiplier="353:70" id="SM9-LE-rmH"/>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="trailing" secondItem="6W5-KC-dED" secondAttribute="trailingMargin" id="h3a-GF-Yzz"/>
+                                        <constraint firstItem="YdE-yt-D0f" firstAttribute="leading" secondItem="6W5-KC-dED" secondAttribute="leadingMargin" id="sxb-ch-6ya"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
