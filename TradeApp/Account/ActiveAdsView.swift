@@ -227,6 +227,7 @@ class ActiveAdsView: UITableViewController {
         label.textColor = .lightGray
         label.textAlignment = .center
         label.backgroundColor = .systemGray6
+        label.center = myView.center
         myView.addSubview(label)
         view.addSubview(myView)
         emptyArrayView = myView

@@ -62,15 +62,16 @@ class LoginView: UITableViewController {
     // set table view header
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
+        let headerX = view.readableContentGuide.layoutFrame.minX
             
         let label = UILabel()
         
         if section == 0 {
-            label.frame = CGRect.init(x: 20, y: 1, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            label.frame = CGRect.init(x: headerX, y: 1, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         } else if section == 1 {
-            label.frame = CGRect.init(x: 20, y: 7, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            label.frame = CGRect.init(x: headerX, y: 7, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         } else {
-            label.frame = CGRect.init(x: 20, y: -8, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            label.frame = CGRect.init(x: headerX, y: -8, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         }
         
         label.text = sections[section] == "Segment" || sections[section] == "Button" ? " " : sections[section]

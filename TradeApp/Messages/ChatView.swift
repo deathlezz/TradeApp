@@ -145,11 +145,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // save message to Firebase Database
     func sendMessage(seller: String, buyer: String, itemID: Int, text: String, completion: @escaping () -> Void) {
-//        let fixedSeller = seller.replacingOccurrences(of: ".", with: "_")
-//        let fixedBuyer = buyer.replacingOccurrences(of: ".", with: "_")
-        
         let sender = loggedUser.replacingOccurrences(of: ".", with: "_")
-        
         let currentSender = Sender(senderId: sender, displayName: "")
         
         DispatchQueue.global().async { [weak self] in

@@ -384,6 +384,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         label.textColor = .lightGray
         label.textAlignment = .center
         label.backgroundColor = .clear
+        label.center = myView.center
         myView.isHidden = true
         myView.isUserInteractionEnabled = false
         myView.addSubview(label)

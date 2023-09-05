@@ -238,6 +238,7 @@ class SearchView: UITableViewController {
         label.textColor = .lightGray
         label.textAlignment = .center
         label.backgroundColor = .white
+        label.center = myView.center
         myView.addSubview(label)
         view.addSubview(myView)
         emptyArrayView = myView
