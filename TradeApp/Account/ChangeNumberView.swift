@@ -56,17 +56,18 @@ class ChangeNumberView: UITableViewController {
     // set table view header
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
+        let headerX = view.readableContentGuide.layoutFrame.minX
         
         let label = UILabel()
         
         if sections[section] == "Current number" {
-            label.frame = CGRect.init(x: 20, y: 11, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            label.frame = CGRect.init(x: headerX, y: 11, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
             firstHeader = label
         } else if sections[section] == "New number" {
-            label.frame = CGRect.init(x: 20, y: 11, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            label.frame = CGRect.init(x: headerX, y: 11, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
             secondHeader = label
         } else {
-            label.frame = CGRect.init(x: 20, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+            label.frame = CGRect.init(x: headerX, y: -20, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         }
         
         label.text = sections[section] == "New number" ? "Set number" : " "
@@ -204,18 +205,20 @@ class ChangeNumberView: UITableViewController {
     
     // update table view header
     func updateHeader(after: NumberAction) {
+        let headerX = view.readableContentGuide.layoutFrame.minX
+        
         tableView.beginUpdates()
         
         if after == .add {
             UIView.transition(with: secondHeader!, duration: 0.3, options: .transitionCrossDissolve, animations: {
                 self.secondHeader?.text = "New number"
-                self.secondHeader?.frame = CGRect.init(x: 20, y: -20, width: self.secondHeader.frame.width, height: self.secondHeader.frame.height)
+                self.secondHeader?.frame = CGRect.init(x: headerX, y: -20, width: self.secondHeader.frame.width, height: self.secondHeader.frame.height)
             })
             
         } else {
             UIView.transition(with: secondHeader!, duration: 0.3, options: .transitionCrossDissolve, animations: {
                 self.secondHeader?.text = "Set number"
-                self.secondHeader?.frame = CGRect.init(x: 20, y: 11, width: self.secondHeader.frame.width, height: self.secondHeader.frame.height)
+                self.secondHeader?.frame = CGRect.init(x: headerX, y: 11, width: self.secondHeader.frame.width, height: self.secondHeader.frame.height)
             })
         }
 

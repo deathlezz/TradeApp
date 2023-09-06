@@ -56,9 +56,10 @@ class ActiveAdsView: UITableViewController {
     // set table view header
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))
+        let headerX = view.readableContentGuide.layoutFrame.minX
             
         let label = UILabel()
-        label.frame = CGRect.init(x: 17, y: -13, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
+        label.frame = CGRect.init(x: headerX, y: -13, width: headerView.frame.width - 10, height: headerView.frame.height - 10)
         label.text = activeAds.count == 1 ? "Found 1 ad" : "Found \(activeAds.count) ads"
         label.font = .boldSystemFont(ofSize: 14)
         label.textColor = .gray
@@ -219,15 +220,15 @@ class ActiveAdsView: UITableViewController {
     // set up empty array view
     func addEmptyArrayView() {
         let screenSize = UIScreen.main.bounds.size
+        let safeArea = (navigationController?.navigationBar.frame.maxY)!
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
-        myView.backgroundColor = .systemGray6
-        let label = UILabel(frame: CGRect(x: (screenSize.width / 2) - 100, y: (screenSize.height / 2) - 175, width: 200, height: 50))
+        myView.backgroundColor = .clear
+        let label = UILabel(frame: CGRect(x: (screenSize.width / 2) - 100, y: (screenSize.height / 2) - safeArea - 25, width: 200, height: 50))
         label.text = "Nothing to show here"
         label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         label.textColor = .lightGray
         label.textAlignment = .center
-        label.backgroundColor = .systemGray6
-        label.center = myView.center
+        label.backgroundColor = .clear
         myView.addSubview(label)
         view.addSubview(myView)
         emptyArrayView = myView
