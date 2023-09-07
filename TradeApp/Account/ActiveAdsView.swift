@@ -28,7 +28,7 @@ class ActiveAdsView: UITableViewController {
         
         tableView.separatorStyle = .singleLine
         tableView.sectionHeaderTopPadding = 0
-        tableView.separatorInset.left = 17
+//        tableView.separatorInset.left = 17
         
         NotificationCenter.default.addObserver(self, selector: #selector(loadUserAds), name: NSNotification.Name("reloadActiveAds"), object: nil)
         
