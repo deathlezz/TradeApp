@@ -10,4 +10,6 @@ import UIKit
 class PriceCell: UITableViewCell {
     @IBOutlet var firstTextField: UITextField!
     @IBOutlet var secondTextField: UITextField!
+    
+    
 }

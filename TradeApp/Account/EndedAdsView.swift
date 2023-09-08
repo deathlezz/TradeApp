@@ -110,7 +110,6 @@ class EndedAdsView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-//            guard let index = AppStorage.shared.users.firstIndex(where: {$0.mail == mail}) else { return }
             let itemID = endedAds[indexPath.row].id
             
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
@@ -120,8 +119,6 @@ class EndedAdsView: UITableViewController {
                 AppStorage.shared.filteredItems.removeAll(where: {$0.id == itemID})
                 
                 self?.deleteItem(itemID: itemID)
-                
-//                AppStorage.shared.users[index].endedItems.removeAll(where: {$0?.id == itemID})
                 self?.endedAds.remove(at: indexPath.row)
                 
                 tableView.deleteRows(at: [indexPath], with: .fade)
