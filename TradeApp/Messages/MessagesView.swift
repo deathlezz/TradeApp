@@ -109,15 +109,15 @@ class MessagesView: UITableViewController {
     // set up empty array view
     func addEmptyArrayView() {
         let screenSize = UIScreen.main.bounds.size
+        let safeArea = (navigationController?.navigationBar.frame.maxY)!
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
         myView.backgroundColor = .white
-        let label = UILabel(frame: CGRect(x: (screenSize.width / 2) - 100, y: (screenSize.height / 2) - 175, width: 200, height: 50))
+        let label = UILabel(frame: CGRect(x: (screenSize.width / 2) - 100, y: (screenSize.height / 2) - safeArea - 25, width: 200, height: 50))
         label.text = "Nothing to show here"
         label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         label.textColor = .lightGray
         label.textAlignment = .center
         label.backgroundColor = .white
-        label.center = myView.center
         myView.addSubview(label)
         view.addSubview(myView)
         emptyArrayView = myView

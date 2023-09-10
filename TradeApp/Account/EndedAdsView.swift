@@ -53,6 +53,12 @@ class EndedAdsView: UITableViewController {
         return endedAds.count
     }
     
+    // set row height
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let screenWidth = UIScreen.main.bounds.width
+        return screenWidth / 1.9
+    }
+    
     // set table view header
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 50))

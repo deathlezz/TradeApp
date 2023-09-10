@@ -28,7 +28,6 @@ class ActiveAdsView: UITableViewController {
         
         tableView.separatorStyle = .singleLine
         tableView.sectionHeaderTopPadding = 0
-//        tableView.separatorInset.left = 17
         
         NotificationCenter.default.addObserver(self, selector: #selector(loadUserAds), name: NSNotification.Name("reloadActiveAds"), object: nil)
         
@@ -41,6 +40,12 @@ class ActiveAdsView: UITableViewController {
     // set number of sections
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
+    }
+    
+    // set row height
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let screenWidth = UIScreen.main.bounds.width
+        return screenWidth / 1.9
     }
     
     // set header height

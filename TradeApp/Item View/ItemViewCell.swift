@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ItemViewCell: UICollectionViewCell {
+class ItemViewCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout {
     
     @IBOutlet var imageView: UIImageView!
     
@@ -32,5 +32,12 @@ class ItemViewCell: UICollectionViewCell {
         UIView.animate(withDuration: 0.3, animations: {
             self.imageView.transform = CGAffineTransform.identity
         })
+    }
+    
+    // set scalable size for item cell
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.frame.size.width
+        let height = collectionView.frame.size.height
+        return CGSize(width: width, height: height)
     }
 }
