@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ItemView: UICollectionViewController {
+class ItemView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     var imgs = [UIImage?]()
     var item: Item!
@@ -74,6 +74,13 @@ class ItemView: UICollectionViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.post(name: Notification.Name("getIndex"), object: nil, userInfo: ["index": currentImage!])
+    }
+    
+    // set scalable size for item cell
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.frame.size.width
+        let height = collectionView.frame.size.height
+        return CGSize(width: width, height: height)
     }
     
 }
