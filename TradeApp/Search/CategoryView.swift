@@ -12,7 +12,7 @@ class CategoryView: UITableViewController {
     var categories = [String]()
     var currentFilters = [String: String]()
     
-    let categoryImages = ["car", "house", "case", "chair.lounge", "laptopcomputer.and.ipad", "tshirt", "leaf", "bird", "teddybear", "basketball", "airpodspro", "dollarsign"]
+    let categoryImages = ["car", "house", "case", "chair.lounge", "laptopcomputer.and.ipad", "tshirt", "leaf", "bird", "teddybear", "basketball", "airpodspro"]
 
     override func viewDidLoad() {
         super.viewDidLoad()

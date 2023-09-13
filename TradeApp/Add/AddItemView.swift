@@ -42,7 +42,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     var images = [UIImage]()
     
-    let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music", "For Free"]
+    let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music"]
     
     let sections = ["Photos", "Title", "Price", "Category", "Location", "Description", "Button"]
 
