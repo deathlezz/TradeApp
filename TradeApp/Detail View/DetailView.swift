@@ -191,11 +191,14 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     
     // set action for action button
     @objc func shareTapped() {
-        messageTextField.resignFirstResponder()
+        if messageTextField != nil {
+            messageTextField.resignFirstResponder()
+        }
         
-        let title = item.title
+        let customURL = "TradeAppOpen://"
+        guard let url = URL(string: customURL) else { return }
         
-        let vc = UIActivityViewController(activityItems: [title], applicationActivities: [])
+        let vc = UIActivityViewController(activityItems: [url], applicationActivities: [])
         
         present(vc, animated: true)
     }
@@ -390,11 +393,12 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     // load item's phone number
     func loadPhoneNumber() {
         let owner = item.owner
-        
+
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(owner).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
-                if let number = snapshot.value as? Int {
-                    self?.phone = number
+                if let number = snapshot.value as? String {
+                    self?.phone = Int(number)
+                    print(number)
                 }
             }
         }

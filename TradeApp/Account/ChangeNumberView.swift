@@ -273,7 +273,7 @@ class ChangeNumberView: UITableViewController {
     // save number to Firebase Database
     func saveNumber(number: String) {
         let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
-        
+
         if !number.isEmpty {
             reference.child(fixedMail).child("phoneNumber").setValue(number)
         } else {

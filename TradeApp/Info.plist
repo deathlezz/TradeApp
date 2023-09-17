@@ -8,10 +8,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>TradeApp</string>
+			<string>com.deathlezz.TradeApp</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>TradeApp://</string>
+				<string>TradeAppOpen</string>
 			</array>
 		</dict>
 	</array>
