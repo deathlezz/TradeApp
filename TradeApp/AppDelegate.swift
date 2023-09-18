@@ -33,13 +33,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDel
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        print(url)
         
-        if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url)
-        } else {
-            print("App scheme not found")
-        }
+        print("URL: \(url)")
+        
+//        if UIApplication.shared.canOpenURL(url) {
+//            UIApplication.shared.open(url)
+//
+//            print("URL: \(url)")
+//
+//            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+//            let navController = UINavigationController(rootViewController: ViewController())
+//            if let vc = storyboard.instantiateViewController(withIdentifier: "CategoryView") as? CategoryView {
+//                navController.pushViewController(vc, animated: true)
+//            }
+//
+////            let customURL = "com.TradeApp://show/\(1234567)"
+//            let customURL = try? String(contentsOf: url)
+//            let id = customURL?.components(separatedBy: "show/")[1]
+//
+//            print("ID: \(id)")
+//
+////            let navController = UINavigationController(rootViewController: ViewController())
+////            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+////            if let vc = storyboard.instantiateViewController(withIdentifier: "detailView") as? DetailView {
+////                vc.item = AppStorage.shared.filteredItems.first(where: {$0.id == Int(id!)})
+////                vc.hidesBottomBarWhenPushed = true
+////                navController.pushViewController(vc, animated: true)
+////            }
+//        } else {
+//            print("App scheme not found")
+//        }
+        
+        
         
         return true
     }

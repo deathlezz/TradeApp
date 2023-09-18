@@ -11,7 +11,7 @@
 			<string>com.deathlezz.TradeApp</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>TradeAppOpen</string>
+				<string>com.TradeApp</string>
 			</array>
 		</dict>
 	</array>

@@ -195,7 +195,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
             messageTextField.resignFirstResponder()
         }
         
-        let customURL = "TradeAppOpen://"
+        let customURL = "com.TradeApp://show/\(item.id)"
         guard let url = URL(string: customURL) else { return }
         
         let vc = UIActivityViewController(activityItems: [url], applicationActivities: [])
