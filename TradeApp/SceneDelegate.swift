@@ -18,7 +18,44 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UINavigationControllerD
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         
         guard let _ = (scene as? UIWindowScene) else { return }
+        guard let url = connectionOptions.urlContexts.first?.url.absoluteString else { return }
+        let id = url.components(separatedBy: "show/")[1]
+        print(id)
         
+        // retrieve the root view controller (which is a tab bar controller)
+        guard let rootViewController = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController else {
+            return
+        }
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if  let vc = storyboard.instantiateViewController(withIdentifier: "detailView") as? DetailView,
+            let tabBarController = rootViewController as? UITabBarController,
+            let navController = tabBarController.selectedViewController as? UINavigationController {
+            vc.item = AppStorage.shared.items.first(where: {$0.id == Int(id)})
+            vc.hidesBottomBarWhenPushed = true
+            navController.pushViewController(vc, animated: true)
+        }
+        
+    }
+    
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url.absoluteString else { return }
+        let id = url.components(separatedBy: "show/")[1]
+        print(id)
+        
+        // retrieve the root view controller (which is a tab bar controller)
+        guard let rootViewController = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController else {
+            return
+        }
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if  let vc = storyboard.instantiateViewController(withIdentifier: "detailView") as? DetailView,
+            let tabBarController = rootViewController as? UITabBarController,
+            let navController = tabBarController.selectedViewController as? UINavigationController {
+            vc.item = AppStorage.shared.items.first(where: {$0.id == Int(id)})
+            vc.hidesBottomBarWhenPushed = true
+            navController.pushViewController(vc, animated: true)
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
