@@ -36,6 +36,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     var reference: DatabaseReference!
     
     var mail: String!
+    var itemToShow: Int!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +51,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         tabBarController?.delegate = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(getItemID), name: NSNotification.Name("itemID"), object: nil)
         
         categoriesButton = UIBarButtonItem(image: .init(systemName: "line.horizontal.3"), style: .plain, target: self, action: #selector(categoriesTapped))
         
@@ -83,6 +86,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                 DispatchQueue.main.async {
                     self?.isArrayEmpty()
                     self?.collectionView.reloadData()
+                    
+                    guard let itemID = self?.itemToShow else { return }
+                    self?.showItem(id: itemID)
                 }
             }
         }
@@ -187,6 +193,29 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         hideButtons()
         isArrayEmpty()
         collectionView.reloadData()
+    }
+    
+    // get item id after url link tap
+    @objc func getItemID(_ notification: Notification) {
+        let itemID = notification.userInfo?["id"] as! String
+        itemToShow = Int(itemID)
+        print(itemID)
+    }
+    
+    // show item when all items are downloaded
+    func showItem(id: Int) {
+        guard let item = AppStorage.shared.items.first(where: {$0.id == id}) else {
+            let ac = UIAlertController(title: "Not found", message: "Item is not available", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
+            return
+        }
+        
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
+            vc.item = item
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // set action for "pull to refresh"

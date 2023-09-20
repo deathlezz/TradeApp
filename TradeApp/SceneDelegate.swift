@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import NotificationCenter
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate, UINavigationControllerDelegate {
 
@@ -20,39 +21,33 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UINavigationControllerD
         guard let _ = (scene as? UIWindowScene) else { return }
         guard let url = connectionOptions.urlContexts.first?.url.absoluteString else { return }
         let id = url.components(separatedBy: "show/")[1]
-        print(id)
-        
-        // retrieve the root view controller (which is a tab bar controller)
-        guard let rootViewController = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController else {
-            return
-        }
-        
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if  let vc = storyboard.instantiateViewController(withIdentifier: "detailView") as? DetailView,
-            let tabBarController = rootViewController as? UITabBarController,
-            let navController = tabBarController.selectedViewController as? UINavigationController {
-            vc.item = AppStorage.shared.items.first(where: {$0.id == Int(id)})
-            vc.hidesBottomBarWhenPushed = true
-            navController.pushViewController(vc, animated: true)
-        }
-        
+        NotificationCenter.default.post(name: NSNotification.Name("itemID"), object: nil, userInfo: ["id": id])
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let url = URLContexts.first?.url.absoluteString else { return }
         let id = url.components(separatedBy: "show/")[1]
-        print(id)
         
         // retrieve the root view controller (which is a tab bar controller)
         guard let rootViewController = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController else {
             return
         }
         
+        guard let item = AppStorage.shared.items.first(where: {$0.id == Int(id)}) else {
+            let tabBarController = rootViewController as? UITabBarController
+            let navController = tabBarController?.selectedViewController as? UINavigationController
+                
+            let ac = UIAlertController(title: "Item unavailable", message: "Try again later", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .cancel))
+            navController?.present(ac, animated: true)
+            return
+        }
+        
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if  let vc = storyboard.instantiateViewController(withIdentifier: "detailView") as? DetailView,
+        if let vc = storyboard.instantiateViewController(withIdentifier: "detailView") as? DetailView,
             let tabBarController = rootViewController as? UITabBarController,
             let navController = tabBarController.selectedViewController as? UINavigationController {
-            vc.item = AppStorage.shared.items.first(where: {$0.id == Int(id)})
+            vc.item = item
             vc.hidesBottomBarWhenPushed = true
             navController.pushViewController(vc, animated: true)
         }
