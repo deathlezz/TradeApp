@@ -11,17 +11,17 @@ import NotificationCenter
 class SceneDelegate: UIResponder, UIWindowSceneDelegate, UINavigationControllerDelegate {
 
     var window: UIWindow?
-
+    static var id: Int?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        
+
         guard let _ = (scene as? UIWindowScene) else { return }
-        guard let url = connectionOptions.urlContexts.first?.url.absoluteString else { return }
-        let id = url.components(separatedBy: "show/")[1]
-        NotificationCenter.default.post(name: NSNotification.Name("itemID"), object: nil, userInfo: ["id": id])
+        guard let url = connectionOptions.urlContexts.first?.url else { return }
+        let id = url.absoluteString.components(separatedBy: "show/")[1]
+        SceneDelegate.id = Int(id)
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

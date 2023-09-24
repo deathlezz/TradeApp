@@ -36,7 +36,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     var reference: DatabaseReference!
     
     var mail: String!
-    var itemToShow: Int!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,8 +50,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         tabBarController?.delegate = self
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(getItemID), name: NSNotification.Name("itemID"), object: nil)
         
         categoriesButton = UIBarButtonItem(image: .init(systemName: "line.horizontal.3"), style: .plain, target: self, action: #selector(categoriesTapped))
         
@@ -87,8 +84,17 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                     self?.isArrayEmpty()
                     self?.collectionView.reloadData()
                     
-                    guard let itemID = self?.itemToShow else { return }
-                    self?.showItem(id: itemID)
+                    guard let itemID = SceneDelegate.id else {
+                        let ac = UIAlertController(title: "no url found", message: nil, preferredStyle: .alert)
+                        ac.addAction(UIAlertAction(title: "OK", style: .default))
+                        self?.present(ac, animated: true)
+                        return }
+//                    self?.showItem(id: itemID)
+                    print("item to show: \(itemID)")
+                    
+                    let ac = UIAlertController(title: "url has been found", message: nil, preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "OK", style: .default))
+                    self?.present(ac, animated: true)
                 }
             }
         }
@@ -193,13 +199,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         hideButtons()
         isArrayEmpty()
         collectionView.reloadData()
-    }
-    
-    // get item id after url link tap
-    @objc func getItemID(_ notification: Notification) {
-        let itemID = notification.userInfo?["id"] as! String
-        itemToShow = Int(itemID)
-        print(itemID)
     }
     
     // show item when all items are downloaded
