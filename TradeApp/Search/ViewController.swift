@@ -84,17 +84,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                     self?.isArrayEmpty()
                     self?.collectionView.reloadData()
                     
-                    guard let itemID = SceneDelegate.id else {
-                        let ac = UIAlertController(title: "no url found", message: nil, preferredStyle: .alert)
-                        ac.addAction(UIAlertAction(title: "OK", style: .default))
-                        self?.present(ac, animated: true)
-                        return }
-//                    self?.showItem(id: itemID)
-                    print("item to show: \(itemID)")
-                    
-                    let ac = UIAlertController(title: "url has been found", message: nil, preferredStyle: .alert)
-                    ac.addAction(UIAlertAction(title: "OK", style: .default))
-                    self?.present(ac, animated: true)
+                    guard let itemID = SceneDelegate.id else { return }
+                    self?.showItem(id: itemID)
+                    SceneDelegate.id = nil
                 }
             }
         }

@@ -44,9 +44,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UINavigationControllerD
         }
         
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
         if let vc = storyboard.instantiateViewController(withIdentifier: "detailView") as? DetailView,
             let tabBarController = rootViewController as? UITabBarController,
             let navController = tabBarController.selectedViewController as? UINavigationController {
+            
+//            if DetailView().isBeingPresented || ItemView().isBeingPresented {
+//                navController.popToRootViewController(animated: true)
+//            }
+            
             vc.item = item
             vc.hidesBottomBarWhenPushed = true
             navController.pushViewController(vc, animated: true)
