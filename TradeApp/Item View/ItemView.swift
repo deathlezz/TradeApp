@@ -11,6 +11,7 @@ class ItemView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     var imgs = [UIImage?]()
     var item: Item!
+    static var isLoaded = false
     
     var currentImage: Int! {
         didSet {
@@ -27,6 +28,7 @@ class ItemView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
         navigationController?.isToolbarHidden = true
+        ItemView.isLoaded = true
     }
     
     // set number of items in section
@@ -74,6 +76,12 @@ class ItemView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.post(name: Notification.Name("getIndex"), object: nil, userInfo: ["index": currentImage!])
+    }
+    
+    // change value for loaded view variable
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        ItemView.isLoaded = false
     }
     
     // set scalable size for item cell

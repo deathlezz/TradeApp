@@ -29,6 +29,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     var removeButton: UIBarButtonItem!
     
     var messageSent = false
+    static var isLoaded = false
     
     var phone: Int!
     var views: Int!
@@ -68,6 +69,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         loadPhoneNumber()
         isSaved()
         increaseViews()
+        DetailView.isLoaded = true
     }
     
     // set number of sections
@@ -283,6 +285,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         super.viewDidDisappear(animated)
         if self.isMovingFromParent {
             NotificationCenter.default.post(name: NSNotification.Name("removeMap"), object: nil)
+            DetailView.isLoaded = false
         }
     }
     
