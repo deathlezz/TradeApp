@@ -8,6 +8,7 @@
 import UIKit
 import Network
 import Firebase
+import FirebaseAuth
 
 enum AccountAction {
     case login
@@ -23,7 +24,7 @@ class LoginView: UITableViewController {
     
     var sections = ["Segment", "Email", "Password", "Button"]
     
-    var loggedUser: String!
+//    var loggedUser: String!
     
     let monitor = NWPathMonitor()
     var isPushed = false
@@ -166,60 +167,102 @@ class LoginView: UITableViewController {
         guard let passText = password.textField.text else { return }
         
         guard !mail.isEmpty && !passText.isEmpty else {
-            return showAlert(title: "Error", message: "Empty text field")
+            return showAlert(title: "Empty text field", message: "All text fields have to be filled")
         }
         
-        DispatchQueue.global().async { [weak self] in
-            let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
-            
-            self?.reference.child(fixedMail).observeSingleEvent(of: .value) { snapshot in
-                DispatchQueue.main.async {
-                    // user exists
-                    if let value = snapshot.value as? [String: Any] {
-                        if self?.segment.segment.selectedSegmentIndex == 0 {
-                            let pass = value["password"] as? String
-                            
-                            guard passText == pass else {
-                                return self?.showAlert(title: "Error", message: "Wrong password") ?? ()
-                            }
-                            
-                            self?.resetView(.login)
-                            Utilities.setUser(mail)
-                            self?.loggedUser = mail
-                            self?.loginPush(after: .signIn)
-                            
-                        } else {
-                            self?.showAlert(title: "Error", message: "This email is already used")
-                        }
-                        
-                    // user doesn't exist
-                    } else {
-                        if self?.segment.segment.selectedSegmentIndex == 0 {
-                            self?.showAlert(title: "Error", message: "You have to sign up first")
-                        } else {
-                            let rePassText = self?.repeatPassword.textField.text
-                            
-                            guard self?.isEmailValid() ?? Bool() else {
-                                return self?.showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*") ?? ()
-                            }
-                            
-                            guard self?.isPasswordValid() ?? Bool() else {
-                                self?.password.textField.text = nil
-                                self?.repeatPassword.textField.text = nil
-                                return self?.showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*") ?? ()
-                            }
-                            
-                            guard passText == rePassText else {
-                                self?.repeatPassword.textField.text = nil
-                                return self?.showAlert(title: "Error", message: "Password repeated incorrectly") ?? ()
-                            }
-                            
-                            self?.createUser(mail: mail, password: passText)
-                        }
-                    }
+        if segment.segment.selectedSegmentIndex == 0 {
+            Auth.auth().signIn(withEmail: mail, password: passText) { [weak self] result, error in
+                
+                guard result == nil else {
+                    self?.showAlert(title: "Sign in failed", message: "Wrong email or password")
+                    return
                 }
+                
+                guard error == nil else {
+                    self?.showAlert(title: "Sign in failed", message: "An internal error has occurred")
+                    return
+                }
+                
+                self?.resetView(after: .login)
+                self?.loginPush(after: .signIn)
             }
+        } else {
+            guard let rePassText = repeatPassword.textField.text else { return }
+            
+            guard isEmailValid() else {
+                showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*")
+                return
+            }
+            
+            guard isPasswordValid() else {
+                password.textField.text = nil
+                repeatPassword.textField.text = nil
+                showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*")
+                return
+            }
+            
+            guard passText == rePassText else {
+                repeatPassword.textField.text = nil
+                showAlert(title: "Error", message: "Password repeated incorrectly")
+                return
+            }
+            
+            createUser(mail: mail, password: passText)
         }
+        
+        // break here
+        
+//        DispatchQueue.global().async { [weak self] in
+//            let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+//
+//            self?.reference.child(fixedMail).observeSingleEvent(of: .value) { snapshot in
+//                DispatchQueue.main.async {
+//                    // user exists
+//                    if let value = snapshot.value as? [String: Any] {
+//                        if self?.segment.segment.selectedSegmentIndex == 0 {
+//                            let pass = value["password"] as? String
+//
+//                            guard passText == pass else {
+//                                return self?.showAlert(title: "Error", message: "Wrong password") ?? ()
+//                            }
+//
+//                            self?.resetView(after: .login)
+//                            Utilities.setUser(mail)
+//                            self?.loggedUser = mail
+//                            self?.loginPush(after: .signIn)
+//
+//                        } else {
+//                            self?.showAlert(title: "Error", message: "This email is already used")
+//                        }
+//
+//                    // user doesn't exist
+//                    } else {
+//                        if self?.segment.segment.selectedSegmentIndex == 0 {
+//                            self?.showAlert(title: "Error", message: "You have to sign up first")
+//                        } else {
+//                            let rePassText = self?.repeatPassword.textField.text
+//
+//                            guard self?.isEmailValid() ?? Bool() else {
+//                                return self?.showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*") ?? ()
+//                            }
+//
+//                            guard self?.isPasswordValid() ?? Bool() else {
+//                                self?.password.textField.text = nil
+//                                self?.repeatPassword.textField.text = nil
+//                                return self?.showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*") ?? ()
+//                            }
+//
+//                            guard passText == rePassText else {
+//                                self?.repeatPassword.textField.text = nil
+//                                return self?.showAlert(title: "Error", message: "Password repeated incorrectly") ?? ()
+//                            }
+//
+//                            self?.createUser(mail: mail, password: passText)
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
     
     // check email address format
@@ -245,7 +288,7 @@ class LoginView: UITableViewController {
     }
     
     // reset view after user account creation
-    func resetView(_ after: AccountAction) {
+    func resetView(after: AccountAction) {
         email.textField.text = nil
         password.textField.text = nil
         
@@ -260,10 +303,10 @@ class LoginView: UITableViewController {
         super.viewWillAppear(animated)
         
         DispatchQueue.global().async { [weak self] in
-            self?.loggedUser = Utilities.loadUser()
+//            self?.loggedUser = Utilities.loadUser()
             
             DispatchQueue.main.async {
-                print(self?.loggedUser ?? "nil")
+//                print(self?.loggedUser ?? "nil")
                 self?.loginPush(after: .load)
             }
         }
@@ -278,28 +321,29 @@ class LoginView: UITableViewController {
     // push vc if user is signed in
     func loginPush(after: LoginPushType) {
         if after == .load {
-            guard loggedUser != nil else { return }
+            guard Auth.auth().currentUser != nil else { return }
+//            guard loggedUser != nil else { return }
         }
         
         guard monitor.currentPath.status == .satisfied else { return }
         
         if tabBarController?.selectedIndex == 2 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
-                vc.loggedUser = loggedUser
+//                vc.loggedUser = Auth.auth().currentUser?.uid
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }
             
         } else if tabBarController?.selectedIndex == 3 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "MessagesView") as? MessagesView {
-                vc.loggedUser = loggedUser
+//                vc.loggedUser = Auth.auth().currentUser?.uid
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }
             
         } else if tabBarController?.selectedIndex == 4 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
-                vc.loggedUser = loggedUser
+//                vc.loggedUser = Auth.auth().currentUser?.uid
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }
@@ -310,7 +354,7 @@ class LoginView: UITableViewController {
     func accountCreatedAlert() {
         let ac = UIAlertController(title: "Success", message: "You can sign in now", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            self?.resetView(.register)
+            self?.resetView(after: .register)
         })
         present(ac, animated: true)
     }
@@ -356,15 +400,24 @@ class LoginView: UITableViewController {
     
     // save user to Firebase database
     func createUser(mail: String, password: String) {
-        let userMail = mail.replacingOccurrences(of: ".", with: "_")
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.reference.child(userMail).child("password").setValue(password)
-            
-            DispatchQueue.main.async {
-                self?.accountCreatedAlert()
+        Auth.auth().createUser(withEmail: mail, password: password) { [weak self] result, error in
+            guard error == nil else {
+                self?.showAlert(title: "Sign up failed", message: "\(error!.localizedDescription.description)")
+                return
             }
+            
+            self?.accountCreatedAlert()
         }
+        
+//        let userMail = mail.replacingOccurrences(of: ".", with: "_")
+//
+//        DispatchQueue.global().async { [weak self] in
+//            self?.reference.child(userMail).child("password").setValue(password)
+//
+//            DispatchQueue.main.async {
+//                self?.accountCreatedAlert()
+//            }
+//        }
     }
     
 }

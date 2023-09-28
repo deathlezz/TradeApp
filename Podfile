@@ -6,10 +6,11 @@ target 'TradeApp' do
   use_frameworks!
 
 pod 'MessageKit'
-pod ‘Firebase’
-pod ‘Firebase/Analytics’
-pod ‘Firebase/Database’
+pod 'Firebase'
+pod 'Firebase/Analytics'
+pod 'Firebase/Database'
 pod 'Firebase/Storage'
 pod 'Firebase/Messaging'
+pod 'Firebase/Auth'
 
 end
