@@ -173,13 +173,23 @@ class LoginView: UITableViewController {
         if segment.segment.selectedSegmentIndex == 0 {
             Auth.auth().signIn(withEmail: mail, password: passText) { [weak self] result, error in
                 
-                guard result == nil else {
-                    self?.showAlert(title: "Sign in failed", message: "Wrong email or password")
-                    return
-                }
-                
                 guard error == nil else {
-                    self?.showAlert(title: "Sign in failed", message: "An internal error has occurred")
+                    if let error = error as? NSError {
+                        let errorCode = AuthErrorCode.Code(rawValue: error._code)
+                        
+                        switch errorCode {
+                        case .userNotFound:
+                            self?.showAlert(title: "Sign in failed", message: "User not found")
+                        case .wrongPassword:
+                            self?.showAlert(title: "Sign in failed", message: "Wrong password")
+                        case .tooManyRequests:
+                            self?.showAlert(title: "Sign in failed", message: "Too many requests")
+                        case .networkError:
+                            self?.showAlert(title: "Sign in failed", message: "Network error occurred")
+                        default:
+                            self?.showAlert(title: "Sign in failed", message: "Internal error occurred")
+                        }
+                    }
                     return
                 }
                 
@@ -402,7 +412,20 @@ class LoginView: UITableViewController {
     func createUser(mail: String, password: String) {
         Auth.auth().createUser(withEmail: mail, password: password) { [weak self] result, error in
             guard error == nil else {
-                self?.showAlert(title: "Sign up failed", message: "\(error!.localizedDescription.description)")
+                if let error = error as? NSError {
+                    let errorCode = AuthErrorCode.Code(rawValue: error._code)
+                    
+                    switch errorCode {
+                    case .emailAlreadyInUse:
+                        self?.showAlert(title: "Sign in failed", message: "Email already in use")
+                    case .tooManyRequests:
+                        self?.showAlert(title: "Sign in failed", message: "Too many requests")
+                    case .networkError:
+                        self?.showAlert(title: "Sign in failed", message: "Network error occurred")
+                    default:
+                        self?.showAlert(title: "Sign in failed", message: "Internal error occurred")
+                    }
+                }
                 return
             }
             

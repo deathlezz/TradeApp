@@ -8,13 +8,14 @@
 import UIKit
 import Firebase
 import FirebaseStorage
+import FirebaseAuth
 
 class AccountView: UITableViewController {
     
     let sections = ["User", "Your ads", "Settings", "Sign out"]
     let settingsSection = ["Change distance unit", "Change phone number", "Change email", "Change password", "Delete account"]
     
-    var loggedUser: String!
+//    var loggedUser: String!
     
     var active: Int!
     var ended: Int!
@@ -70,7 +71,7 @@ class AccountView: UITableViewController {
 
         switch sections[indexPath.section] {
         case "User":
-            accountCell.textLabel?.text = loggedUser
+            accountCell.textLabel?.text = Auth.auth().currentUser?.email
             accountCell.textLabel?.font = UIFont.boldSystemFont(ofSize: 16)
             accountCell.backgroundColor = .systemGray6
             accountCell.textLabel?.textColor = .darkGray
@@ -152,9 +153,15 @@ class AccountView: UITableViewController {
             }
             
         default:
-            Utilities.setUser(nil)
-            NotificationCenter.default.post(name: NSNotification.Name("signOut"), object: nil)
-            navigationController?.popViewController(animated: true)
+//            Utilities.setUser(nil)
+            do {
+                try Auth.auth().signOut()
+//                NotificationCenter.default.post(name: NSNotification.Name("signOut"), object: nil)
+                navigationController?.popToRootViewController(animated: true)
+            } catch {
+                showAlert(title: "Sign out failed", message: "An internal error occurred")
+            }
+            
         }
     }
     
@@ -164,8 +171,10 @@ class AccountView: UITableViewController {
         ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
             
             // remove user from database
-            guard let fixedMail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
-            self?.deleteUser(user: fixedMail)
+            Auth.auth().currentUser?.delete()
+            
+//            guard let fixedMail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+            self?.deleteUser(user: Auth.auth().currentUser!.uid)
             self?.showAlert(title: "Success", message: "Your account has been deleted")
         })
         
@@ -179,7 +188,7 @@ class AccountView: UITableViewController {
     // push vc to ActiveAdsView
     func pushToActiveAdsView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ActiveAdsView") as? ActiveAdsView {
-            vc.mail = loggedUser
+//            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -188,7 +197,7 @@ class AccountView: UITableViewController {
     // push vc to EndedAdsView
     func pushToEndedAdsView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "EndedAdsView") as? EndedAdsView {
-            vc.mail = loggedUser
+//            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -206,7 +215,7 @@ class AccountView: UITableViewController {
     // push vc to ChangeNumberView
     func pushToChangeNumberView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeNumberView") as? ChangeNumberView {
-            vc.mail = loggedUser
+//            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
@@ -216,7 +225,7 @@ class AccountView: UITableViewController {
     // push vc to ChangeEmailView
     func pushToChangeEmailView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeEmailView") as? ChangeEmailView {
-            vc.loggedUser = loggedUser
+//            vc.loggedUser = loggedUser
             vc.hidesBottomBarWhenPushed = true
             willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
@@ -226,7 +235,7 @@ class AccountView: UITableViewController {
     // push vc to ChangePasswordView
     func pushToChangePasswordView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangePasswordView") as? ChangePasswordView {
-            vc.mail = loggedUser
+//            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
@@ -276,7 +285,7 @@ class AccountView: UITableViewController {
                     
                     DispatchQueue.main.async {
                         self?.reference.child(user).removeValue()
-                        Utilities.setUser(nil)
+//                        Utilities.setUser(nil)
                     }
                 }
             }
@@ -287,12 +296,14 @@ class AccountView: UITableViewController {
     func loadAdsData() {
         guard willLoadAds else { return }
         
-        let fixedMail = loggedUser.replacingOccurrences(of: ".", with: "_")
+        guard let user = Auth.auth().currentUser?.uid else { return }
+        
+//        let fixedMail = loggedUser.replacingOccurrences(of: ".", with: "_")
         let userItems = ["activeItems", "endedItems"]
         
         DispatchQueue.global().async { [weak self] in
             for item in userItems {
-                self?.reference.child(fixedMail).child(item).observeSingleEvent(of: .value) { snapshot in
+                self?.reference.child(user).child(item).observeSingleEvent(of: .value) { snapshot in
                     
                     if item == userItems[0] {
                         self?.active = Int(snapshot.childrenCount)
