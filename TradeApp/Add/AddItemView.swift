@@ -9,6 +9,7 @@ import UIKit
 import CoreLocation
 import Firebase
 import FirebaseStorage
+import FirebaseAuth
 import UserNotifications
 
 enum AlertType {
@@ -27,7 +28,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var index: Int!
     var action: ActionType!
 
-    var loggedUser: String!
+//    var loggedUser: String!
     var isEditMode: Bool!
     var isAdActive: Bool!
     
@@ -61,7 +62,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         NotificationCenter.default.addObserver(self, selector: #selector(reorderImages), name: NSNotification.Name("reorderImages"), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
         
         if isEditMode != nil {
             title = "Edit"

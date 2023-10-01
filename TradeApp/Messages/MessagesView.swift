@@ -8,12 +8,13 @@
 import UIKit
 import MessageKit
 import Firebase
+import FirebaseAuth
 
 class MessagesView: UITableViewController {
     
     var emptyArrayView: UIView!
     
-    var loggedUser: String!
+//    var loggedUser: String!
     
     var chats = [String: [Message]]()
     var chatsData = [String: [String: Any]]()
@@ -26,7 +27,7 @@ class MessagesView: UITableViewController {
         title = "Messages"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "messageCell")
         
@@ -60,7 +61,7 @@ class MessagesView: UITableViewController {
             ChatView.shared.buyer = ""
             ChatView.shared.seller = ""
             vc.isPushedByChats = true
-            vc.loggedUser = loggedUser
+//            vc.loggedUser = Auth.auth().currentUser.u
             vc.itemID = Int(chatId)
             vc.messages = chats[chatId] ?? [Message]()
             vc.hidesBottomBarWhenPushed = true
@@ -151,12 +152,12 @@ class MessagesView: UITableViewController {
     
     // load user chats
     func loadChats(completion: @escaping ([String: [Message]]) -> Void) {
-        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+        guard let user = Auth.auth().currentUser?.uid else { return }
         
         var result = [String: [Message]]()
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(mail).child("chats").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
                 if let conversations = snapshot.value as? [String: [String: [[String: String]]]] {
                     for (id, buyer) in conversations {
                         
@@ -196,11 +197,11 @@ class MessagesView: UITableViewController {
     
     // get chat title and thumbnail
     func getChatData(child: String, id: String, completion: @escaping ([String: [String: Any]]) -> Void) {
+        guard let user = Auth.auth().currentUser?.uid else { return }
+        
         var result = [String: [String: Any]]()
         
-        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
-        
-        let userCases = [child, mail]
+        let userCases = [child, user]
         let itemsCases = ["activeItems", "endedItems"]
         
         DispatchQueue.global().async { [weak self] in

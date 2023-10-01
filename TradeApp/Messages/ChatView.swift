@@ -9,11 +9,12 @@ import UIKit
 import MessageKit
 import InputBarAccessoryView
 import Firebase
+import FirebaseAuth
 
 class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate, InputBarAccessoryViewDelegate {
     
     var chatTitle: String!
-    var loggedUser: String!
+//    var loggedUser: String!
     var itemID: Int!
     
     static let shared = ChatView()
@@ -59,8 +60,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // return current sender
     func currentSender() -> SenderType {
-        let fixedUser = loggedUser.replacingOccurrences(of: ".", with: "_")
-        return Sender(senderId: fixedUser, displayName: "")
+        let user = Auth.auth().currentUser?.uid ?? "nil"
+        return Sender(senderId: user, displayName: "")
     }
     
     // set collection view cell
@@ -145,14 +146,14 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // save message to Firebase Database
     func sendMessage(seller: String, buyer: String, itemID: Int, text: String, completion: @escaping () -> Void) {
-        let sender = loggedUser.replacingOccurrences(of: ".", with: "_")
-        let currentSender = Sender(senderId: sender, displayName: "")
+        guard let user = Auth.auth().currentUser?.uid else { return }
+        let sender = Sender(senderId: user, displayName: "")
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(seller).child("chats").child("\(itemID)").child(buyer).observeSingleEvent(of: .value) { snapshot in
                 let messagesCount = snapshot.childrenCount
                 
-                let message = Message(sender: currentSender, messageId: "\(messagesCount)", sentDate: Date(), kind: .text(text))
+                let message = Message(sender: sender, messageId: "\(messagesCount)", sentDate: Date(), kind: .text(text))
                 self?.messages.append(message)
                 
                 let msg = message.toAnyObject()
