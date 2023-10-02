@@ -7,6 +7,7 @@
 
 import UIKit
 import Firebase
+import FirebaseAuth
 
 class ChangeEmailView: UITableViewController {
     
@@ -15,7 +16,7 @@ class ChangeEmailView: UITableViewController {
     var currentEmail: TextFieldCell!
     var newEmail: TextFieldCell!
     
-    var loggedUser: String!
+//    var loggedUser: String!
     
     var reference: DatabaseReference!
 
@@ -125,7 +126,7 @@ class ChangeEmailView: UITableViewController {
         guard let currentMailText = currentEmail.textField.text else { return }
         guard let newMailText = newEmail.textField.text else { return }
                 
-        guard currentMailText == loggedUser else {
+        guard currentMailText == Auth.auth().currentUser?.email else {
             return showAlert(title: "Error", message: "Incorrect current address")
         }
         
@@ -147,29 +148,41 @@ class ChangeEmailView: UITableViewController {
         present(ac, animated: true)
     }
     
-    // save mail to Firebase Database
+    // save mail to Firebase Auth
     func saveEmail(email: String) {
-        let fixedMail = loggedUser.replacingOccurrences(of: ".", with: "_")
-        let fixedNewMail = email.replacingOccurrences(of: ".", with: "_")
+        guard let user = Auth.auth().currentUser?.uid else { return }
         
-        DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).observeSingleEvent(of: .value) { snapshot in
-                if let value = snapshot.value as? [String: Any] {
-                    self?.reference.child(fixedNewMail).setValue(value)
-                    self?.reference.child(fixedMail).removeValue()
-                    
-                    DispatchQueue.main.async {
-                        Utilities.setUser(nil)
-                        
-                        let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)
-                        ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-                            self?.navigationController?.popToRootViewController(animated: true)
-                        })
-                        self?.present(ac, animated: true)
-                    }
+        Auth.auth().currentUser?.updateEmail(to: email) { [weak self] _ in
+            let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+                do {
+                    try Auth.auth().signOut()
+                    self?.navigationController?.popToRootViewController(animated: true)
+                } catch {
+                    self?.showAlert(title: "Sign out failed", message: "An internal error occurred")
                 }
-            }
+            })
+            self?.present(ac, animated: true)
         }
+        
+//        DispatchQueue.global().async { [weak self] in
+//            self?.reference.child(user).observeSingleEvent(of: .value) { snapshot in
+//                if let value = snapshot.value as? [String: Any] {
+//                    self?.reference.child(fixedNewMail).setValue(value)
+//                    self?.reference.child(user).removeValue()
+//
+//                    DispatchQueue.main.async {
+//                        Utilities.setUser(nil)
+//
+//                        let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)
+//                        ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+//                            self?.navigationController?.popToRootViewController(animated: true)
+//                        })
+//                        self?.present(ac, animated: true)
+//                    }
+//                }
+//            }
+//        }
     }
     
 }

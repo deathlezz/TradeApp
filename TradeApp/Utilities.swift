@@ -124,22 +124,22 @@ class Utilities {
     }
     
     // set logged user
-    static func setUser(_ user: String?) {
-        if user != nil {
-            KeychainWrapper.standard.set(user!, forKey: "loggedUser")
-        } else {
-            KeychainWrapper.standard.removeObject(forKey: "loggedUser")
-        }
-    }
+//    static func setUser(_ user: String?) {
+//        if user != nil {
+//            KeychainWrapper.standard.set(user!, forKey: "loggedUser")
+//        } else {
+//            KeychainWrapper.standard.removeObject(forKey: "loggedUser")
+//        }
+//    }
     
     // load logged user
-    static func loadUser() -> String? {
-        if let user = KeychainWrapper.standard.string(forKey: "loggedUser") {
-            return user
-        } else {
-            return nil
-        }
-    }
+//    static func loadUser() -> String? {
+//        if let user = KeychainWrapper.standard.string(forKey: "loggedUser") {
+//            return user
+//        } else {
+//            return nil
+//        }
+//    }
     
     // load distance measurement unit
     static func loadDistanceUnit() -> String {

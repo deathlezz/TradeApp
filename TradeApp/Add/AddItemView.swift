@@ -336,9 +336,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // set action for submit button
     @objc func submitTapped(_ sender: UIButton) {
+        guard let user = Auth.auth().currentUser?.uid else { return }
+        
         sender.isUserInteractionEnabled = false
         
-        let owner = loggedUser.replacingOccurrences(of: ".", with: "_")
         let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
             
         guard let title = textFieldCells[0].textField.text else { return }
@@ -354,11 +355,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                         if self?.isEditMode != nil {
                             // edit active item
                             if self?.isAdActive == true {
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: owner)
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: user)
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-                                    guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
-                                    self?.saveItem(user: mail, item: newItem, urls: urls)
+//                                    guard let user = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+                                    self?.saveItem(user: user, item: newItem, urls: urls)
                                 }
 
                                 NotificationCenter.default.post(name: NSNotification.Name("reloadActiveAds"), object: nil)
@@ -367,11 +368,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 
                             } else {
                                 // edit ended item
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: owner)
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: user)
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-                                    guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
-                                    self?.saveItem(user: mail, item: newItem, urls: urls)
+//                                    guard let user = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+                                    self?.saveItem(user: user, item: newItem, urls: urls)
                                 }
                                 
                                 NotificationCenter.default.post(name: NSNotification.Name("reloadEndedAds"), object: nil)
@@ -382,21 +383,21 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                         } else {
                             // create new item
                             self?.createItemID() { id in
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: owner)
+                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: user)
                                 AppStorage.shared.items.append(newItem)
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-                                    guard let mail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
-                                    self?.saveItem(user: mail, item: newItem, urls: urls)
+//                                    guard let user = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+                                    self?.saveItem(user: user, item: newItem, urls: urls)
                                 }
                                 
                                 // show notification if new message arrive
-                                self?.reference.child(owner).child("chats").child("\(id)").observe(.childAdded) { snapshot in
+                                self?.reference.child(user).child("chats").child("\(id)").observe(.childAdded) { snapshot in
                                     
                                     if let _ = snapshot.value as? [[String: String]] {
                                         let buyer = snapshot.key
                                         
-                                        self?.reference.child(owner).child("chats").child("\(id)").child("\(buyer)").observe(.childAdded) { snapshot in
+                                        self?.reference.child(user).child("chats").child("\(id)").child("\(buyer)").observe(.childAdded) { snapshot in
                                             
                                             if let newMessage = snapshot.value as? [String: String] {
                                                 guard let kind = newMessage["kind"] else { return }
@@ -625,11 +626,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // save images to Firebase Storage and return images URLs
     func uploadImages(images: [Data?], itemID: Int, completion: @escaping ([String: String]) -> Void) {
+        guard let user = Auth.auth().currentUser?.uid else { return }
+        
         var imagesURL = [String: String]()
-        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
         
         for (index, image) in images.enumerated() {
-            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(mail).child("\(itemID)").child("image\(index)")
+            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(index)")
             
             guard let img = image else { return }
             

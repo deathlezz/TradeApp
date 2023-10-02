@@ -7,6 +7,7 @@
 
 import UIKit
 import Firebase
+import FirebaseAuth
 
 enum NumberAction {
     case add
@@ -23,7 +24,7 @@ class ChangeNumberView: UITableViewController {
     var oldNumber: UITableViewCell!
     var newNumber: TextFieldCell!
     
-    var mail: String!
+//    var mail: String!
     var currentNumber: Int!
     
     var reference: DatabaseReference!
@@ -173,19 +174,23 @@ class ChangeNumberView: UITableViewController {
     
     // load user's current phone number
     func loadCurrentNumber() {
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        guard let phoneNumber = Auth.auth().currentUser?.phoneNumber else { return }
+//        guard let user = Auth.auth().currentUser?.uid else { return }
         
-        DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
-                if let number = snapshot.value as? String {
-                    self?.currentNumber = Int(number)
-                    
-                    DispatchQueue.main.async {
-                        self?.updateRows()
-                    }
-                }
-            }
-        }
+        currentNumber = Int(phoneNumber)
+        updateRows()
+        
+//        DispatchQueue.global().async { [weak self] in
+//            self?.reference.child(user).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
+//                if let number = snapshot.value as? String {
+//                    self?.currentNumber = Int(number)
+//                    
+//                    DispatchQueue.main.async {
+//                        self?.updateRows()
+//                    }
+//                }
+//            }
+//        }
     }
     
     // update table view rows
@@ -272,12 +277,12 @@ class ChangeNumberView: UITableViewController {
     
     // save number to Firebase Database
     func saveNumber(number: String) {
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        guard let user = Auth.auth().currentUser?.uid else { return }
 
         if !number.isEmpty {
-            reference.child(fixedMail).child("phoneNumber").setValue(number)
+            reference.child(user).child("phoneNumber").setValue(number)
         } else {
-            reference.child(fixedMail).child("phoneNumber").removeValue()
+            reference.child(user).child("phoneNumber").removeValue()
         }
     }
 }

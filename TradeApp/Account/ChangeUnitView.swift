@@ -11,10 +11,10 @@ class ChangeUnitView: UITableViewController {
     
     let sections = ["Segment", "Unit"]
     
-    var segment: SegmentedControlCell!
-    var unit: UITableViewCell!
+    var segmentCell: SegmentedControlCell!
+    var unitCell: UITableViewCell!
     
-    var currentUnit: String!
+    var unit: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,7 +24,7 @@ class ChangeUnitView: UITableViewController {
         tableView.separatorStyle = .none
         
         DispatchQueue.global().async { [weak self] in
-            self?.currentUnit = Utilities.loadDistanceUnit()
+            self?.unit = Utilities.loadDistanceUnit()
             
             DispatchQueue.main.async {
                 self?.updateSegment()
@@ -55,29 +55,29 @@ class ChangeUnitView: UITableViewController {
                 cell.selectionStyle = .none
                 cell.segment.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.white], for: .selected)
                 cell.segment.addTarget(self, action: #selector(handleSegmentChange), for: .primaryActionTriggered)
-                segment = cell
+                segmentCell = cell
                 return cell
             }
         }
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "DistanceUnitCell", for: indexPath)
         cell.selectionStyle = .none
-        unit = cell
+        unitCell = cell
         return cell
     }
     
     // set action for segment change
     @objc func handleSegmentChange(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
-            UIView.transition(with: unit, duration: 0.2, options: .transitionCrossDissolve, animations: {
-                self.unit.textLabel?.text = "1 mi = 1,609 km"
+            UIView.transition(with: unitCell, duration: 0.2, options: .transitionCrossDissolve, animations: {
+                self.unitCell.textLabel?.text = "1 mi = 1,609 km"
             }) { finished in
                 self.setDistanceUnit("mi")
             }
             
         } else {
-            UIView.transition(with: unit, duration: 0.2, options: .transitionCrossDissolve, animations: {
-                self.unit.textLabel?.text = "1 km = 0,621 mi"
+            UIView.transition(with: unitCell, duration: 0.2, options: .transitionCrossDissolve, animations: {
+                self.unitCell.textLabel?.text = "1 km = 0,621 mi"
             }) { finished in
                 self.setDistanceUnit("km")
             }
@@ -92,12 +92,12 @@ class ChangeUnitView: UITableViewController {
     
     // set segment control index
     func updateSegment() {
-        if currentUnit == "mi" {
-            segment.segment.selectedSegmentIndex = 0
-            unit.textLabel?.text = "1 mi = 1,609 km"
+        if unit == "mi" {
+            segmentCell.segment.selectedSegmentIndex = 0
+            unitCell.textLabel?.text = "1 mi = 1,609 km"
         } else {
-            segment.segment.selectedSegmentIndex = 1
-            unit.textLabel?.text = "1 km = 0,621 mi"
+            segmentCell.segment.selectedSegmentIndex = 1
+            unitCell.textLabel?.text = "1 km = 0,621 mi"
         }
     }
 
