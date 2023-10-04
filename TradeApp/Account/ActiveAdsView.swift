@@ -8,6 +8,7 @@
 import UIKit
 import Firebase
 import FirebaseStorage
+import FirebaseAuth
 
 class ActiveAdsView: UITableViewController {
     
@@ -15,7 +16,7 @@ class ActiveAdsView: UITableViewController {
     
     var header: UILabel!
     
-    var mail: String!
+//    var mail: String!
     var activeAds = [Item?]()
     
     var reference: DatabaseReference!
@@ -106,7 +107,7 @@ class ActiveAdsView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = activeAds[indexPath.row]
             vc.hidesBottomBarWhenPushed = true
-            vc.loggedUser = mail
+//            vc.loggedUser = mail
             vc.toolbarItems = []
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -149,7 +150,7 @@ class ActiveAdsView: UITableViewController {
             guard let item = activeAds.first(where: {$0?.id == sender.tag}) else { return }
             vc.isEditMode = true
             vc.isAdActive = true
-            vc.loggedUser = mail
+//            vc.loggedUser = mail
             vc.item = item
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -250,14 +251,14 @@ class ActiveAdsView: UITableViewController {
     
     // move item from activeItems to endedItems folder
     func moveItem(itemID: Int, date: String) {
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("activeItems").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
                 if let value = snapshot.value as? [String: Any] {
-                    self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").setValue(value)
-                    self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").child("date").setValue(date)
-                    self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").removeValue()
+                    self?.reference.child(user).child("endedItems").child("\(itemID)").setValue(value)
+                    self?.reference.child(user).child("endedItems").child("\(itemID)").child("date").setValue(date)
+                    self?.reference.child(user).child("activeItems").child("\(itemID)").removeValue()
                 }
             }
         }
@@ -265,28 +266,28 @@ class ActiveAdsView: UITableViewController {
     
     // delete item from Firebase
     func deleteItem(itemID: Int) {
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").child("photos").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("activeItems").child("\(itemID)").child("photos").observeSingleEvent(of: .value) { snapshot in
                 if let value = snapshot.value as? [String: String] {
                     for i in 0..<value.keys.count {
-                        let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(fixedMail).child("\(itemID)").child("image\(i)")
+                        let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(i)")
                         storageRef.delete() { _ in }
                     }
                     
-                    self?.reference.child(fixedMail).child("chats").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
+                    self?.reference.child(user).child("chats").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
                         
                         if let buyers = snapshot.value as? [String: [[String: String]]] {
                             let keys = buyers.keys
                             
                             for key in keys {
-                                self?.reference.child(fixedMail).child("chats").child("\(itemID)").child(key).removeAllObservers()
+                                self?.reference.child(user).child("chats").child("\(itemID)").child(key).removeAllObservers()
                             }
                             
-                            self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").removeValue()
-                            self?.reference.child(fixedMail).child("chats").child("\(itemID)").removeAllObservers()
-                            self?.reference.child(fixedMail).child("chats").child("\(itemID)").removeValue()
+                            self?.reference.child(user).child("activeItems").child("\(itemID)").removeValue()
+//                            self?.reference.child(user).child("chats").child("\(itemID)").removeAllObservers()
+                            self?.reference.child(user).child("chats").child("\(itemID)").removeValue()
                         }
                     }
                 }
@@ -316,12 +317,12 @@ class ActiveAdsView: UITableViewController {
     
     // download active ads from Firebase
     func getActiveAds(completion: @escaping ([String: [String: Any]]) -> Void) {
+        guard let user = Auth.auth().currentUser?.uid else { return }
         var fixedItems = [String: [String: Any]]()
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
         var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).child("activeItems").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("activeItems").observeSingleEvent(of: .value) { snapshot in
                 if let data = snapshot.value as? [String: [String: Any]] {
                     fixedItems = data
                     for (key, value) in data {

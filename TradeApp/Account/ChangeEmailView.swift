@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Firebase
+//import Firebase
 import FirebaseAuth
 
 class ChangeEmailView: UITableViewController {
@@ -18,7 +18,7 @@ class ChangeEmailView: UITableViewController {
     
 //    var loggedUser: String!
     
-    var reference: DatabaseReference!
+//    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +29,7 @@ class ChangeEmailView: UITableViewController {
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
         
-        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+//        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // set number of sections
@@ -150,7 +150,7 @@ class ChangeEmailView: UITableViewController {
     
     // save mail to Firebase Auth
     func saveEmail(email: String) {
-        guard let user = Auth.auth().currentUser?.uid else { return }
+//        guard let user = Auth.auth().currentUser?.uid else { return }
         
         Auth.auth().currentUser?.updateEmail(to: email) { [weak self] _ in
             let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)

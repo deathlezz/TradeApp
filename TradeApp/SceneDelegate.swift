@@ -26,32 +26,33 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UINavigationControllerD
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let url = URLContexts.first?.url.absoluteString else { return }
+        guard url.contains("show/") else { return }
         let id = url.components(separatedBy: "show/")[1]
-        
+
         // retrieve the root view controller (which is a tab bar controller)
         guard let rootViewController = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController else {
             return
         }
-        
+
         let tabBarController = rootViewController as? UITabBarController
         let navController = tabBarController?.selectedViewController as? UINavigationController
-        
+
         guard let item = AppStorage.shared.items.first(where: {$0.id == Int(id)}) else {
             let ac = UIAlertController(title: "Item unavailable", message: "Try again later", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .cancel))
             navController?.present(ac, animated: true)
             return
         }
-        
+
         if ItemView.isLoaded {
             navController?.popViewController(animated: false)
             navController?.popViewController(animated: false)
         } else if DetailView.isLoaded {
             navController?.popViewController(animated: false)
         }
-        
+
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        
+
         if let vc = storyboard.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = item
             vc.hidesBottomBarWhenPushed = true

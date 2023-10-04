@@ -12,7 +12,7 @@ import Firebase
 class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     var savedItems = [Item]()
-    var loggedUser: String!
+//    var loggedUser: String!
     
     let monitor = NWPathMonitor()
     var isPushed = false
@@ -52,7 +52,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
-        loggedUser = Utilities.loadUser()
+//        loggedUser = Utilities.loadUser()
         
         DispatchQueue.global().async { [weak self] in
             self?.updateSavedItems() { _ in }

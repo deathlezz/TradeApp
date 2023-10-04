@@ -8,6 +8,7 @@
 import UIKit
 import Firebase
 import FirebaseStorage
+import FirebaseAuth
 
 class EndedAdsView: UITableViewController {
     
@@ -15,7 +16,7 @@ class EndedAdsView: UITableViewController {
     
     var header: UILabel!
     
-    var mail: String!
+//    var mail: String!
     var endedAds = [Item]()
     
     var reference: DatabaseReference!
@@ -150,7 +151,7 @@ class EndedAdsView: UITableViewController {
             guard let item = endedAds.first(where: {$0.id == sender.tag}) else { return }
             vc.isEditMode = true
             vc.isAdActive = false
-            vc.loggedUser = mail
+//            vc.loggedUser = mail
             vc.item = item
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -246,14 +247,14 @@ class EndedAdsView: UITableViewController {
     
     // move item from endedItems to activeItems folder in Firebase
     func moveItem(itemID: Int, date: String) {
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("endedItems").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
                 if let value = snapshot.value as? [String: Any] {
-                    self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").setValue(value)
-                    self?.reference.child(fixedMail).child("activeItems").child("\(itemID)").child("date").setValue(date)
-                    self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").removeValue()
+                    self?.reference.child(user).child("activeItems").child("\(itemID)").setValue(value)
+                    self?.reference.child(user).child("activeItems").child("\(itemID)").child("date").setValue(date)
+                    self?.reference.child(user).child("endedItems").child("\(itemID)").removeValue()
                 }
             }
         }
@@ -261,16 +262,16 @@ class EndedAdsView: UITableViewController {
     
     // delete item from Firebase
     func deleteItem(itemID: Int) {
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
+        guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").child("photos").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("endedItems").child("\(itemID)").child("photos").observeSingleEvent(of: .value) { snapshot in
                 if let value = snapshot.value as? [String: String] {
                     for i in 0..<value.keys.count {
-                        let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(fixedMail).child("\(itemID)").child("image\(i)")
+                        let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(i)")
                         storageRef.delete() { _ in }
                     }
-                    self?.reference.child(fixedMail).child("endedItems").child("\(itemID)").removeValue()
+                    self?.reference.child(user).child("endedItems").child("\(itemID)").removeValue()
                 }
             }
         }
@@ -298,12 +299,12 @@ class EndedAdsView: UITableViewController {
     
     // download ended ads from Firebase
     func getEndedAds(completion: @escaping ([String: [String: Any]]) -> Void) {
+        guard let user = Auth.auth().currentUser?.uid else { return }
         var fixedItems = [String: [String: Any]]()
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
         var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).child("endedItems").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("endedItems").observeSingleEvent(of: .value) { snapshot in
                 if let data = snapshot.value as? [String: [String: Any]] {
                     fixedItems = data
                     for (key, value) in data {

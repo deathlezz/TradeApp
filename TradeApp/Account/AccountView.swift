@@ -159,7 +159,10 @@ class AccountView: UITableViewController {
 //                NotificationCenter.default.post(name: NSNotification.Name("signOut"), object: nil)
                 navigationController?.popToRootViewController(animated: true)
             } catch {
-                showAlert(title: "Sign out failed", message: "An internal error occurred")
+                let ac = UIAlertController(title: "Sign out failed", message: "An internal error occurred", preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "OK", style: .default))
+                present(ac, animated: true)
+//                showAlert(title: "Sign out failed", message: "An internal error occurred")
             }
             
         }

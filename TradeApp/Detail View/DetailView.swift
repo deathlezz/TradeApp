@@ -9,7 +9,8 @@ import UIKit
 import CoreData
 import Firebase
 import MessageKit
-import UserNotifications
+import FirebaseAuth
+//import UserNotifications
 
 enum SaveAction {
     case save
@@ -63,10 +64,10 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         
         navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
         
-        loggedUser = Utilities.loadUser()
+//        loggedUser = Utilities.loadUser()
         savedItems = Utilities.loadItems()
         checkForMessage()
-        loadPhoneNumber()
+//        loadPhoneNumber()
         isSaved()
         increaseViews()
         DetailView.isLoaded = true
@@ -258,9 +259,9 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         if messageSent {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
                 vc.chatTitle = item.title
-                vc.loggedUser = loggedUser
+//                vc.loggedUser = loggedUser
                 vc.isPushedByChats = false
-                ChatView.shared.buyer = loggedUser
+                ChatView.shared.buyer = Auth.auth().currentUser?.uid
                 ChatView.shared.seller = item.owner
                 vc.itemID = item.id
                 present(vc, animated: true)
@@ -368,12 +369,12 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         messageFrame.layer.borderWidth = 0.2
         let messageButton = UIBarButtonItem(customView: messageFrame)
         
-        if loggedUser == nil && phone == 0 {
+        if Auth.auth().currentUser == nil && phone == 0 {
             // show disabled message button only
             messageButton.customView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 20, height: 50)
             messageButton.isEnabled = false
             callButton.isHidden = true
-        } else if loggedUser == nil {
+        } else if Auth.auth().currentUser == nil {
             // show call button and disabled message button
             messageButton.isEnabled = false
         } else if phone == 0 {
@@ -382,8 +383,8 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
             callButton.isHidden = true
         }
         
-        if loggedUser != nil {
-            let mail = loggedUser!.replacingOccurrences(of: ".", with: "_")
+        if Auth.auth().currentUser != nil {
+            let user = Auth.auth().currentUser?.uid
             
 //            if mail == item.owner {
 //                messageButton.isEnabled = false
@@ -409,7 +410,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     
     // increase number of views
     func increaseViews() {
-        let mail = loggedUser?.replacingOccurrences(of: ".", with: "_") ?? ""
+        let user = Auth.auth().currentUser?.uid
         let owner = item.owner
         let itemID = item.id
         
@@ -417,7 +418,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
             self?.reference.child(owner).child("activeItems").child("\(itemID)").child("views").observeSingleEvent(of: .value) { snapshot in
                 if let views = snapshot.value as? Int {
                     
-                    if mail != owner {
+                    if user != owner {
                         self?.reference.child(owner).child("activeItems").child("\(itemID)").child("views").setValue(views + 1)
                         self?.views = views + 1
                     } else {

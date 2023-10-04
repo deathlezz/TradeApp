@@ -6,16 +6,17 @@
 //
 
 import UIKit
-import Firebase
+//import Firebase
+import FirebaseAuth
 
 class ChangePasswordView: UITableViewController {
     
     let sections = ["Current password", "New password", "Repeat password", "Button"]
     
     var cells = [TextFieldCell]()    
-    var mail: String!
+//    var mail: String!
     
-    var reference: DatabaseReference!
+//    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +27,7 @@ class ChangePasswordView: UITableViewController {
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
         
-        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+//        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // set number of sections
@@ -152,43 +153,23 @@ class ChangePasswordView: UITableViewController {
             return showAlert(title: "Error", message: "Password repeated incorrectly")
         }
         
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.reference.child(fixedMail).child("password").observeSingleEvent(of: .value) { snapshot in
-                if let pass = snapshot.value as? String {
-                    
-                    DispatchQueue.main.async {
-                        guard currentPassword == pass else {
-                            for cell in (self?.cells)! {
-                                cell.textField.text = nil
-                            }
-                            return self?.showAlert(title: "Error", message: "Wrong current password") ?? ()
-                        }
-                        
-                        DispatchQueue.global().async {
-                            self?.changePassword(to: newPassword)
-                        }
-                    }
-                }
-            }
-        }
+        changePassword(to: newPassword)
     }
     
-    // set password change function
-    func changePassword(to: String) {
-        let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
-        reference.child(fixedMail).child("password").setValue(to)
-        Utilities.setUser(nil)
-        
-        DispatchQueue.main.async { [weak self] in
+    // change password function
+    func changePassword(to password: String) {
+        Auth.auth().currentUser?.updatePassword(to: password) { [weak self] _ in
             let ac = UIAlertController(title: "Password has been changed", message: "You can sign in now", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-                self?.navigationController?.popToRootViewController(animated: true)
+                do {
+                    try Auth.auth().signOut()
+                    self?.navigationController?.popToRootViewController(animated: true)
+                } catch {
+                    self?.showAlert(title: "Sign out failed", message: "Internal error occurred")
+                }
             })
             self?.present(ac, animated: true)
         }
-        
     }
     
     // check password format

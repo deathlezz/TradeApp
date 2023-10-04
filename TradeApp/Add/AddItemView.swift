@@ -10,7 +10,7 @@ import CoreLocation
 import Firebase
 import FirebaseStorage
 import FirebaseAuth
-import UserNotifications
+//import UserNotifications
 
 enum AlertType {
     case emptyField
@@ -392,21 +392,21 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 }
                                 
                                 // show notification if new message arrive
-                                self?.reference.child(user).child("chats").child("\(id)").observe(.childAdded) { snapshot in
-                                    
-                                    if let _ = snapshot.value as? [[String: String]] {
-                                        let buyer = snapshot.key
-                                        
-                                        self?.reference.child(user).child("chats").child("\(id)").child("\(buyer)").observe(.childAdded) { snapshot in
-                                            
-                                            if let newMessage = snapshot.value as? [String: String] {
-                                                guard let kind = newMessage["kind"] else { return }
-                                                
-                                                self?.showNotification(title: title, body: kind)
-                                            }
-                                        }
-                                    }
-                                }
+//                                self?.reference.child(user).child("chats").child("\(id)").observe(.childAdded) { snapshot in
+//                                    
+//                                    if let _ = snapshot.value as? [[String: String]] {
+//                                        let buyer = snapshot.key
+//                                        
+//                                        self?.reference.child(user).child("chats").child("\(id)").child("\(buyer)").observe(.childAdded) { snapshot in
+//                                            
+//                                            if let newMessage = snapshot.value as? [String: String] {
+//                                                guard let kind = newMessage["kind"] else { return }
+//                                                
+//                                                self?.showNotification(title: title, body: kind)
+//                                            }
+//                                        }
+//                                    }
+//                                }
                                 
                                 sender.isUserInteractionEnabled = true
                                 self?.showAlert(.success)

@@ -35,7 +35,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     
     var reference: DatabaseReference!
     
-    var mail: String!
+//    var mail: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,7 +73,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         
         DispatchQueue.global().async { [weak self] in
             self?.resetFilters()
-            self?.mail = Utilities.loadUser()
+//            self?.mail = Utilities.loadUser()
             self?.currentUnit = Utilities.loadDistanceUnit()
             
             self?.getData() { dict in

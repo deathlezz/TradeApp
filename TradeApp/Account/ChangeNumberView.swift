@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Firebase
+//import Firebase
 import FirebaseAuth
 
 enum NumberAction {
@@ -21,13 +21,13 @@ class ChangeNumberView: UITableViewController {
     var firstHeader: UILabel!
     var secondHeader: UILabel!
     
-    var oldNumber: UITableViewCell!
+    var currentNumber: UITableViewCell!
     var newNumber: TextFieldCell!
     
 //    var mail: String!
-    var currentNumber: Int!
+//    var currentNumber: Int!
     
-    var reference: DatabaseReference!
+//    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,9 +39,13 @@ class ChangeNumberView: UITableViewController {
         tableView.sectionHeaderTopPadding = 20
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CurrentNumberCell")
         
-        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+        print(Auth.auth().currentUser?.phoneNumber)
         
-        loadCurrentNumber()
+//        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+        
+//        setCurrentNumber()
+//        updateRows()
+//        loadCurrentNumber()
     }
     
     // set number of sections
@@ -97,7 +101,7 @@ class ChangeNumberView: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "NewNumberCell", for: indexPath) as? TextFieldCell {
             if sections[indexPath.section] == "New number" {
-                cell.textField.placeholder = "e.g. 1234567890"
+                cell.textField.placeholder = "e.g. +44 123 4567890"
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 cell.textField.clearButtonMode = .whileEditing
                 cell.selectionStyle = .none
@@ -109,21 +113,22 @@ class ChangeNumberView: UITableViewController {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "ButtonCell", for: indexPath) as? ButtonCell {
             if sections[indexPath.section] == "Button" {
                 cell.submitButton.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
+                cell.submitButton.setTitle("Verify", for: .normal)
                 cell.selectionStyle = .none
                 return cell
             }
         }
         
-        if currentNumber != nil {
+        if Auth.auth().currentUser?.phoneNumber != nil {
             if sections[indexPath.section] == "Current number" {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentNumberCell", for: indexPath)
-                cell.textLabel?.text = "\(currentNumber!)"
+                cell.textLabel?.text = Auth.auth().currentUser?.phoneNumber
                 cell.selectionStyle = .none
                 cell.imageView?.image = UIImage(systemName: "phone.fill")
                 cell.textLabel?.font = UIFont.systemFont(ofSize: 22)
                 cell.textLabel?.textColor = .darkGray
                 cell.contentView.layoutMargins = UIEdgeInsets(top: 0, left: 30, bottom: 0, right: 0)
-                oldNumber = cell
+                currentNumber = cell
                 return cell
             }
         }
@@ -136,19 +141,19 @@ class ChangeNumberView: UITableViewController {
         guard let phoneNumber = newNumber.textField.text else { return }
         
         if isNumberValid() && sections.count == 2 {
-            currentNumber = Int(phoneNumber)
+//            currentNumber = Int(phoneNumber)
             saveNumber(number: phoneNumber)
             newNumber.textField.text = nil
-            updateRows()
+//            updateRows()
         } else if isNumberValid() && sections.count == 3 {
-            currentNumber = Int(phoneNumber)
+//            currentNumber = Int(phoneNumber)
             saveNumber(number: phoneNumber)
             newNumber.textField.text = nil
             updateNumberCell()
         } else if newNumber.textField.text == "" && sections.count == 3 {
             newNumber.textField.text = nil
             saveNumber(number: phoneNumber)
-            currentNumber = nil
+//            currentNumber = nil
             updateRows()
         } else {
             showAlert(title: "Error", message: "Invalid number format")
@@ -173,31 +178,31 @@ class ChangeNumberView: UITableViewController {
     }
     
     // load user's current phone number
-    func loadCurrentNumber() {
-        guard let phoneNumber = Auth.auth().currentUser?.phoneNumber else { return }
-//        guard let user = Auth.auth().currentUser?.uid else { return }
-        
-        currentNumber = Int(phoneNumber)
-        updateRows()
-        
-//        DispatchQueue.global().async { [weak self] in
-//            self?.reference.child(user).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
-//                if let number = snapshot.value as? String {
-//                    self?.currentNumber = Int(number)
-//                    
-//                    DispatchQueue.main.async {
-//                        self?.updateRows()
-//                    }
-//                }
-//            }
-//        }
-    }
+//    func loadCurrentNumber() {
+//        guard let phoneNumber = Auth.auth().currentUser?.phoneNumber else { return }
+////        guard let user = Auth.auth().currentUser?.uid else { return }
+//
+////        currentNumber = Int(phoneNumber)
+//        updateRows()
+//
+////        DispatchQueue.global().async { [weak self] in
+////            self?.reference.child(user).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
+////                if let number = snapshot.value as? String {
+////                    self?.currentNumber = Int(number)
+////
+////                    DispatchQueue.main.async {
+////                        self?.updateRows()
+////                    }
+////                }
+////            }
+////        }
+//    }
     
     // update table view rows
     func updateRows() {
         let indexSet = IndexSet(integer: 0)
         
-        if currentNumber != nil {
+        if Auth.auth().currentUser?.phoneNumber != nil {
             sections = ["Current number", "New number", "Button"]
             tableView.insertSections(indexSet, with: .fade)
             updateHeader(after: .add)
@@ -240,7 +245,7 @@ class ChangeNumberView: UITableViewController {
     // update phone number cell
     func updateNumberCell() {
         let indexPath = IndexPath(row: 0, section: 0)
-        oldNumber.textLabel?.text = String(currentNumber)
+        currentNumber.textLabel?.text = Auth.auth().currentUser?.phoneNumber
         tableView.reloadRows(at: [indexPath], with: .automatic)
     }
     
@@ -268,21 +273,39 @@ class ChangeNumberView: UITableViewController {
     func setCurrentNumber() {
         let indexSet = IndexSet(integer: 0)
         
-        if currentNumber != nil {
+        if Auth.auth().currentUser?.phoneNumber != nil {
             sections = ["Current number", "New number", "Button"]
             tableView.insertSections(indexSet, with: .fade)
             updateHeader(after: .add)
         }
     }
     
-    // save number to Firebase Database
+    // save number to Firebase Authentication
     func saveNumber(number: String) {
-        guard let user = Auth.auth().currentUser?.uid else { return }
+        PhoneAuthProvider.provider().verifyPhoneNumber(number, uiDelegate: nil) { [weak self] verificationID, error in
 
-        if !number.isEmpty {
-            reference.child(user).child("phoneNumber").setValue(number)
-        } else {
-            reference.child(user).child("phoneNumber").removeValue()
+            guard error == nil else {
+                print(error?.localizedDescription)
+                return
+            }
+            
+            let ac = UIAlertController(title: "Verification", message: "Enter SMS code to authenticate", preferredStyle: .alert)
+            ac.addTextField()
+            ac.addAction(UIAlertAction(title: "Submit", style: .default) { _ in
+                let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID!, verificationCode: ac.textFields![0].text!)
+                
+                Auth.auth().currentUser?.updatePhoneNumber(credential, completion: { error in
+                    guard error == nil else {
+                        self?.showAlert(title: "Verification failed", message: "Invalid text code has been entered")
+                        return
+                    }
+                })
+                self?.setCurrentNumber()
+                self?.updateNumberCell()
+            })
+            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            self?.present(ac, animated: true)
         }
+
     }
 }
