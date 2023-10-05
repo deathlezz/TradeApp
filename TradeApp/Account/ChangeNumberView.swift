@@ -39,13 +39,8 @@ class ChangeNumberView: UITableViewController {
         tableView.sectionHeaderTopPadding = 20
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CurrentNumberCell")
         
-        print(Auth.auth().currentUser?.phoneNumber)
-        
 //        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
-//        setCurrentNumber()
-//        updateRows()
-//        loadCurrentNumber()
     }
     
     // set number of sections
@@ -136,25 +131,33 @@ class ChangeNumberView: UITableViewController {
         return UITableViewCell()
     }
     
+    // swipe to delete cell
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        guard sections[indexPath.section] == "Current number" else { return }
+        
+        if editingStyle == .delete {
+            let ac = UIAlertController(title: "Delete number", message: "Are you sure you want to delete your phone number?", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Continue", style: .default) { [weak self] _ in
+                Auth.auth().currentUser?.unlink(fromProvider: PhoneAuthProviderID) { _, error in
+                    guard error == nil else {
+                        self?.showAlert(title: "Remove phone failed", message: error!.localizedDescription)
+                        return
+                    }
+                    self?.updateRows()
+                }
+            })
+            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            present(ac, animated: true)
+        }
+    }
+    
     // set action for tapped button
     @objc func submitTapped() {
         guard let phoneNumber = newNumber.textField.text else { return }
         
-        if isNumberValid() && sections.count == 2 {
-//            currentNumber = Int(phoneNumber)
+        if isNumberValid() {
             saveNumber(number: phoneNumber)
             newNumber.textField.text = nil
-//            updateRows()
-        } else if isNumberValid() && sections.count == 3 {
-//            currentNumber = Int(phoneNumber)
-            saveNumber(number: phoneNumber)
-            newNumber.textField.text = nil
-            updateNumberCell()
-        } else if newNumber.textField.text == "" && sections.count == 3 {
-            newNumber.textField.text = nil
-            saveNumber(number: phoneNumber)
-//            currentNumber = nil
-            updateRows()
         } else {
             showAlert(title: "Error", message: "Invalid number format")
         }
@@ -163,6 +166,7 @@ class ChangeNumberView: UITableViewController {
     // add "done" button to numeric keyboard
     override func viewDidAppear(_ animated: Bool) {
         addDoneButtonToKeyboard()
+        updateRows()
     }
     
     // set action for "return" keyboard button
@@ -202,11 +206,11 @@ class ChangeNumberView: UITableViewController {
     func updateRows() {
         let indexSet = IndexSet(integer: 0)
         
-        if Auth.auth().currentUser?.phoneNumber != nil {
+        if Auth.auth().currentUser?.phoneNumber != nil && sections.count == 2 {
             sections = ["Current number", "New number", "Button"]
             tableView.insertSections(indexSet, with: .fade)
             updateHeader(after: .add)
-        } else {
+        } else if Auth.auth().currentUser?.phoneNumber == nil && sections.count == 3 {
             sections = ["New number", "Button"]
             tableView.deleteSections(indexSet, with: .fade)
             updateHeader(after: .delete)
@@ -285,7 +289,7 @@ class ChangeNumberView: UITableViewController {
         PhoneAuthProvider.provider().verifyPhoneNumber(number, uiDelegate: nil) { [weak self] verificationID, error in
 
             guard error == nil else {
-                print(error?.localizedDescription)
+                self?.showAlert(title: "Verification failed", message: error!.localizedDescription)
                 return
             }
             
@@ -299,13 +303,17 @@ class ChangeNumberView: UITableViewController {
                         self?.showAlert(title: "Verification failed", message: "Invalid text code has been entered")
                         return
                     }
+                    
+                    if self?.sections.count == 2 {
+                        self?.setCurrentNumber()
+                        self?.updateNumberCell()
+                    } else {
+                        self?.updateNumberCell()
+                    }
                 })
-                self?.setCurrentNumber()
-                self?.updateNumberCell()
             })
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             self?.present(ac, animated: true)
         }
-
     }
 }
