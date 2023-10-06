@@ -158,7 +158,12 @@ class ChangePasswordView: UITableViewController {
     
     // change password function
     func changePassword(to password: String) {
-        Auth.auth().currentUser?.updatePassword(to: password) { [weak self] _ in
+        Auth.auth().currentUser?.updatePassword(to: password) { [weak self] error in
+            guard error == nil else {
+                self?.showAlert(title: "Change password failed", message: error!.localizedDescription)
+                return
+            }
+            
             let ac = UIAlertController(title: "Password has been changed", message: "You can sign in now", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
                 do {

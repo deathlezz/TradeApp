@@ -131,10 +131,17 @@ class ChangeNumberView: UITableViewController {
         return UITableViewCell()
     }
     
+    // set editing style for each cell
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+       if sections[indexPath.section] == "Current number" {
+           return UITableViewCell.EditingStyle.delete
+        } else {
+            return UITableViewCell.EditingStyle.none
+        }
+    }
+    
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        guard sections[indexPath.section] == "Current number" else { return }
-        
         if editingStyle == .delete {
             let ac = UIAlertController(title: "Delete number", message: "Are you sure you want to delete your phone number?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Continue", style: .default) { [weak self] _ in

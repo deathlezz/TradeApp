@@ -150,9 +150,21 @@ class ChangeEmailView: UITableViewController {
     
     // save mail to Firebase Auth
     func saveEmail(email: String) {
-//        guard let user = Auth.auth().currentUser?.uid else { return }
+        // send verification email
+        if Auth.auth().currentUser != nil && !Auth.auth().currentUser!.isEmailVerified {
+            self.authUser!.sendEmailVerification(completion: { (error) in
+                // Notify the user that the mail has sent or couldn't because of an error.
+            })
+        }
         
-        Auth.auth().currentUser?.updateEmail(to: email) { [weak self] _ in
+        
+        
+        Auth.auth().currentUser?.updateEmail(to: email) { [weak self] error in
+            guard error == nil else {
+                self?.showAlert(title: "Change email failed", message: error!.localizedDescription)
+                return
+            }
+            
             let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
                 do {
