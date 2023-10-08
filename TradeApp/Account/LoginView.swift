@@ -219,60 +219,6 @@ class LoginView: UITableViewController {
             
             createUser(mail: mail, password: passText)
         }
-        
-        // break here
-        
-//        DispatchQueue.global().async { [weak self] in
-//            let fixedMail = mail.replacingOccurrences(of: ".", with: "_")
-//
-//            self?.reference.child(fixedMail).observeSingleEvent(of: .value) { snapshot in
-//                DispatchQueue.main.async {
-//                    // user exists
-//                    if let value = snapshot.value as? [String: Any] {
-//                        if self?.segment.segment.selectedSegmentIndex == 0 {
-//                            let pass = value["password"] as? String
-//
-//                            guard passText == pass else {
-//                                return self?.showAlert(title: "Error", message: "Wrong password") ?? ()
-//                            }
-//
-//                            self?.resetView(after: .login)
-//                            Utilities.setUser(mail)
-//                            self?.loggedUser = mail
-//                            self?.loginPush(after: .signIn)
-//
-//                        } else {
-//                            self?.showAlert(title: "Error", message: "This email is already used")
-//                        }
-//
-//                    // user doesn't exist
-//                    } else {
-//                        if self?.segment.segment.selectedSegmentIndex == 0 {
-//                            self?.showAlert(title: "Error", message: "You have to sign up first")
-//                        } else {
-//                            let rePassText = self?.repeatPassword.textField.text
-//
-//                            guard self?.isEmailValid() ?? Bool() else {
-//                                return self?.showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*") ?? ()
-//                            }
-//
-//                            guard self?.isPasswordValid() ?? Bool() else {
-//                                self?.password.textField.text = nil
-//                                self?.repeatPassword.textField.text = nil
-//                                return self?.showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*") ?? ()
-//                            }
-//
-//                            guard passText == rePassText else {
-//                                self?.repeatPassword.textField.text = nil
-//                                return self?.showAlert(title: "Error", message: "Password repeated incorrectly") ?? ()
-//                            }
-//
-//                            self?.createUser(mail: mail, password: passText)
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
     
     // check email address format
@@ -364,6 +310,7 @@ class LoginView: UITableViewController {
     func accountCreatedAlert() {
         let ac = UIAlertController(title: "Success", message: "You can sign in now", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+            self?.sendEmail()
             self?.resetView(after: .register)
         })
         present(ac, animated: true)
@@ -410,20 +357,20 @@ class LoginView: UITableViewController {
     
     // save user to Firebase database
     func createUser(mail: String, password: String) {
-        Auth.auth().createUser(withEmail: mail, password: password) { [weak self] result, error in
+        Auth.auth().createUser(withEmail: mail, password: password) { [weak self] (_, error) in
             guard error == nil else {
                 if let error = error as? NSError {
                     let errorCode = AuthErrorCode.Code(rawValue: error._code)
                     
                     switch errorCode {
                     case .emailAlreadyInUse:
-                        self?.showAlert(title: "Sign in failed", message: "Email already in use")
+                        self?.showAlert(title: "Sign up failed", message: "Email already in use")
                     case .tooManyRequests:
-                        self?.showAlert(title: "Sign in failed", message: "Too many requests")
+                        self?.showAlert(title: "Sign up failed", message: "Too many requests")
                     case .networkError:
-                        self?.showAlert(title: "Sign in failed", message: "Network error occurred")
+                        self?.showAlert(title: "Sign up failed", message: "Network error occurred")
                     default:
-                        self?.showAlert(title: "Sign in failed", message: "Internal error occurred")
+                        self?.showAlert(title: "Sign up failed", message: "Internal error occurred")
                     }
                 }
                 return
@@ -431,16 +378,23 @@ class LoginView: UITableViewController {
             
             self?.accountCreatedAlert()
         }
-        
-//        let userMail = mail.replacingOccurrences(of: ".", with: "_")
-//
-//        DispatchQueue.global().async { [weak self] in
-//            self?.reference.child(userMail).child("password").setValue(password)
-//
-//            DispatchQueue.main.async {
-//                self?.accountCreatedAlert()
-//            }
-//        }
+    }
+    
+    // send verification email
+    func sendEmail() {
+        if Auth.auth().currentUser != nil && !Auth.auth().currentUser!.isEmailVerified {
+            Auth.auth().currentUser?.sendEmailVerification() { [weak self] error in
+                
+                // show email sent failed alert
+                guard error == nil else {
+                    self?.showAlert(title: "Sent email failed", message: error!.localizedDescription)
+                    return
+                }
+                
+                // show email sent success alert
+                self?.showAlert(title: "Email sent", message: "Check your inbox to verify")
+            }
+        }
     }
     
 }

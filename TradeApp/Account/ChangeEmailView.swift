@@ -100,6 +100,7 @@ class ChangeEmailView: UITableViewController {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "ButtonCell", for: indexPath) as? ButtonCell {
             if sections[indexPath.section] == "Button" {
                 cell.submitButton.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
+                cell.submitButton.setTitle("Verify", for: .normal)
                 cell.selectionStyle = .none
                 return cell
             }
@@ -141,20 +142,30 @@ class ChangeEmailView: UITableViewController {
         saveEmail(email: newMailText)
     }
     
-    // set alert for incorect textField input
+    // show alert function
     func showAlert(title: String, message: String) {
         let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
     }
     
-    // save mail to Firebase Auth
+    // save email to Firebase Auth
     func saveEmail(email: String) {
-        // send verification email
-        if Auth.auth().currentUser != nil && !Auth.auth().currentUser!.isEmailVerified {
-            self.authUser!.sendEmailVerification(completion: { (error) in
-                // Notify the user that the mail has sent or couldn't because of an error.
+        Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email) { [weak self] error in
+
+            guard error == nil else {
+                self?.showAlert(title: "Sent email failed", message: error!.localizedDescription)
+                return
+            }
+            
+//            self?.showAlert(title: "Email sent to \(email)", message: "Verify email and tap Continue to proceed")
+            
+            let ac = UIAlertController(title: "Email sent to \(email)", message: "Verify email and tap Continue to proceed", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Continue", style: .default) { _ in
+                
             })
+            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            self?.present(ac, animated: true)
         }
         
         
@@ -176,25 +187,19 @@ class ChangeEmailView: UITableViewController {
             })
             self?.present(ac, animated: true)
         }
-        
-//        DispatchQueue.global().async { [weak self] in
-//            self?.reference.child(user).observeSingleEvent(of: .value) { snapshot in
-//                if let value = snapshot.value as? [String: Any] {
-//                    self?.reference.child(fixedNewMail).setValue(value)
-//                    self?.reference.child(user).removeValue()
-//
-//                    DispatchQueue.main.async {
-//                        Utilities.setUser(nil)
-//
-//                        let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)
-//                        ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-//                            self?.navigationController?.popToRootViewController(animated: true)
-//                        })
-//                        self?.present(ac, animated: true)
-//                    }
-//                }
-//            }
-//        }
+    }
+    
+    // send verification email into new inbox
+    func sendEmail(email: String) {
+        Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email) { [weak self] error in
+
+            guard error == nil else {
+                self?.showAlert(title: "Sent email failed", message: error!.localizedDescription)
+                return
+            }
+            
+            self?.showAlert(title: "Email sent", message: "Check your inbox to verify your new email")
+        }
     }
     
 }

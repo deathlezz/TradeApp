@@ -174,7 +174,12 @@ class AccountView: UITableViewController {
         ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
             
             // remove user from database
-            Auth.auth().currentUser?.delete()
+            Auth.auth().currentUser?.delete() { error in
+                guard error == nil else {
+                    self?.showAlert(title: "Delete account failed", message: error!.localizedDescription)
+                    return
+                }
+            }
             
 //            guard let fixedMail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
             self?.deleteUser(user: Auth.auth().currentUser!.uid)
