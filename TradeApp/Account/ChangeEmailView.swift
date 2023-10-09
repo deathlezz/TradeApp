@@ -123,23 +123,31 @@ class ChangeEmailView: UITableViewController {
     }
     
     // set action for tapped button
-    @objc func submitTapped() {
+    @objc func submitTapped(_ sender: UIButton) {
         guard let currentMailText = currentEmail.textField.text else { return }
         guard let newMailText = newEmail.textField.text else { return }
+        
+        sender.isUserInteractionEnabled = false
                 
         guard currentMailText == Auth.auth().currentUser?.email else {
-            return showAlert(title: "Error", message: "Incorrect current address")
+            sender.isUserInteractionEnabled = true
+            showAlert(title: "Error", message: "Incorrect current address")
+            return
         }
         
         guard currentMailText != newMailText else {
-            return showAlert(title: "Error", message: "New email can't be the same as the old one")
+            sender.isUserInteractionEnabled = true
+            showAlert(title: "Error", message: "New email can't be the same as the old one")
+            return
         }
         
         guard isEmailValid() else {
-            return showAlert(title: "Error", message: "Incorrect new email format")
+            sender.isUserInteractionEnabled = true
+            showAlert(title: "Error", message: "Incorrect new email format")
+            return
         }
         
-        saveEmail(email: newMailText)
+        saveEmail(email: newMailText, sender: sender)
     }
     
     // show alert function
@@ -150,55 +158,28 @@ class ChangeEmailView: UITableViewController {
     }
     
     // save email to Firebase Auth
-    func saveEmail(email: String) {
+    func saveEmail(email: String, sender: UIButton) {
         Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email) { [weak self] error in
-
             guard error == nil else {
                 self?.showAlert(title: "Sent email failed", message: error!.localizedDescription)
+                sender.isUserInteractionEnabled = true
                 return
             }
             
-//            self?.showAlert(title: "Email sent to \(email)", message: "Verify email and tap Continue to proceed")
-            
-            let ac = UIAlertController(title: "Email sent to \(email)", message: "Verify email and tap Continue to proceed", preferredStyle: .alert)
+            let ac = UIAlertController(title: "Email sent to \(email)", message: "Check inbox to update your email address", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Continue", style: .default) { _ in
+                self?.currentEmail.textField.text = nil
+                self?.newEmail.textField.text = nil
+                sender.isUserInteractionEnabled = true
                 
-            })
-            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-            self?.present(ac, animated: true)
-        }
-        
-        
-        
-        Auth.auth().currentUser?.updateEmail(to: email) { [weak self] error in
-            guard error == nil else {
-                self?.showAlert(title: "Change email failed", message: error!.localizedDescription)
-                return
-            }
-            
-            let ac = UIAlertController(title: "Email has been changed", message: "You can sign in now", preferredStyle: .alert)
-            ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
                 do {
                     try Auth.auth().signOut()
                     self?.navigationController?.popToRootViewController(animated: true)
                 } catch {
-                    self?.showAlert(title: "Sign out failed", message: "An internal error occurred")
+                    self?.showAlert(title: "Sign out failed", message: "Internal error occurred")
                 }
             })
             self?.present(ac, animated: true)
-        }
-    }
-    
-    // send verification email into new inbox
-    func sendEmail(email: String) {
-        Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email) { [weak self] error in
-
-            guard error == nil else {
-                self?.showAlert(title: "Sent email failed", message: error!.localizedDescription)
-                return
-            }
-            
-            self?.showAlert(title: "Email sent", message: "Check your inbox to verify your new email")
         }
     }
     

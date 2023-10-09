@@ -129,43 +129,57 @@ class ChangePasswordView: UITableViewController {
     }
     
     // set action for tapped button
-    @objc func submitTapped() {
+    @objc func submitTapped(_ sender: UIButton) {
         guard let currentPassword = cells[0].textField.text else { return }
         guard let newPassword = cells[1].textField.text else { return }
         guard let repeatPassword = cells[2].textField.text else { return }
         
+        sender.isUserInteractionEnabled = false
+        
         guard !currentPassword.isEmpty && !newPassword.isEmpty && !repeatPassword.isEmpty else {
-            return showAlert(title: "Empty field", message: "All text fields have to be filled")
+            showAlert(title: "Empty field", message: "All text fields have to be filled")
+            sender.isUserInteractionEnabled = true
+            return
         }
         
         guard isPasswordValid() else {
-            return showAlert(title: "Error", message: "Incorrect password format")
+            showAlert(title: "Error", message: "Incorrect password format")
+            sender.isUserInteractionEnabled = true
+            return
         }
         
         guard newPassword != currentPassword else {
             cells[1].textField.text = nil
             cells[2].textField.text = nil
-            return showAlert(title: "Error", message: "New password can't be the same as the old one")
+            showAlert(title: "Error", message: "New password can't be the same as the old one")
+            sender.isUserInteractionEnabled = true
+            return
         }
         
         guard repeatPassword == newPassword else {
             cells[2].textField.text = nil
-            return showAlert(title: "Error", message: "Password repeated incorrectly")
+            showAlert(title: "Error", message: "Password repeated incorrectly")
+            sender.isUserInteractionEnabled = true
+            return
         }
         
-        changePassword(to: newPassword)
+        changePassword(to: newPassword, sender: sender)
     }
     
     // change password function
-    func changePassword(to password: String) {
+    func changePassword(to password: String, sender: UIButton) {
         Auth.auth().currentUser?.updatePassword(to: password) { [weak self] error in
             guard error == nil else {
                 self?.showAlert(title: "Change password failed", message: error!.localizedDescription)
+                sender.isUserInteractionEnabled = true
                 return
             }
             
             let ac = UIAlertController(title: "Password has been changed", message: "You can sign in now", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+                self?.cells.removeAll()
+                sender.isUserInteractionEnabled = true
+                
                 do {
                     try Auth.auth().signOut()
                     self?.navigationController?.popToRootViewController(animated: true)

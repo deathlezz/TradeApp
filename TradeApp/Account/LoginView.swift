@@ -162,16 +162,20 @@ class LoginView: UITableViewController {
     }
     
     // set action for tapped button
-    @objc func submitTapped() {
+    @objc func submitTapped(_ sender: UIButton) {
         guard let mail = email.textField.text else { return }
         guard let passText = password.textField.text else { return }
         
+        sender.isUserInteractionEnabled = false
+        
         guard !mail.isEmpty && !passText.isEmpty else {
-            return showAlert(title: "Empty text field", message: "All text fields have to be filled")
+            showAlert(title: "Empty text field", message: "All text fields have to be filled")
+            sender.isUserInteractionEnabled = true
+            return
         }
         
         if segment.segment.selectedSegmentIndex == 0 {
-            Auth.auth().signIn(withEmail: mail, password: passText) { [weak self] result, error in
+            Auth.auth().signIn(withEmail: mail, password: passText) { [weak self] (_, error) in
                 
                 guard error == nil else {
                     if let error = error as? NSError {
@@ -190,10 +194,12 @@ class LoginView: UITableViewController {
                             self?.showAlert(title: "Sign in failed", message: "Internal error occurred")
                         }
                     }
+                    sender.isUserInteractionEnabled = true
                     return
                 }
                 
                 self?.resetView(after: .login)
+                sender.isUserInteractionEnabled = true
                 self?.loginPush(after: .signIn)
             }
         } else {
@@ -201,6 +207,7 @@ class LoginView: UITableViewController {
             
             guard isEmailValid() else {
                 showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*")
+                sender.isUserInteractionEnabled = true
                 return
             }
             
@@ -208,16 +215,18 @@ class LoginView: UITableViewController {
                 password.textField.text = nil
                 repeatPassword.textField.text = nil
                 showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*")
+                sender.isUserInteractionEnabled = true
                 return
             }
             
             guard passText == rePassText else {
                 repeatPassword.textField.text = nil
                 showAlert(title: "Error", message: "Password repeated incorrectly")
+                sender.isUserInteractionEnabled = true
                 return
             }
             
-            createUser(mail: mail, password: passText)
+            createUser(mail: mail, password: passText, sender: sender)
         }
     }
     
@@ -356,7 +365,7 @@ class LoginView: UITableViewController {
     }
     
     // save user to Firebase database
-    func createUser(mail: String, password: String) {
+    func createUser(mail: String, password: String, sender: UIButton) {
         Auth.auth().createUser(withEmail: mail, password: password) { [weak self] (_, error) in
             guard error == nil else {
                 if let error = error as? NSError {
@@ -373,10 +382,12 @@ class LoginView: UITableViewController {
                         self?.showAlert(title: "Sign up failed", message: "Internal error occurred")
                     }
                 }
+                sender.isUserInteractionEnabled = true
                 return
             }
             
             self?.accountCreatedAlert()
+            sender.isUserInteractionEnabled = true
         }
     }
     
@@ -392,7 +403,7 @@ class LoginView: UITableViewController {
                 }
                 
                 // show email sent success alert
-                self?.showAlert(title: "Email sent", message: "Check your inbox to verify")
+                self?.showAlert(title: "Email sent", message: "Check your inbox to verify your account")
             }
         }
     }

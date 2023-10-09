@@ -170,20 +170,29 @@ class AccountView: UITableViewController {
     
     // show delete account alert
     func deleteAccount() {
+        let user = Auth.auth().currentUser!.uid
         let ac = UIAlertController(title: "Delete account", message: "Are you sure, you want to delete your account?", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
             
             // remove user from database
             Auth.auth().currentUser?.delete() { error in
                 guard error == nil else {
-                    self?.showAlert(title: "Delete account failed", message: error!.localizedDescription)
+                    let ac = UIAlertController(title: "Delete account failed", message: error!.localizedDescription, preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+                        do {
+                            try Auth.auth().signOut()
+                            self?.navigationController?.popToRootViewController(animated: true)
+                        } catch {
+                            self?.showAlert(title: "Sign out failed", message: "Internal error occurred")
+                        }
+                    })
+                    self?.present(ac, animated: true)
                     return
                 }
+                
+                self?.deleteUser(user: user)
+                self?.showAlert(title: "Success", message: "Your account has been deleted")
             }
-            
-//            guard let fixedMail = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
-            self?.deleteUser(user: Auth.auth().currentUser!.uid)
-            self?.showAlert(title: "Success", message: "Your account has been deleted")
         })
         
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
