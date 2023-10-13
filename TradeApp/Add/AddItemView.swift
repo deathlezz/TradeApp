@@ -388,7 +388,9 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
 //                                    guard let user = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
+                                    
                                     self?.saveItem(user: user, item: newItem, urls: urls)
+                                    print("item saved")
                                 }
                                 
                                 // show notification if new message arrive
@@ -585,8 +587,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 
                 if let data = snapshot.value as? [String: [String: Any]] {
                     for user in data {
-                        let fixedMail = user.key.replacingOccurrences(of: ".", with: "_")
-                        let activeItems = data[fixedMail]?["activeItems"] as? [String: [String: Any]] ?? [:]
+//                        let fixedMail = user.key
+                        let activeItems = data[user.key]?["activeItems"] as? [String: [String: Any]] ?? [:]
                         
                         for item in activeItems {
                             usedIDs.append(Int(item.key)!)
@@ -608,15 +610,18 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             break
                         }
                     }
+                } else {
+                    let random = range.randomElement()
+                    completion(random!)
                 }
             }
         }
     }
     
     // sign out current user
-    @objc func signOut() {
-        navigationController?.popViewController(animated: true)
-    }
+//    @objc func signOut() {
+//        navigationController?.popViewController(animated: true)
+//    }
     
     // get reordered images
     @objc func reorderImages(_ notification: NSNotification) {
@@ -627,17 +632,20 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // save images to Firebase Storage and return images URLs
     func uploadImages(images: [Data?], itemID: Int, completion: @escaping ([String: String]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
-        
+        print("here1")
         var imagesURL = [String: String]()
         
         for (index, image) in images.enumerated() {
             let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(index)")
-            
+            print("here2")
             guard let img = image else { return }
             
             storageRef.putData(img) { (metadata, error) in
+                print("here3")
                 if metadata != nil {
+                    print("here4")
                     storageRef.downloadURL() { (url, error) in
+                        print("here5")
                 
                         guard let urlString = url?.absoluteString else { return }
                         imagesURL["image\(index)"] = urlString
@@ -651,7 +659,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // save item to Firebase Database
     func saveItem(user: String, item: Item, urls: [String: String]) {
         let newItem = item.toAnyObject(urls: urls)
-        
         reference.child(user).child("activeItems").child("\(item.id)").setValue(newItem)
     }
     

@@ -134,9 +134,9 @@ class MessagesView: UITableViewController {
     }
     
     // sign out current user
-    @objc func signOut() {
-        navigationController?.popViewController(animated: true)
-    }
+//    @objc func signOut() {
+//        navigationController?.popViewController(animated: true)
+//    }
     
     // convert message kind text into string
     func getMessageText(_ messageKind: MessageKind) -> String {

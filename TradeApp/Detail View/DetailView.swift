@@ -19,7 +19,7 @@ enum SaveAction {
 
 class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationCenterDelegate {
 
-    var loggedUser: String?
+//    var loggedUser: String?
     
     var savedItems = [Item]()
     
@@ -67,7 +67,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
 //        loggedUser = Utilities.loadUser()
         savedItems = Utilities.loadItems()
         checkForMessage()
-//        loadPhoneNumber()
+        loadPhoneNumber()
         isSaved()
         increaseViews()
         DetailView.isLoaded = true
@@ -480,11 +480,11 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     // send message function
     @objc func sendMessage() {
         guard !messageTextField.text!.isEmpty else { return }
-        guard let loggedUser = loggedUser else { return }
+//        guard let loggedUser = loggedUser else { return }
         
-        let mail = loggedUser.replacingOccurrences(of: ".", with: "_")
+        guard let user = Auth.auth().currentUser?.uid else { return }
         
-        let newSender = Sender(senderId: mail, displayName: mail.components(separatedBy: "@")[0])
+        let newSender = Sender(senderId: user, displayName: user.components(separatedBy: "@")[0])
         
         let newMessage = Message(sender: newSender, messageId: "0", sentDate: Date(), kind: .text((messageTextField.text)!))
         
@@ -496,22 +496,22 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
             guard let owner = self?.item.owner else { return }
             guard let itemID = self?.item.id else { return }
             
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).setValue(anyChat)
-            self?.reference.child(mail).child("chats").child("\(itemID)").child(owner).setValue(anyChat)
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).setValue(anyChat)
+            self?.reference.child(user).child("chats").child("\(itemID)").child(owner).setValue(anyChat)
             
             // remove observer if item has been removed
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observe(.childRemoved) { snapshot in
-                self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).removeAllObservers()
-                self?.reference.child(mail).child("chats").child("\(itemID)").child(owner).removeValue()
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observe(.childRemoved) { snapshot in
+                self?.reference.child(owner).child("chats").child("\(itemID)").child(user).removeAllObservers()
+                self?.reference.child(user).child("chats").child("\(itemID)").child(owner).removeValue()
             }
 
             // show notification when get message
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observe(.childAdded) { snapshot in
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observe(.childAdded) { snapshot in
                 
                 if let value = snapshot.value as? [String: String] {
                     guard let sender = value["sender"] else { return }
                     guard let kind = value["kind"] else { return }
-                    guard sender != mail else { return }
+                    guard sender != user else { return }
                     
                     // notify ChatView about the message
                     NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
@@ -538,18 +538,24 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     
     // check if message was sent
     func checkForMessage() {
-        guard loggedUser != nil else {
+        guard let user = Auth.auth().currentUser?.uid else {
             setToolbar()
             return
         }
         
-        let mail = loggedUser!.replacingOccurrences(of: ".", with: "_")
+        
+//        guard loggedUser != nil else {
+//            setToolbar()
+//            return
+//        }
+        
+//        let mail = loggedUser!.replacingOccurrences(of: ".", with: "_")
         
         DispatchQueue.global().async { [weak self] in
             guard let owner = self?.item.owner else { return }
             guard let itemID = self?.item.id else { return }
             
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(mail).observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observeSingleEvent(of: .value) { snapshot in
                 if let _ = snapshot.value as? [[String: String]] {
                     self?.messageSent = true
                 } else {

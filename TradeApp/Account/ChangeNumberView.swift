@@ -6,7 +6,7 @@
 //
 
 import UIKit
-//import Firebase
+import Firebase
 import FirebaseAuth
 
 enum NumberAction {
@@ -27,7 +27,7 @@ class ChangeNumberView: UITableViewController {
 //    var mail: String!
 //    var currentNumber: Int!
     
-//    var reference: DatabaseReference!
+    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +39,7 @@ class ChangeNumberView: UITableViewController {
         tableView.sectionHeaderTopPadding = 20
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CurrentNumberCell")
         
-//        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
     }
     
@@ -142,6 +142,8 @@ class ChangeNumberView: UITableViewController {
     
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        guard let user = Auth.auth().currentUser?.uid else { return }
+        
         if editingStyle == .delete {
             let ac = UIAlertController(title: "Delete number", message: "Are you sure you want to delete your phone number?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Continue", style: .default) { [weak self] _ in
@@ -151,6 +153,7 @@ class ChangeNumberView: UITableViewController {
                         return
                     }
                     self?.updateRows()
+                    self?.reference.child(user).child("phoneNumber").removeValue()
                 }
             })
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
@@ -294,6 +297,8 @@ class ChangeNumberView: UITableViewController {
     // save number to Firebase Authentication
     func saveNumber(number: String) {
         PhoneAuthProvider.provider().verifyPhoneNumber(number, uiDelegate: nil) { [weak self] verificationID, error in
+            
+            guard let user = Auth.auth().currentUser?.uid else { return }
 
             guard error == nil else {
                 self?.showAlert(title: "Verification failed", message: error!.localizedDescription)
@@ -317,6 +322,8 @@ class ChangeNumberView: UITableViewController {
                     } else {
                         self?.updateNumberCell()
                     }
+                    
+                    self?.reference.child(user).child("phoneNumber").setValue(number)
                 })
             })
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
