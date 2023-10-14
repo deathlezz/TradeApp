@@ -17,9 +17,9 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
 //    var loggedUser: String!
     var itemID: Int!
     
-    static let shared = ChatView()
-    var buyer: String!
-    var seller: String!
+//    static let shared = ChatView()
+    static var buyer: String!
+    static var seller: String!
     
     var isPushedByChats: Bool!
     
@@ -86,10 +86,10 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // set "send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        let fixedBuyer = ChatView.shared.buyer.replacingOccurrences(of: ".", with: "_")
-        let fixedSeller = ChatView.shared.seller.replacingOccurrences(of: ".", with: "_")
+//        let fixedBuyer = ChatView.shared.buyer.replacingOccurrences(of: ".", with: "_")
+//        let fixedSeller = ChatView.shared.seller.replacingOccurrences(of: ".", with: "_")
         
-        sendMessage(seller: fixedSeller, buyer: fixedBuyer, itemID: itemID, text: text) { [weak self] in
+        sendMessage(seller: ChatView.seller, buyer: ChatView.buyer, itemID: itemID, text: text) { [weak self] in
             guard let messagesCount = self?.messages.count else { return }
             
             var indexPath = IndexPath()
@@ -190,13 +190,13 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         
         var currentChat = [Message]()
         
-        let fixedSeller = ChatView.shared.seller.replacingOccurrences(of: ".", with: "_")
-        let fixedBuyer = ChatView.shared.buyer.replacingOccurrences(of: ".", with: "_")
+//        let fixedSeller = ChatView.shared.seller.replacingOccurrences(of: ".", with: "_")
+//        let fixedBuyer = ChatView.shared.buyer.replacingOccurrences(of: ".", with: "_")
         
         DispatchQueue.global().async { [weak self] in
             guard let itemID = self?.itemID else { return }
             
-            self?.reference.child(fixedSeller).child("chats").child("\(itemID)").child(fixedBuyer).observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(ChatView.seller).child("chats").child("\(itemID)").child(ChatView.buyer).observeSingleEvent(of: .value) { snapshot in
                 if let chats = snapshot.value as? [[String: String]] {
                     for chat in chats {
                         let sender = Sender(senderId: chat["sender"]!, displayName: "")

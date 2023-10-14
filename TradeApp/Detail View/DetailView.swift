@@ -261,8 +261,8 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
                 vc.chatTitle = item.title
 //                vc.loggedUser = loggedUser
                 vc.isPushedByChats = false
-                ChatView.shared.buyer = Auth.auth().currentUser?.uid
-                ChatView.shared.seller = item.owner
+                ChatView.buyer = Auth.auth().currentUser?.uid
+                ChatView.seller = item.owner
                 vc.itemID = item.id
                 present(vc, animated: true)
             }
@@ -384,11 +384,11 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         }
         
         if Auth.auth().currentUser != nil {
-            let user = Auth.auth().currentUser?.uid
+//            let user = Auth.auth().currentUser?.uid
             
-//            if mail == item.owner {
-//                messageButton.isEnabled = false
-//            }
+            if Auth.auth().currentUser?.uid == item.owner {
+                messageButton.isEnabled = false
+            }
         }
         
         toolbarItems = [callButton, messageButton]
@@ -500,27 +500,27 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
             self?.reference.child(user).child("chats").child("\(itemID)").child(owner).setValue(anyChat)
             
             // remove observer if item has been removed
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observe(.childRemoved) { snapshot in
-                self?.reference.child(owner).child("chats").child("\(itemID)").child(user).removeAllObservers()
-                self?.reference.child(user).child("chats").child("\(itemID)").child(owner).removeValue()
-            }
+//            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observe(.childRemoved) { snapshot in
+//                self?.reference.child(owner).child("chats").child("\(itemID)").child(user).removeAllObservers()
+//                self?.reference.child(user).child("chats").child("\(itemID)").child(owner).removeValue()
+//            }
 
             // show notification when get message
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observe(.childAdded) { snapshot in
-                
-                if let value = snapshot.value as? [String: String] {
-                    guard let sender = value["sender"] else { return }
-                    guard let kind = value["kind"] else { return }
-                    guard sender != user else { return }
-                    
-                    // notify ChatView about the message
-                    NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
-                    
-                    guard sender != ChatView.shared.seller && sender != ChatView.shared.buyer else { return }
-                                    
-                    self?.showNotification(title: itemTitle, body: kind)
-                }
-            }
+//            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observe(.childAdded) { snapshot in
+//
+//                if let value = snapshot.value as? [String: String] {
+//                    guard let sender = value["sender"] else { return }
+//                    guard let kind = value["kind"] else { return }
+//                    guard sender != user else { return }
+//
+//                    // notify ChatView about the message
+//                    NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
+//
+//                    guard sender != ChatView.shared.seller && sender != ChatView.shared.buyer else { return }
+//
+//                    self?.showNotification(title: itemTitle, body: kind)
+//                }
+//            }
             
             DispatchQueue.main.async {
                 self?.messageSent = true

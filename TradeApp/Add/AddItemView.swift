@@ -390,7 +390,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
 //                                    guard let user = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
                                     
                                     self?.saveItem(user: user, item: newItem, urls: urls)
-                                    print("item saved")
                                 }
                                 
                                 // show notification if new message arrive
@@ -632,20 +631,15 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // save images to Firebase Storage and return images URLs
     func uploadImages(images: [Data?], itemID: Int, completion: @escaping ([String: String]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
-        print("here1")
         var imagesURL = [String: String]()
         
         for (index, image) in images.enumerated() {
             let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(index)")
-            print("here2")
             guard let img = image else { return }
             
             storageRef.putData(img) { (metadata, error) in
-                print("here3")
                 if metadata != nil {
-                    print("here4")
                     storageRef.downloadURL() { (url, error) in
-                        print("here5")
                 
                         guard let urlString = url?.absoluteString else { return }
                         imagesURL["image\(index)"] = urlString

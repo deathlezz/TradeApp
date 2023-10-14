@@ -276,17 +276,17 @@ class ActiveAdsView: UITableViewController {
                         storageRef.delete() { _ in }
                     }
                     
+                    self?.reference.child(user).child("activeItems").child("\(itemID)").removeValue()
+                    
                     self?.reference.child(user).child("chats").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
-                        
+
                         if let buyers = snapshot.value as? [String: [[String: String]]] {
                             let keys = buyers.keys
-                            
+
                             for key in keys {
-                                self?.reference.child(user).child("chats").child("\(itemID)").child(key).removeAllObservers()
+                                self?.reference.child(key).child("chats").child("\(itemID)").removeValue()
                             }
-                            
-                            self?.reference.child(user).child("activeItems").child("\(itemID)").removeValue()
-//                            self?.reference.child(user).child("chats").child("\(itemID)").removeAllObservers()
+
                             self?.reference.child(user).child("chats").child("\(itemID)").removeValue()
                         }
                     }
