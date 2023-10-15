@@ -6,11 +6,12 @@
 //
 
 import Firebase
+import FirebaseMessaging
 import UIKit
 import UserNotifications
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
 
     // core data initialization
     lazy var coreDataStack: CoreDataStack = .init(modelName: "SavedAd")
@@ -28,8 +29,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDel
         UNUserNotificationCenter.current().delegate = self
         FirebaseApp.configure()
         application.registerForRemoteNotifications()
+        Messaging.messaging().delegate = self
+        
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { success, _ in
+            print("Success in APNs registry")
+        }
         
         return true
+    }
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        messaging.token() { token, _ in
+            guard let token = token else { return }
+            print("Token: \(token)")
+        }
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
