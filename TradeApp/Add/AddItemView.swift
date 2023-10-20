@@ -10,7 +10,6 @@ import CoreLocation
 import Firebase
 import FirebaseStorage
 import FirebaseAuth
-//import UserNotifications
 
 enum AlertType {
     case emptyField
@@ -23,12 +22,11 @@ enum ActionType {
     case edit
 }
 
-class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextViewDelegate, UNUserNotificationCenterDelegate {
+class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextViewDelegate {
     
     var index: Int!
     var action: ActionType!
 
-//    var loggedUser: String!
     var isEditMode: Bool!
     var isAdActive: Bool!
     
@@ -61,8 +59,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearTapped))
         
         NotificationCenter.default.addObserver(self, selector: #selector(reorderImages), name: NSNotification.Name("reorderImages"), object: nil)
-        
-//        NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
         
         if isEditMode != nil {
             title = "Edit"
@@ -287,8 +283,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         textViewCell?.textView.text = nil
         tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: 200"
-        images.removeAll()
-        uploadedPhotos.removeAll()
+        images.removeAll(keepingCapacity: false)
+        uploadedPhotos.removeAll(keepingCapacity: false)
         
         for _ in 0...7 {
             images.append(UIImage(systemName: "plus")!)
@@ -340,7 +336,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         sender.isUserInteractionEnabled = false
         
-        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()}
+        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.jpegData(compressionQuality: 0.8)}
             
         guard let title = textFieldCells[0].textField.text else { return }
         guard let price = textFieldCells[1].textField.text else { return }
@@ -358,7 +354,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: user)
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-//                                    guard let user = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
                                     self?.saveItem(user: user, item: newItem, urls: urls)
                                 }
 
@@ -371,7 +366,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: user)
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-//                                    guard let user = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
                                     self?.saveItem(user: user, item: newItem, urls: urls)
                                 }
                                 
@@ -387,27 +381,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 AppStorage.shared.items.append(newItem)
                                 
                                 self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-//                                    guard let user = self?.loggedUser.replacingOccurrences(of: ".", with: "_") else { return }
-                                    
                                     self?.saveItem(user: user, item: newItem, urls: urls)
                                 }
-                                
-                                // show notification if new message arrive
-//                                self?.reference.child(user).child("chats").child("\(id)").observe(.childAdded) { snapshot in
-//                                    
-//                                    if let _ = snapshot.value as? [[String: String]] {
-//                                        let buyer = snapshot.key
-//                                        
-//                                        self?.reference.child(user).child("chats").child("\(id)").child("\(buyer)").observe(.childAdded) { snapshot in
-//                                            
-//                                            if let newMessage = snapshot.value as? [String: String] {
-//                                                guard let kind = newMessage["kind"] else { return }
-//                                                
-//                                                self?.showNotification(title: title, body: kind)
-//                                            }
-//                                        }
-//                                    }
-//                                }
                                 
                                 sender.isUserInteractionEnabled = true
                                 self?.showAlert(.success)
@@ -500,7 +475,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                     break
                 }
             }
-            
         }
         
         uploadedPhotos = images
@@ -586,7 +560,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 
                 if let data = snapshot.value as? [String: [String: Any]] {
                     for user in data {
-//                        let fixedMail = user.key
                         let activeItems = data[user.key]?["activeItems"] as? [String: [String: Any]] ?? [:]
                         
                         for item in activeItems {
@@ -616,11 +589,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             }
         }
     }
-    
-    // sign out current user
-//    @objc func signOut() {
-//        navigationController?.popViewController(animated: true)
-//    }
     
     // get reordered images
     @objc func reorderImages(_ notification: NSNotification) {
@@ -655,31 +623,5 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let newItem = item.toAnyObject(urls: urls)
         reference.child(user).child("activeItems").child("\(item.id)").setValue(newItem)
     }
-    
-    // show message notification
-    func showNotification(title: String, body: String) {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
-            if success {
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-                let content = UNMutableNotificationContent()
-                content.title = title
-                content.body = body
-                content.sound = UNNotificationSound.default
-                let request = UNNotificationRequest(identifier: UUID().uuidString , content: content, trigger: trigger)
-                UNUserNotificationCenter.current().add(request)
-                
-            } else if let error = error {
-                print(error.localizedDescription)
-            }
-        }
-    }
-    
-    // handle user notification action
-//    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-//        let userInfo = response.notification.request.content.userInfo
-//        
-//        
-//        
-//    }
     
 }
