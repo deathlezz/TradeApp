@@ -10,16 +10,13 @@ import CoreData
 import Firebase
 import MessageKit
 import FirebaseAuth
-//import UserNotifications
 
 enum SaveAction {
     case save
     case remove
 }
 
-class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationCenterDelegate {
-
-//    var loggedUser: String?
+class DetailView: UITableViewController, Index, Coordinates {
     
     var savedItems = [Item]()
     
@@ -64,7 +61,6 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         
         navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
         
-//        loggedUser = Utilities.loadUser()
         savedItems = Utilities.loadItems()
         checkForMessage()
         loadPhoneNumber()
@@ -226,7 +222,19 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     // show keyboard before view disappeared
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        if isMovingFromParent {
+            NotificationCenter.default.post(name: NSNotification.Name("removeImages"), object: nil)
+            savedItems.removeAll(keepingCapacity: false)
+            phone = nil
+            views = nil
+            latitude = nil
+            longitude = nil
+            item = nil
+        }
+        
         guard messageTextField != nil else { return }
+        messageTextField.text = nil
         messageTextField.resignFirstResponder()
     }
     
@@ -259,7 +267,6 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         if messageSent {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
                 vc.chatTitle = item.title
-//                vc.loggedUser = loggedUser
                 vc.isPushedByChats = false
                 ChatView.buyer = Auth.auth().currentUser?.uid
                 ChatView.seller = item.owner
@@ -284,7 +291,7 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     // remove mapView after view disappeared
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        if self.isMovingFromParent {
+        if isMovingFromParent {
             NotificationCenter.default.post(name: NSNotification.Name("removeMap"), object: nil)
             DetailView.isLoaded = false
         }
@@ -384,8 +391,6 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         }
         
         if Auth.auth().currentUser != nil {
-//            let user = Auth.auth().currentUser?.uid
-            
             if Auth.auth().currentUser?.uid == item.owner {
                 messageButton.isEnabled = false
             }
@@ -480,7 +485,6 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
     // send message function
     @objc func sendMessage() {
         guard !messageTextField.text!.isEmpty else { return }
-//        guard let loggedUser = loggedUser else { return }
         
         guard let user = Auth.auth().currentUser?.uid else { return }
         
@@ -492,35 +496,12 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
         let anyChat = chat.map {$0.toAnyObject()}
         
         DispatchQueue.global().async { [weak self] in
-            guard let itemTitle = self?.item.title else { return }
+//            guard let itemTitle = self?.item.title else { return }
             guard let owner = self?.item.owner else { return }
             guard let itemID = self?.item.id else { return }
             
             self?.reference.child(owner).child("chats").child("\(itemID)").child(user).setValue(anyChat)
             self?.reference.child(user).child("chats").child("\(itemID)").child(owner).setValue(anyChat)
-            
-            // remove observer if item has been removed
-//            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observe(.childRemoved) { snapshot in
-//                self?.reference.child(owner).child("chats").child("\(itemID)").child(user).removeAllObservers()
-//                self?.reference.child(user).child("chats").child("\(itemID)").child(owner).removeValue()
-//            }
-
-            // show notification when get message
-//            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observe(.childAdded) { snapshot in
-//
-//                if let value = snapshot.value as? [String: String] {
-//                    guard let sender = value["sender"] else { return }
-//                    guard let kind = value["kind"] else { return }
-//                    guard sender != user else { return }
-//
-//                    // notify ChatView about the message
-//                    NotificationCenter.default.post(name: NSNotification.Name("newMessage"), object: nil, userInfo: ["message": value])
-//
-//                    guard sender != ChatView.shared.seller && sender != ChatView.shared.buyer else { return }
-//
-//                    self?.showNotification(title: itemTitle, body: kind)
-//                }
-//            }
             
             DispatchQueue.main.async {
                 self?.messageSent = true
@@ -543,14 +524,6 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
             return
         }
         
-        
-//        guard loggedUser != nil else {
-//            setToolbar()
-//            return
-//        }
-        
-//        let mail = loggedUser!.replacingOccurrences(of: ".", with: "_")
-        
         DispatchQueue.global().async { [weak self] in
             guard let owner = self?.item.owner else { return }
             guard let itemID = self?.item.id else { return }
@@ -568,31 +541,5 @@ class DetailView: UITableViewController, Index, Coordinates, UNUserNotificationC
             }
         }
     }
-    
-    // show message notification
-    func showNotification(title: String, body: String) {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
-            if success {
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-                let content = UNMutableNotificationContent()
-                content.title = title
-                content.body = body
-                content.sound = UNNotificationSound.default
-                let request = UNNotificationRequest(identifier: UUID().uuidString , content: content, trigger: trigger)
-                UNUserNotificationCenter.current().add(request)
-                
-            } else if let error = error {
-                print(error.localizedDescription)
-            }
-        }
-    }
-    
-    // handle user notification action
-//    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-//        let userInfo = response.notification.request.content.userInfo
-//        
-//        
-//        
-//    }
     
 }

@@ -25,6 +25,8 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
         collectionView.isPagingEnabled = true
         
         NotificationCenter.default.addObserver(self, selector: #selector(getIndex), name: NSNotification.Name("getIndex"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(removeImages), name: NSNotification.Name("removeImages"), object: nil)
     }
     
     // set number of items in section
@@ -72,6 +74,11 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
         let width = collectionView.frame.size.width
         let height = collectionView.frame.size.height
         return CGSize(width: width, height: height)
+    }
+    
+    // remove images before view dissappear to release memory
+    @objc func removeImages() {
+        imgs.removeAll(keepingCapacity: false)
     }
     
 }

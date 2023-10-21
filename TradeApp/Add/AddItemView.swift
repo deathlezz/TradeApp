@@ -359,6 +359,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
 
                                 NotificationCenter.default.post(name: NSNotification.Name("reloadActiveAds"), object: nil)
                                 sender.isUserInteractionEnabled = true
+                                self?.isEditMode = nil
+                                self?.isAdActive = nil
                                 self?.showAlert(.edit)
                                 
                             } else {
@@ -371,6 +373,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 
                                 NotificationCenter.default.post(name: NSNotification.Name("reloadEndedAds"), object: nil)
                                 sender.isUserInteractionEnabled = true
+                                self?.isEditMode = nil
+                                self?.isAdActive = nil
                                 self?.showAlert(.edit)
                             }
                             
@@ -416,14 +420,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             let ac = UIAlertController(title: "Item edited successfully", message: "Changes will be visible soon", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
                 self?.clearTapped()
-                self?.navigationController?.popViewController(animated: true)
+//                self?.navigationController?.popViewController(animated: true)
             })
             present(ac, animated: true)
         } else {
             let ac = UIAlertController(title: "Item added successfully", message: "Your item will be visible soon", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .cancel) { [weak self] _ in
                 self?.clearTapped()
-                self?.tabBarController?.selectedIndex = 0
+//                self?.tabBarController?.selectedIndex = 0
             })
             present(ac, animated: true)
         }
@@ -517,6 +521,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // remove photo
     func deletePhoto() {
+        uploadedPhotos.remove(at: index)
         images[index] = UIImage(systemName: "plus")!
         let plusImages = images.filter {$0 == UIImage(systemName: "plus")}
         images = images.filter {$0 != UIImage(systemName: "plus")}
