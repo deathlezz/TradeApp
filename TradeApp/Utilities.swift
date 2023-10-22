@@ -123,24 +123,6 @@ class Utilities {
         })
     }
     
-    // set logged user
-//    static func setUser(_ user: String?) {
-//        if user != nil {
-//            KeychainWrapper.standard.set(user!, forKey: "loggedUser")
-//        } else {
-//            KeychainWrapper.standard.removeObject(forKey: "loggedUser")
-//        }
-//    }
-    
-    // load logged user
-//    static func loadUser() -> String? {
-//        if let user = KeychainWrapper.standard.string(forKey: "loggedUser") {
-//            return user
-//        } else {
-//            return nil
-//        }
-//    }
-    
     // load distance measurement unit
     static func loadDistanceUnit() -> String {
         let defaults = UserDefaults.standard
@@ -205,16 +187,12 @@ class Utilities {
             let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
             let results = try managedContext.fetch(adsFetch)
             
-//            var items = [Item]()
-            
             for result in results {
                 let item = Item(photos: [result.image], title: result.title!, price: Int(result.price), location: result.location!, date: result.date!, id: Int(result.id), owner: result.owner)
                 items.append(item)
             }
             print("items loaded: \(items)")
-//            return items
             
-
         } catch let error as NSError {
             print("Fetch error: \(error) description: \(error.userInfo)")
         }

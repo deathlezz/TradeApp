@@ -102,7 +102,7 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
                     let center = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
                     let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.7, longitudeDelta: 0.7))
                     
-                    self?.mapView.setRegion(region, animated: true)
+                    self?.mapView.setRegion(region, animated: false)
                     self?.didGeocode = true
                     
                     let itemLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
@@ -119,6 +119,8 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
     // remove map before view disappeared to avoid memory leak
     @objc func removeMap() {
         mapView.removeAnnotations(mapView.annotations)
+        mapView.removeOverlays(mapView.overlays)
+        mapView.removeConstraints(mapView.constraints)
         mapView.removeFromSuperview()
         mapView = nil
     }

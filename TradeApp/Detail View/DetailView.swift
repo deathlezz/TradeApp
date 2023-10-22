@@ -47,6 +47,9 @@ class DetailView: UITableViewController, Index, Coordinates {
         navigationItem.backButtonTitle = " "
         navigationController?.hidesBarsOnSwipe = false
         
+        tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "HeaderView")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Text")
+        
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         actionButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareTapped))
@@ -76,13 +79,17 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set title for every section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if sectionTitles[section] == "Image" || sectionTitles[section] == "Title" {
-            return nil
-        } else if sectionTitles[section] == "Views" {
-            return " "
-        } else {
-            return sectionTitles[section]
+        if let _ = tableView.dequeueReusableHeaderFooterView(withIdentifier: "HeaderView") {
+            if sectionTitles[section] == "Image" || sectionTitles[section] == "Title" {
+                return nil
+            } else if sectionTitles[section] == "Views" {
+                return " "
+            } else {
+                return sectionTitles[section]
+            }
         }
+        
+        return nil
     }
     
     // set number of rows in section
@@ -102,7 +109,12 @@ class DetailView: UITableViewController, Index, Coordinates {
             }
             
         case "Title":
-            let cell = tableView.dequeueReusableCell(withIdentifier: "SubText", for: indexPath)
+            var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "SubText")
+            
+            if cell == nil {
+                cell = UITableViewCell(style: .subtitle, reuseIdentifier: "SubText")
+            }
+            
             cell.textLabel?.text = item.title
             cell.detailTextLabel?.text = "£\(item.price)"
             cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
@@ -155,6 +167,16 @@ class DetailView: UITableViewController, Index, Coordinates {
         }
         
         return UITableViewCell()
+    }
+    
+    // remove header text
+    override func tableView(_ tableView: UITableView, didEndDisplayingHeaderView view: UIView, forSection section: Int) {
+        <#code#>
+    }
+    
+    // remove cell text
+    override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        <#code#>
     }
     
     // set action for tapped cell
