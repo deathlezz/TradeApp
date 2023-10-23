@@ -20,8 +20,6 @@ class CategoryView: UITableViewController {
         title = "Categories"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "categoryCell")
-        
         DispatchQueue.global().async { [weak self] in
             self?.currentFilters = Utilities.loadFilters()
         }
@@ -39,7 +37,12 @@ class CategoryView: UITableViewController {
 
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "categoryCell")
+        var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "categoryCell")
+        
+        if cell == nil {
+            cell = UITableViewCell(style: .subtitle, reuseIdentifier: "categoryCell")
+        }
+    
         let conf = UIImage.SymbolConfiguration(scale: .large)
         
         if indexPath.row == 0 {

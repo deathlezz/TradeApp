@@ -171,12 +171,20 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // remove header text
     override func tableView(_ tableView: UITableView, didEndDisplayingHeaderView view: UIView, forSection section: Int) {
-        <#code#>
+        if let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "HeaderView") {
+            header.textLabel?.text = nil
+        }
     }
     
     // remove cell text
     override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        <#code#>
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "Text") {
+            cell.textLabel?.text = nil
+        }
+        
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "SubText") {
+            cell.textLabel?.text = nil
+        }
     }
     
     // set action for tapped cell
