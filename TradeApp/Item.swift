@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import UIKit
 
 struct Item {
-    var photos: [Data?]
+    var thumbnail: UIImage
+    var photosURL: [String]
     var title: String
     var price: Int
     var category: String?

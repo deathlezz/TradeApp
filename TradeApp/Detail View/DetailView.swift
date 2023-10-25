@@ -38,6 +38,8 @@ class DetailView: UITableViewController, Index, Coordinates {
     var reference: DatabaseReference!
     
     var item: Item!
+    var images = [UIImage]()
+    
     let sectionTitles = ["Image", "Title", "Tags", "Description", "Location", "Views"]
     
     override func viewDidLoad() {
@@ -70,6 +72,17 @@ class DetailView: UITableViewController, Index, Coordinates {
         isSaved()
         increaseViews()
         DetailView.isLoaded = true
+        
+        images = [item.thumbnail]
+        
+        DispatchQueue.global().async { [weak self] in
+            guard let urls = self?.item.photosURL else { return }
+            
+            self?.convertImages(urls: urls) { imgs in
+                self?.images = imgs
+                self?.tableView.reloadData()
+            }
+        }
     }
     
     // set number of sections
@@ -102,7 +115,8 @@ class DetailView: UITableViewController, Index, Coordinates {
         switch sectionTitles[indexPath.section] {
         case "Image":
             if let cell = tableView.dequeueReusableCell(withIdentifier: "detailCollectionView") as? DetailViewCell {
-                cell.imgs = item.photos.map {UIImage(data: $0!)}
+                cell.imgs = images
+//                cell.imgs = item.photos.map {UIImage(data: $0!)}
                 cell.delegate = self
                 cell.selectionStyle = .none
                 return cell
@@ -313,7 +327,8 @@ class DetailView: UITableViewController, Index, Coordinates {
     func pushIndex(index: Int) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ItemView") as? ItemView {
             vc.currentImage = index
-            vc.imgs = item.photos.map {UIImage(data: $0!)}
+//            vc.imgs = item.photos.map {UIImage(data: $0!)}
+            vc.imgs = images
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -569,6 +584,27 @@ class DetailView: UITableViewController, Index, Coordinates {
                     self?.setToolbar()
                 }
             }
+        }
+    }
+    
+    // convert URLs into dictionary Data
+    func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
+        var images = [UIImage]()
+        
+        let links = urls.sorted(by: <).map {URL(string: $0)}
+        
+        for url in links {
+            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+                if let data = data {
+                    let image = UIImage(data: data) ?? UIImage()
+                    images.append(image)
+                }
+
+                guard images.count == links.count else { return }
+                completion(images)
+            }
+
+            task.resume()
         }
     }
     

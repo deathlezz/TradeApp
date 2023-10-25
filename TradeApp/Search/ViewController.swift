@@ -34,8 +34,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     var sortButton: UIBarButtonItem!
     
     var reference: DatabaseReference!
-    
-//    var mail: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -446,7 +444,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     
     // load recently added items
     func loadRecentItems() {
-        AppStorage.shared.recentlyAdded.removeAll()
+        AppStorage.shared.recentlyAdded.removeAll(keepingCapacity: false)
         
         for item in AppStorage.shared.items {
             if isItemRecent(item.date) {
