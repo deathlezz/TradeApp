@@ -71,7 +71,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         
         DispatchQueue.global().async { [weak self] in
             self?.resetFilters()
-//            self?.mail = Utilities.loadUser()
             self?.currentUnit = Utilities.loadDistanceUnit()
             
             self?.getData() { dict in
@@ -105,8 +104,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
             fatalError("Unable to dequeue itemCell")
         }
-        let thumbnail = UIImage(data: AppStorage.shared.filteredItems[indexPath.item].photos[0]!)
-        cell.image.image = thumbnail
+//        let thumbnail = UIImage(data: AppStorage.shared.filteredItems[indexPath.item].photos[0]!)
+        cell.image.image = AppStorage.shared.filteredItems[indexPath.item].thumbnail
         cell.title.text = AppStorage.shared.filteredItems[indexPath.item].title
         cell.price.text = "£\(AppStorage.shared.filteredItems[indexPath.item].price)"
         cell.location.text = AppStorage.shared.filteredItems[indexPath.item].location
@@ -491,25 +490,43 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         }
     }
     
-    // convert URLs into dictionary Data
-    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
-        var images = [String: Data]()
+    // convert URL to a thumbnail
+    func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
+        guard let link = URL(string: url) else { return }
         
-        let links = urls.sorted(by: <).map {URL(string: $0)}
+        var thumbnail = UIImage()
         
-        for (index, url) in links.enumerated() {
-            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
-                if let data = data {
-                    images["image\(index)"] = data
-                }
-
-                guard images.keys.count == links.count else { return }
-                completion(images)
+//        let links = urls.sorted(by: <).map {URL(string: $0)}
+        
+        let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
+            if let data = data {
+                let image = UIImage(data: data)!
+                thumbnail = image
+                completion(thumbnail)
             }
-
-            task.resume()
         }
+
+        task.resume()
     }
+    
+//    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
+//        var images = [String: Data]()
+//        
+//        let links = urls.sorted(by: <).map {URL(string: $0)}
+//        
+//        for (index, url) in links.enumerated() {
+//            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+//                if let data = data {
+//                    images["image\(index)"] = data
+//                }
+//
+//                guard images.keys.count == links.count else { return }
+//                completion(images)
+//            }
+//
+//            task.resume()
+//        }
+//    }
     
     // download all active items from firebase & convert images urls to data array
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
@@ -530,10 +547,10 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                             
                             let fixedUrls = photos.values.sorted(by: <).map {String($0)}
                             
-                            self?.convertImages(urls: fixedUrls) { images in
-                                items[item.key]?["photos"] = images
+                            self?.convertThumbnail(url: fixedUrls[0]) { thumbnail in
+                                items[item.key]?["thumbnail"] = thumbnail
                                 
-                                if let _ = items[item.key]?["photos"] as? [String: Data] {
+                                if let _ = items[item.key]?["thumbnail"] as? [String: UIImage] {
                                     adsReady += 1
                                 }
                                 
@@ -552,10 +569,12 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         var result = [Item]()
         
         for item in dict {
-            let dictPhotos = item.value["photos"] as! [String: Data]
-            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
-            let arrayPhotos = sorted.map {$0.value}
+//            let dictPhotos = item.value["photos"] as! [String: Data]
+//            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
+//            let arrayPhotos = sorted.map {$0.value}
             
+            let thumbnail = item.value["thumbnail"] as? UIImage
+            let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int
             let category = item.value["category"] as? String
@@ -569,7 +588,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
             let id = item.value["id"] as? Int
             let owner = item.value["owner"] as? String
             
-            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
+            let model = Item(thumbnail: thumbnail!, photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
             
             result.append(model)
         }

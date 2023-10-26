@@ -79,8 +79,13 @@ class DetailView: UITableViewController, Index, Coordinates {
             guard let urls = self?.item.photosURL else { return }
             
             self?.convertImages(urls: urls) { imgs in
-                self?.images = imgs
-                self?.tableView.reloadData()
+//                self?.images = imgs
+                self?.images.append(contentsOf: imgs)
+                
+                DispatchQueue.main.async {
+                    let indexSet = IndexSet(integer: 0)
+                    self?.tableView.reloadSections(indexSet, with: .automatic)
+                }
             }
         }
     }
@@ -270,6 +275,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         if isMovingFromParent {
             NotificationCenter.default.post(name: NSNotification.Name("removeImages"), object: nil)
             savedItems.removeAll(keepingCapacity: false)
+            images.removeAll(keepingCapacity: false)
             phone = nil
             views = nil
             latitude = nil
@@ -327,7 +333,6 @@ class DetailView: UITableViewController, Index, Coordinates {
     func pushIndex(index: Int) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ItemView") as? ItemView {
             vc.currentImage = index
-//            vc.imgs = item.photos.map {UIImage(data: $0!)}
             vc.imgs = images
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -541,7 +546,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         let anyChat = chat.map {$0.toAnyObject()}
         
         DispatchQueue.global().async { [weak self] in
-//            guard let itemTitle = self?.item.title else { return }
             guard let owner = self?.item.owner else { return }
             guard let itemID = self?.item.id else { return }
             
@@ -589,9 +593,12 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // convert URLs into dictionary Data
     func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
+        guard urls.count > 1 else { return }
+        
         var images = [UIImage]()
         
-        let links = urls.sorted(by: <).map {URL(string: $0)}
+        // get all images except the thumbnail
+        let links = Array(urls.sorted(by: <).map {URL(string: $0)}.dropFirst())
         
         for url in links {
             let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
