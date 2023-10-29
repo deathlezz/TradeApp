@@ -60,15 +60,34 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         NotificationCenter.default.addObserver(self, selector: #selector(reorderImages), name: NSNotification.Name("reorderImages"), object: nil)
         
-        if isEditMode != nil {
-            title = "Edit"
-            loadImages()
-        } else {
-            title = "Add"
-        }
-        
         for _ in 0...7 {
             images.append(UIImage(systemName: "plus")!)
+        }
+        
+        if isEditMode != nil {
+            title = "Edit"
+            
+            DispatchQueue.global().async { [weak self] in
+                guard let urls = self?.item?.photosURL else { return }
+                
+                self?.convertImages(urls: urls) { images in
+                    self?.images.removeAll(keepingCapacity: false)
+                    
+                    self?.images[0] = self?.item?.thumbnail ?? UIImage()
+                    
+                    for i in 1...urls.count {
+                        self?.images[i] = images[i]
+                    }
+                    
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": self?.images ?? [UIImage]()])
+                    }
+                }
+            }
+            
+//            loadImages()
+        } else {
+            title = "Add"
         }
         
     }
@@ -247,15 +266,39 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
     }
     
+    // convert URLs into images
+    func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
+        guard urls.count > 1 else { return }
+        
+        var images = [UIImage]()
+        
+        // get all images except the thumbnail
+        let links = Array(urls.sorted(by: <).map {URL(string: $0)}.dropFirst())
+        
+        for url in links {
+            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+                if let data = data {
+                    let image = UIImage(data: data) ?? UIImage()
+                    images.append(image)
+                }
+
+                guard images.count == links.count else { return }
+                completion(images)
+            }
+
+            task.resume()
+        }
+    }
+    
     // load images and push them into CollectionView
     func loadImages() {
         DispatchQueue.global().async { [weak self] in
 
-            let itemPhotos = self?.item?.photos.map {UIImage(data: $0!)!} ?? [UIImage]()
+//            let itemPhotos = self?.item?.photos.map {UIImage(data: $0!)!} ?? [UIImage]()
             
-            for i in 0..<itemPhotos.count {
-                self?.images[i] = itemPhotos[i]
-            }
+//            for i in 0..<itemPhotos.count {
+//                self?.images[i] = itemPhotos[i]
+//            }
             
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": self?.images ?? [UIImage]()])
@@ -333,10 +376,15 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // set action for submit button
     @objc func submitTapped(_ sender: UIButton) {
         guard let user = Auth.auth().currentUser?.uid else { return }
-        
         sender.isUserInteractionEnabled = false
         
-        let photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.jpegData(compressionQuality: 0.8)}
+        var photos = [Data]()
+        
+        if isEditMode != nil {
+            photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()!}
+        } else {
+            photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.jpegData(compressionQuality: 0.8)!}
+        }
             
         guard let title = textFieldCells[0].textField.text else { return }
         guard let price = textFieldCells[1].textField.text else { return }
@@ -349,47 +397,38 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 if valid {
                     Utilities.forwardGeocoding(address: location) { (lat, long) in
                         if self?.isEditMode != nil {
-                            // edit active item
-                            if self?.isAdActive == true {
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: user)
+                            guard let itemID = self?.item?.id else { return }
+                            
+                            self?.uploadImages(images: photos, itemID: itemID) { [weak self] urls in
                                 
-                                self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-                                    self?.saveItem(user: user, item: newItem, urls: urls)
-                                }
-
-                                NotificationCenter.default.post(name: NSNotification.Name("reloadActiveAds"), object: nil)
-                                sender.isUserInteractionEnabled = true
-                                self?.isEditMode = nil
-                                self?.isAdActive = nil
-                                self?.showAlert(.edit)
+                                let newItem = Item(photosURL: urls, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: itemID, owner: user)
                                 
-                            } else {
-                                // edit ended item
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: (self?.item?.id)!, owner: user)
-                                
-                                self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-                                    self?.saveItem(user: user, item: newItem, urls: urls)
+                                if self?.isAdActive == true {
+                                    self?.saveItem(user: user, item: newItem, isActive: true)
+                                    NotificationCenter.default.post(name: NSNotification.Name("reloadActiveAds"), object: nil)
+                                } else {
+                                    self?.saveItem(user: user, item: newItem, isActive: false)
+                                    NotificationCenter.default.post(name: NSNotification.Name("reloadEndedAds"), object: nil)
                                 }
                                 
-                                NotificationCenter.default.post(name: NSNotification.Name("reloadEndedAds"), object: nil)
-                                sender.isUserInteractionEnabled = true
                                 self?.isEditMode = nil
                                 self?.isAdActive = nil
+                                sender.isUserInteractionEnabled = true
                                 self?.showAlert(.edit)
                             }
                             
                         } else {
                             // create new item
                             self?.createItemID() { id in
-                                let newItem = Item(photos: photos, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: user)
-                                AppStorage.shared.items.append(newItem)
-                                
-                                self?.uploadImages(images: photos, itemID: newItem.id) { [weak self] urls in
-                                    self?.saveItem(user: user, item: newItem, urls: urls)
+                                self?.uploadImages(images: photos, itemID: id) { [weak self] urls in
+                                    
+                                    let newItem = Item(photosURL: urls, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: user)
+                                    
+                                    self?.saveItem(user: user, item: newItem, isActive: true)
+                                    
+                                    sender.isUserInteractionEnabled = true
+                                    self?.showAlert(.success)
                                 }
-                                
-                                sender.isUserInteractionEnabled = true
-                                self?.showAlert(.success)
                             }
                         }
                     }
@@ -602,9 +641,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // save images to Firebase Storage and return images URLs
-    func uploadImages(images: [Data?], itemID: Int, completion: @escaping ([String: String]) -> Void) {
+    func uploadImages(images: [Data?], itemID: Int, completion: @escaping ([String]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
-        var imagesURL = [String: String]()
+        var imagesURL = [String]()
+        var urlsReady = 0
         
         for (index, image) in images.enumerated() {
             let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(index)")
@@ -615,18 +655,26 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                     storageRef.downloadURL() { (url, error) in
                 
                         guard let urlString = url?.absoluteString else { return }
-                        imagesURL["image\(index)"] = urlString
-                        completion(imagesURL)
+                        imagesURL.append(urlString)
+                        urlsReady += 1
                     }
                 }
             }
+            
+            guard urlsReady == imagesURL.count else { return }
+            completion(imagesURL)
         }
     }
     
     // save item to Firebase Database
-    func saveItem(user: String, item: Item, urls: [String: String]) {
-        let newItem = item.toAnyObject(urls: urls)
-        reference.child(user).child("activeItems").child("\(item.id)").setValue(newItem)
+    func saveItem(user: String, item: Item, isActive: Bool) {
+        let newItem = item.toAnyObject()
+        
+        if isActive {
+            reference.child(user).child("activeItems").child("\(item.id)").setValue(newItem)
+        } else {
+            reference.child(user).child("endedItems").child("\(item.id)").setValue(newItem)
+        }
     }
     
 }

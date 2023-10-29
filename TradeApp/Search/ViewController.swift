@@ -212,7 +212,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         
         DispatchQueue.global().async { [weak self] in
             self?.getData() { dict in
-                
                 AppStorage.shared.items = self?.toItemModel(dict: dict) ?? [Item]()
 
                 DispatchQueue.main.async {
@@ -221,7 +220,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                     } else {
                         self?.applyFilters()
                     }
-
+                    
                     refreshControl.endRefreshing()
                     self?.isArrayEmpty()
                     self?.collectionView.reloadData()
@@ -496,8 +495,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         
         var thumbnail = UIImage()
         
-//        let links = urls.sorted(by: <).map {URL(string: $0)}
-        
         let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
             if let data = data {
                 let image = UIImage(data: data)!
@@ -505,7 +502,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                 completion(thumbnail)
             }
         }
-
         task.resume()
     }
     
@@ -528,7 +524,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
 //        }
 //    }
     
-    // download all active items from firebase & convert images urls to data array
+    // download all active items & convert thumbnails to UIImage
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
         var items = [String: [String: Any]]()
         var adsReady = 0
@@ -558,6 +554,12 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                                 completion(items)
                             }
                         }
+                    }
+                } else {
+                    guard let refresh = self?.refreshControl else { return }
+                    
+                    if refresh.isRefreshing {
+                        refresh.endRefreshing()
                     }
                 }
             }

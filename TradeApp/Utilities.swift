@@ -138,7 +138,7 @@ class Utilities {
         let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
         
         let newAd = NSEntityDescription.insertNewObject(forEntityName: "SavedAd", into: managedContext)
-        let thumbnail = item.thumbnail.pngData()
+        let thumbnail = item.thumbnail?.pngData()
         newAd.setValue(thumbnail, forKey: "image")
         newAd.setValue(item.photosURL, forKey: "photosURL")
         newAd.setValue(item.title, forKey: "title")

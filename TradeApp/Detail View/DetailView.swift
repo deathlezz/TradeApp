@@ -73,7 +73,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         increaseViews()
         DetailView.isLoaded = true
         
-        images = [item.thumbnail]
+        images = [item.thumbnail!]
         
         DispatchQueue.global().async { [weak self] in
             guard let urls = self?.item.photosURL else { return }
@@ -591,7 +591,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         }
     }
     
-    // convert URLs into dictionary Data
+    // convert URLs into images
     func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
         guard urls.count > 1 else { return }
         

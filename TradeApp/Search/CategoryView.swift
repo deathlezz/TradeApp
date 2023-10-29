@@ -20,6 +20,8 @@ class CategoryView: UITableViewController {
         title = "Categories"
         navigationController?.navigationBar.prefersLargeTitles = true
         
+//        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "categoryCell")
+        
         DispatchQueue.global().async { [weak self] in
             self?.currentFilters = Utilities.loadFilters()
         }

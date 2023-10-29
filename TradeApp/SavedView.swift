@@ -80,9 +80,9 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             fatalError("Unable to dequeue itemCell")
         }
         
-        let thumbnail = UIImage(data: savedItems[indexPath.item].photos[0]!)
+//        let thumbnail = UIImage(data: savedItems[indexPath.item].photos[0]!)
         
-        cell.image.image = thumbnail
+        cell.image.image = savedItems[indexPath.row].thumbnail
         cell.title.text = savedItems[indexPath.item].title
         cell.price.text = "£\(savedItems[indexPath.item].price)"
         cell.location.text = savedItems[indexPath.item].location
@@ -485,10 +485,12 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         var result = [Item]()
         
         for item in dict {
-            let dictPhotos = item.value["photos"] as! [String: Data]
-            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
-            let arrayPhotos = sorted.map {$0.value}
+//            let dictPhotos = item.value["photos"] as! [String: Data]
+//            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
+//            let arrayPhotos = sorted.map {$0.value}
             
+            let thumbnail = item.value["thumbnail"] as? UIImage
+            let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int
             let category = item.value["category"] as? String
@@ -502,7 +504,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             let id = item.value["id"] as? Int
             let owner = item.value["owner"] as? String
             
-            let model = Item(photos: arrayPhotos, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
+            let model = Item(thumbnail: thumbnail!, photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
             
             result.append(model)
         }

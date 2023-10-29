@@ -8,19 +8,19 @@
 import Foundation
 import MessageKit
 
-struct User {
-    var activeItems = [Item?]()
-    var endedItems = [Item?]()
-    var chats = [String: [Message]]()
-    var mail: String
-    var password: String
-    var phoneNumber: Int?
-    
-    func toAnyObject() -> [String: Any] {
-        
-        return [
-            "password": password
-        ]
-        
-    }
-}
+//struct User {
+//    var activeItems = [Item?]()
+//    var endedItems = [Item?]()
+//    var chats = [String: [Message]]()
+//    var mail: String
+//    var password: String
+//    var phoneNumber: Int?
+//    
+//    func toAnyObject() -> [String: Any] {
+//        
+//        return [
+//            "password": password
+//        ]
+//        
+//    }
+//}

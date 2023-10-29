@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 struct Item {
-    var thumbnail: UIImage
+    var thumbnail: UIImage?
     var photosURL: [String]
     var title: String
     var price: Int
@@ -25,9 +25,9 @@ struct Item {
     var owner: String
     
     // convert custom model to Any object
-    func toAnyObject(urls: [String: String]) -> [String: Any] {
+    func toAnyObject() -> [String: Any] {
         return [
-            "photos": urls,
+            "photosURL": photosURL,
             "title": title,
             "price": price,
             "category": category!,
