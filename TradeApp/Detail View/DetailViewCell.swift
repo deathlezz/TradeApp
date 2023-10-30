@@ -15,7 +15,7 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
         
     @IBOutlet var collectionView: UICollectionView!
     
-    var imgs = [UIImage?]()
+    var imgs = [String: UIImage]()
     var delegate: Index?
     var currentImage = 0
     
@@ -42,7 +42,7 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     // set collection view cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "detailViewCell", for: indexPath) as? PhotosCell {
-            cell.imageView.image = imgs[indexPath.item]
+            cell.imageView.image = imgs["image\(indexPath.item)"]
             return cell
         }
         

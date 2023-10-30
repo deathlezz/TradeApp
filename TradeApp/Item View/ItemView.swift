@@ -9,7 +9,7 @@ import UIKit
 
 class ItemView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
-    var imgs = [UIImage?]()
+    var imgs = [String: UIImage]()
     var item: Item!
     static var isLoaded = false
     
@@ -40,7 +40,7 @@ class ItemView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemViewCell", for: indexPath) as? ItemViewCell {
 
-            cell.imageView.image = imgs[indexPath.item]
+            cell.imageView.image = imgs["image\(indexPath.item)"]
             return cell
         }
         

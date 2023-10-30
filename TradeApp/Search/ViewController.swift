@@ -493,13 +493,13 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
         guard let link = URL(string: url) else { return }
         
-        var thumbnail = UIImage()
+//        var thumbnail = UIImage()
         
         let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
             if let data = data {
                 let image = UIImage(data: data)!
-                thumbnail = image
-                completion(thumbnail)
+//                thumbnail = image
+                completion(image)
             }
         }
         task.resume()
@@ -539,14 +539,14 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                         for item in activeItems {
                             items["\(item.key)"] = item.value
                             
-                            let photos = item.value["photos"] as! [String: String]
+                            let photos = item.value["photosURL"] as! [String]
                             
-                            let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+//                            let fixedUrls = photos.sorted(by: <).map {String($0)}
                             
-                            self?.convertThumbnail(url: fixedUrls[0]) { thumbnail in
+                            self?.convertThumbnail(url: photos[0]) { thumbnail in
                                 items[item.key]?["thumbnail"] = thumbnail
                                 
-                                if let _ = items[item.key]?["thumbnail"] as? [String: UIImage] {
+                                if let _ = items[item.key]?["thumbnail"] as? UIImage {
                                     adsReady += 1
                                 }
                                 

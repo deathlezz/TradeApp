@@ -449,11 +449,11 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                         // add item to existed items
                         existedItems["\(item.id)"] = value
                         
-                        let photos = value["photos"] as! [String: String]
-                        let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+                        let photos = value["photosURL"] as! [String]
+                        let fixedUrls = photos.sorted(by: <).map {String($0)}
                         
                         self?.convertImages(urls: fixedUrls) { images in
-                            existedItems["\(item.id)"]?["photos"] = images
+                            existedItems["\(item.id)"]?["photosURL"] = images
                             
                             if let _ = existedItems["\(item.id)"]?["photos"] as? [String: Data] {
                                 adsReady += 1

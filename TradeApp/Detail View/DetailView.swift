@@ -38,7 +38,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     var reference: DatabaseReference!
     
     var item: Item!
-    var images = [UIImage]()
+    var images = [String: UIImage]()
     
     let sectionTitles = ["Image", "Title", "Tags", "Description", "Location", "Views"]
     
@@ -73,18 +73,18 @@ class DetailView: UITableViewController, Index, Coordinates {
         increaseViews()
         DetailView.isLoaded = true
         
-        images = [item.thumbnail!]
+        images["image0"] = item.thumbnail!
         
         DispatchQueue.global().async { [weak self] in
             guard let urls = self?.item.photosURL else { return }
             
             self?.convertImages(urls: urls) { imgs in
 //                self?.images = imgs
-                self?.images.append(contentsOf: imgs)
+                self?.images = imgs
                 
                 DispatchQueue.main.async {
                     let indexSet = IndexSet(integer: 0)
-                    self?.tableView.reloadSections(indexSet, with: .automatic)
+                    self?.tableView.reloadSections(indexSet, with: .none)
                 }
             }
         }
@@ -592,22 +592,25 @@ class DetailView: UITableViewController, Index, Coordinates {
     }
     
     // convert URLs into images
-    func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
+    func convertImages(urls: [String], completion: @escaping ([String: UIImage]) -> Void) {
         guard urls.count > 1 else { return }
         
-        var images = [UIImage]()
+        var images = [String: UIImage]()
+        
+        images["image0"] = self.item.thumbnail!
         
         // get all images except the thumbnail
-        let links = Array(urls.sorted(by: <).map {URL(string: $0)}.dropFirst())
+//        let links = Array(urls.sorted(by: <).map {URL(string: $0)}.dropFirst())
+        let links = urls.map {URL(string: $0)}.dropFirst()
         
-        for url in links {
+        for (index, url) in links.enumerated() {
             let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
                 if let data = data {
                     let image = UIImage(data: data) ?? UIImage()
-                    images.append(image)
+                    images["image\(index + 1)"] = image
                 }
 
-                guard images.count == links.count else { return }
+                guard images.count == links.count + 1 else { return }
                 completion(images)
             }
 

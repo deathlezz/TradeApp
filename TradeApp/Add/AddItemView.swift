@@ -39,7 +39,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
     
-    var images = [UIImage]()
+    var images = [String: UIImage]()
     
     let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music"]
     
@@ -70,13 +70,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             DispatchQueue.global().async { [weak self] in
                 guard let urls = self?.item?.photosURL else { return }
                 
+                self?.images.removeAll(keepingCapacity: false)
                 self?.convertImages(urls: urls) { images in
-                    self?.images.removeAll(keepingCapacity: false)
                     
-                    self?.images[0] = self?.item?.thumbnail ?? UIImage()
+                    self?.images["image0"] = self?.item?.thumbnail ?? UIImage()
                     
-                    for i in 1...urls.count {
-                        self?.images[i] = images[i]
+                    for i in 0..<images.count {
+//                        self?.images.insert(images[i], at: i)
+                        self?.images["image\(i + 1)"] = images["image\(i)"]
                     }
                     
                     DispatchQueue.main.async {
@@ -267,22 +268,25 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // convert URLs into images
-    func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
+    func convertImages(urls: [String], completion: @escaping ([String: UIImage]) -> Void) {
         guard urls.count > 1 else { return }
         
-        var images = [UIImage]()
+        var images = [String: UIImage]()
+        
+        images["image0"] = self.item?.thumbnail!
         
         // get all images except the thumbnail
-        let links = Array(urls.sorted(by: <).map {URL(string: $0)}.dropFirst())
+//        let links = Array(urls.sorted(by: <).map {URL(string: $0)}.dropFirst())
+        let links = urls.map {URL(string: $0)}.dropFirst()
         
-        for url in links {
+        for (index, url) in links.enumerated() {
             let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
                 if let data = data {
                     let image = UIImage(data: data) ?? UIImage()
-                    images.append(image)
+                    images["image\(index + 1)"] = image
                 }
 
-                guard images.count == links.count else { return }
+                guard images.count == links.count + 1 else { return }
                 completion(images)
             }
 
@@ -657,12 +661,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                         guard let urlString = url?.absoluteString else { return }
                         imagesURL.append(urlString)
                         urlsReady += 1
+                        guard urlsReady == images.count else { return }
+                        imagesURL.sort(by: <)
+                        completion(imagesURL)
                     }
                 }
             }
-            
-            guard urlsReady == imagesURL.count else { return }
-            completion(imagesURL)
         }
     }
     

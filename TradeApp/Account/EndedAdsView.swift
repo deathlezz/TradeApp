@@ -315,13 +315,13 @@ class EndedAdsView: UITableViewController {
     func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
         guard let link = URL(string: url) else { return }
         
-        var thumbnail = UIImage()
+//        var thumbnail = UIImage()
         
         let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
             if let data = data {
                 let image = UIImage(data: data)!
-                thumbnail = image
-                completion(thumbnail)
+//                thumbnail = image
+                completion(image)
             }
         }
         task.resume()
@@ -338,14 +338,14 @@ class EndedAdsView: UITableViewController {
                 if let data = snapshot.value as? [String: [String: Any]] {
                     items = data
                     for (key, value) in data {
-                        let photos = value["photos"] as! [String: String]
+                        let photos = value["photosURL"] as! [String]
                         
-                        let fixedUrls = photos.values.sorted(by: <).map {String($0)}
+//                        let fixedUrls = photos.sorted(by: <).map {String($0)}
                         
-                        self?.convertThumbnail(url: fixedUrls[0]) { thumbnail in
+                        self?.convertThumbnail(url: photos[0]) { thumbnail in
                             items[key]?["thumbnail"] = thumbnail
                             
-                            if let _ = items[key]?["thumbnail"] as? [String: UIImage] {
+                            if let _ = items[key]?["thumbnail"] as? UIImage {
                                 adsReady += 1
                             }
                             
