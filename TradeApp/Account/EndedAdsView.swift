@@ -151,7 +151,6 @@ class EndedAdsView: UITableViewController {
             guard let item = endedAds.first(where: {$0.id == sender.tag}) else { return }
             vc.isEditMode = true
             vc.isAdActive = false
-//            vc.loggedUser = mail
             vc.item = item
             navigationController?.pushViewController(vc, animated: true)
         }

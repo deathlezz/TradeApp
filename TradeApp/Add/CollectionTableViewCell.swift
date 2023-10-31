@@ -140,8 +140,9 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     // load item images on load
     @objc func loadImages(_ notification: NSNotification) {
         let itemPhotos = notification.userInfo?["images"] as! [UIImage]
-        images = itemPhotos
-        collectionView.reloadData()
+        images.removeAll(keepingCapacity: false)
+        images.append(contentsOf: itemPhotos)
+        reloadView()
     }
     
     // set scalable size for item cell
@@ -152,7 +153,6 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     
     // set collection view edge insets
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-//        let minX = collectionView.readableContentGuide.layoutFrame.minX * 2
         return UIEdgeInsets(top: 0, left: minX, bottom: 0, right: minX)
     }
     

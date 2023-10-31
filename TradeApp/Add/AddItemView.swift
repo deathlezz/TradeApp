@@ -39,7 +39,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
     
-    var images = [String: UIImage]()
+    var images = [UIImage]()
     
     let categories = ["Vehicles", "Real Estate", "Job", "Home", "Electronics", "Fashion", "Agriculture", "Animals", "For Kids", "Sport & Hobby", "Music"]
     
@@ -66,27 +66,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         if isEditMode != nil {
             title = "Edit"
-            
-            DispatchQueue.global().async { [weak self] in
-                guard let urls = self?.item?.photosURL else { return }
-                
-                self?.images.removeAll(keepingCapacity: false)
-                self?.convertImages(urls: urls) { images in
-                    
-                    self?.images["image0"] = self?.item?.thumbnail ?? UIImage()
-                    
-                    for i in 0..<images.count {
-//                        self?.images.insert(images[i], at: i)
-                        self?.images["image\(i + 1)"] = images["image\(i)"]
-                    }
-                    
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": self?.images ?? [UIImage]()])
-                    }
-                }
-            }
-            
-//            loadImages()
+            loadImages()
         } else {
             title = "Add"
         }
@@ -268,25 +248,26 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // convert URLs into images
-    func convertImages(urls: [String], completion: @escaping ([String: UIImage]) -> Void) {
+    func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
         guard urls.count > 1 else { return }
         
-        var images = [String: UIImage]()
+        var imagesDict = [String: UIImage]()
         
-        images["image0"] = self.item?.thumbnail!
+        imagesDict["image0"] = self.item?.thumbnail!
         
         // get all images except the thumbnail
-//        let links = Array(urls.sorted(by: <).map {URL(string: $0)}.dropFirst())
         let links = urls.map {URL(string: $0)}.dropFirst()
         
         for (index, url) in links.enumerated() {
             let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
                 if let data = data {
                     let image = UIImage(data: data) ?? UIImage()
-                    images["image\(index + 1)"] = image
+                    imagesDict["image\(index + 1)"] = image
                 }
 
-                guard images.count == links.count + 1 else { return }
+                guard imagesDict.count == links.count + 1 else { return }
+                let sorted = imagesDict.sorted {$0.key < $1.key}
+                let images = Array(sorted.map {$0.value})
                 completion(images)
             }
 
@@ -297,15 +278,18 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // load images and push them into CollectionView
     func loadImages() {
         DispatchQueue.global().async { [weak self] in
-
-//            let itemPhotos = self?.item?.photos.map {UIImage(data: $0!)!} ?? [UIImage]()
+            guard let urls = self?.item?.photosURL else { return }
             
-//            for i in 0..<itemPhotos.count {
-//                self?.images[i] = itemPhotos[i]
-//            }
-            
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": self?.images ?? [UIImage]()])
+            self?.uploadedPhotos.removeAll(keepingCapacity: false)
+            self?.convertImages(urls: urls) { imgs in
+                
+                self?.uploadedPhotos = imgs
+                self?.images.removeFirst(imgs.count)
+                self?.images.insert(contentsOf: imgs, at: 0)
+                
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": self?.images ?? [UIImage]()])
+                }
             }
         }
     }
@@ -463,14 +447,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             let ac = UIAlertController(title: "Item edited successfully", message: "Changes will be visible soon", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
                 self?.clearTapped()
-//                self?.navigationController?.popViewController(animated: true)
             })
             present(ac, animated: true)
         } else {
             let ac = UIAlertController(title: "Item added successfully", message: "Your item will be visible soon", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .cancel) { [weak self] _ in
                 self?.clearTapped()
-//                self?.tabBarController?.selectedIndex = 0
             })
             present(ac, animated: true)
         }

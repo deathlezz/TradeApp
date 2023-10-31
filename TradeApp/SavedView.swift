@@ -12,7 +12,6 @@ import Firebase
 class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     var savedItems = [Item]()
-//    var loggedUser: String!
     
     let monitor = NWPathMonitor()
     var isPushed = false
@@ -52,8 +51,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
-//        loggedUser = Utilities.loadUser()
-        
         DispatchQueue.global().async { [weak self] in
             self?.updateSavedItems() { _ in }
             
@@ -79,8 +76,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
             fatalError("Unable to dequeue itemCell")
         }
-        
-//        let thumbnail = UIImage(data: savedItems[indexPath.item].photos[0]!)
         
         cell.image.image = savedItems[indexPath.row].thumbnail
         cell.title.text = savedItems[indexPath.item].title

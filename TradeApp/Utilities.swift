@@ -139,12 +139,13 @@ class Utilities {
         
         let newAd = NSEntityDescription.insertNewObject(forEntityName: "SavedAd", into: managedContext)
         let thumbnail = item.thumbnail?.pngData()
-        newAd.setValue(thumbnail, forKey: "image")
+        let date = item.date.toString(shortened: false)
+        newAd.setValue(thumbnail, forKey: "thumbnail")
         newAd.setValue(item.photosURL, forKey: "photosURL")
         newAd.setValue(item.title, forKey: "title")
         newAd.setValue(item.price, forKey: "price")
         newAd.setValue(item.location, forKey: "location")
-        newAd.setValue(item.date, forKey: "date")
+        newAd.setValue(date, forKey: "date")
         newAd.setValue(item.id, forKey: "id")
         newAd.setValue(item.owner, forKey: "owner")
 

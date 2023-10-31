@@ -16,7 +16,6 @@ class ActiveAdsView: UITableViewController {
     
     var header: UILabel!
     
-//    var mail: String!
     var activeAds = [Item?]()
     
     var reference: DatabaseReference!
@@ -79,7 +78,6 @@ class ActiveAdsView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "activeAdCell", for: indexPath) as? AdCell {
-//            let thumbnail = activeAds[indexPath.row]?.thumbnail
             cell.thumbnail.image = activeAds[indexPath.row]?.thumbnail
             cell.thumbnail.layer.cornerRadius = 7
             cell.title.text = activeAds[indexPath.row]?.title
@@ -107,7 +105,6 @@ class ActiveAdsView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = activeAds[indexPath.row]
             vc.hidesBottomBarWhenPushed = true
-//            vc.loggedUser = mail
             vc.toolbarItems = []
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -150,7 +147,6 @@ class ActiveAdsView: UITableViewController {
             guard let item = activeAds.first(where: {$0?.id == sender.tag}) else { return }
             vc.isEditMode = true
             vc.isAdActive = true
-//            vc.loggedUser = mail
             vc.item = item
             navigationController?.pushViewController(vc, animated: true)
         }
