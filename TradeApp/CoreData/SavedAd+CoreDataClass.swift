@@ -2,7 +2,7 @@
 //  SavedAd+CoreDataClass.swift
 //  TradeApp
 //
-//  Created by deathlezz on 26/04/2023.
+//  Created by deathlezz on 01/11/2023.
 //
 //
 

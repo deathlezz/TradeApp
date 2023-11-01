@@ -2,7 +2,7 @@
 //  SavedAd+CoreDataProperties.swift
 //  TradeApp
 //
-//  Created by deathlezz on 26/04/2023.
+//  Created by deathlezz on 01/11/2023.
 //
 //
 
@@ -16,14 +16,14 @@ extension SavedAd {
         return NSFetchRequest<SavedAd>(entityName: "SavedAd")
     }
 
-    @NSManaged public var thumbnail: Data
-    @NSManaged public var photosURL: [String]
-    @NSManaged public var title: String?
-    @NSManaged public var price: Int32
-    @NSManaged public var location: String?
-    @NSManaged public var date: Date?
+    @NSManaged public var date: String?
     @NSManaged public var id: Int32
-    @NSManaged public var owner: String
+    @NSManaged public var location: String?
+    @NSManaged public var owner: String?
+    @NSManaged public var photosURL: [String]?
+    @NSManaged public var price: Int32
+    @NSManaged public var thumbnail: Data?
+    @NSManaged public var title: String?
 
 }
 
