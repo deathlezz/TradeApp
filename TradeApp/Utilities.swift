@@ -191,8 +191,9 @@ class Utilities {
             let results = try managedContext.fetch(adsFetch)
             
             for result in results {
-                let thumbnail = UIImage(data: result.thumbnail) ?? UIImage()
-                let item = Item(thumbnail: thumbnail, photosURL: result.photosURL, title: result.title!, price: Int(result.price), location: result.location!, date: result.date!, id: Int(result.id), owner: result.owner)
+                let thumbnail = UIImage(data: result.thumbnail!) ?? UIImage()
+                let date = result.date!.toDate()
+                let item = Item(thumbnail: thumbnail, photosURL: result.photosURL!, title: result.title!, price: Int(result.price), location: result.location!, date: date, id: Int(result.id), owner: result.owner!)
                 items.append(item)
             }
             print("items loaded: \(items)")
