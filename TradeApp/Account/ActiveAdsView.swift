@@ -315,12 +315,9 @@ class ActiveAdsView: UITableViewController {
     func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
         guard let link = URL(string: url) else { return }
         
-//        var thumbnail = UIImage()
-        
         let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
             if let data = data {
                 let image = UIImage(data: data)!
-//                thumbnail = image
                 completion(image)
             }
         }
@@ -339,8 +336,6 @@ class ActiveAdsView: UITableViewController {
                     items = data
                     for (key, value) in data {
                         let photos = value["photosURL"] as! [String]
-                        
-//                        let fixedUrls = photos.sorted(by: <).map {String($0)}
                         
                         self?.convertThumbnail(url: photos[0]) { thumbnail in
                             items[key]?["thumbnail"] = thumbnail
@@ -363,10 +358,6 @@ class ActiveAdsView: UITableViewController {
         var result = [Item]()
         
         for item in dict {
-//            let dictPhotos = item.value["photos"] as! [String: Data]
-//            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
-//            let arrayPhotos = sorted.map {$0.value}
-            
             let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String

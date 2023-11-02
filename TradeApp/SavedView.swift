@@ -95,7 +95,8 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         if navigationItem.rightBarButtonItems == [selectButton] && monitor.currentPath.status == .satisfied {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
                 let item = savedItems[indexPath.item]
-                vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
+//                vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
+                vc.item = item
                 vc.hidesBottomBarWhenPushed = true
                 isDetailShown = true
                 navigationController?.pushViewController(vc, animated: true)
@@ -134,7 +135,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             }) { finished in
                 guard let index = self.selectedCells.firstIndex(of: cell) else { return }
                 self.selectedCells.remove(at: index)
-//                self.selectedItems.remove(at: indexPath.item)
                 self.showButton()
                 self.updateHeader()
             }
@@ -410,28 +410,41 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     }
     
     // convert URLs into dictionary Data
-    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
-        var images = [String: Data]()
+//    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
+//        var images = [String: Data]()
+//        
+//        let links = urls.sorted(by: <).map {URL(string: $0)}
+//        
+//        for (index, url) in links.enumerated() {
+//            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+//                if let data = data {
+//                    images["image\(index)"] = data
+//                }
+//
+//                guard images.keys.count == links.count else { return }
+//                completion(images)
+//            }
+//
+//            task.resume()
+//        }
+//    }
+    
+    // convert URL to a thumbnail
+    func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
+        guard let link = URL(string: url) else { return }
         
-        let links = urls.sorted(by: <).map {URL(string: $0)}
-        
-        for (index, url) in links.enumerated() {
-            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
-                if let data = data {
-                    images["image\(index)"] = data
-                }
-
-                guard images.keys.count == links.count else { return }
-                completion(images)
+        let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
+            if let data = data {
+                let image = UIImage(data: data)!
+                completion(image)
             }
-
-            task.resume()
         }
+        task.resume()
     }
     
     // download active items from firebase & convert images urls to data array
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
-        var existedItems = [String: [String: Any]]()
+        var items = [String: [String: Any]]()
         var removedItems = [Item]()
         var adsReady = 0
         
@@ -442,21 +455,32 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                 self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
                     if let value = snapshot.value as? [String: Any] {
                         // add item to existed items
-                        existedItems["\(item.id)"] = value
+                        items["\(item.id)"] = value
                         
                         let photos = value["photosURL"] as! [String]
-                        let fixedUrls = photos.sorted(by: <).map {String($0)}
+//                        let fixedUrls = photos.sorted(by: <).map {String($0)}
                         
-                        self?.convertImages(urls: fixedUrls) { images in
-                            existedItems["\(item.id)"]?["photosURL"] = images
+                        self?.convertThumbnail(url: photos[0]) { thumbnail in
+                            items["\(item.id)"]?["thumbnail"] = thumbnail
                             
-                            if let _ = existedItems["\(item.id)"]?["photos"] as? [String: Data] {
+                            if let _ = items["\(item.id)"]?["thumbnail"] as? UIImage {
                                 adsReady += 1
                             }
                             
-                            guard adsReady == existedItems.count else { return }
-                            completion(existedItems)
+                            guard adsReady == items.count else { return }
+                            completion(items)
                         }
+                        
+//                        self?.convertImages(urls: photos) { images in
+//                            existedItems["\(item.id)"]?["photosURL"] = images
+//                            
+//                            if let _ = existedItems["\(item.id)"]?["photos"] as? [String: Data] {
+//                                adsReady += 1
+//                            }
+//                            
+//                            guard adsReady == existedItems.count else { return }
+//                            completion(existedItems)
+//                        }
                         
                     } else {
                         removedItems.append(item)
@@ -480,10 +504,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         var result = [Item]()
         
         for item in dict {
-//            let dictPhotos = item.value["photos"] as! [String: Data]
-//            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
-//            let arrayPhotos = sorted.map {$0.value}
-            
             let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String

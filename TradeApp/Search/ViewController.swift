@@ -541,8 +541,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                             
                             let photos = item.value["photosURL"] as! [String]
                             
-//                            let fixedUrls = photos.sorted(by: <).map {String($0)}
-                            
                             self?.convertThumbnail(url: photos[0]) { thumbnail in
                                 items[item.key]?["thumbnail"] = thumbnail
                                 
