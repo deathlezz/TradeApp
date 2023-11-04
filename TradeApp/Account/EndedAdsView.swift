@@ -253,6 +253,8 @@ class EndedAdsView: UITableViewController {
                 if let value = snapshot.value as? [String: Any] {
                     self?.reference.child(user).child("activeItems").child("\(itemID)").setValue(value)
                     self?.reference.child(user).child("activeItems").child("\(itemID)").child("date").setValue(date)
+                    self?.reference.child(user).child("activeItems").child("\(itemID)").child("views").setValue(0)
+                    self?.reference.child(user).child("activeItems").child("\(itemID)").child("saved").setValue(0)
                     self?.reference.child(user).child("endedItems").child("\(itemID)").removeValue()
                 }
             }

@@ -19,7 +19,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     
     var emptyArrayView: UIView!
     var reference: DatabaseReference!
-    var refreshControl: UIRefreshControl!
+//    var refreshControl: UIRefreshControl!
     
     var selectButton: UIBarButtonItem!
     var cancelButton: UIBarButtonItem!
@@ -44,21 +44,12 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         navigationItem.rightBarButtonItems = [selectButton]
         
         // pull to refresh
-        refreshControl = UIRefreshControl()
-        refreshControl.tintColor = .lightGray
-        refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
-        collectionView.refreshControl = refreshControl
+//        refreshControl = UIRefreshControl()
+//        refreshControl.tintColor = .lightGray
+////        refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
+//        collectionView.refreshControl = refreshControl
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.updateSavedItems() { _ in }
-            
-            DispatchQueue.main.async {
-                guard self?.savedItems.count == 0 else { return }
-                self?.isArrayEmpty()
-            }
-        }
     }
     
     // number of sections
@@ -95,8 +86,8 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         if navigationItem.rightBarButtonItems == [selectButton] && monitor.currentPath.status == .satisfied {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
                 let item = savedItems[indexPath.item]
-//                vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
-                vc.item = item
+                vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
+//                vc.item = item
                 vc.hidesBottomBarWhenPushed = true
                 isDetailShown = true
                 navigationController?.pushViewController(vc, animated: true)
@@ -174,21 +165,22 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     }
     
     // set action for "pull to refresh"
-    @objc func refresh(refreshControl: UIRefreshControl) {
-        refreshControl.beginRefreshing()
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.updateSavedItems() { _ in
-                refreshControl.endRefreshing()
-            }
-            
-            DispatchQueue.main.async {
-                guard self?.savedItems.count == 0 else { return }
-                self?.isArrayEmpty()
-                refreshControl.endRefreshing()
-            }
-        }
-    }
+//    @objc func refresh(refreshControl: UIRefreshControl) {
+//        refreshControl.beginRefreshing()
+//        
+//        DispatchQueue.global().async { [weak self] in
+//            self?.updateSavedItems() { _ in
+//                refreshControl.endRefreshing()
+//                
+//                DispatchQueue.main.async {
+//                    guard self?.savedItems.count == 0 else { return }
+//                    self?.isArrayEmpty()
+//                    refreshControl.endRefreshing()
+//                }
+//            }
+//            
+//        }
+//    }
     
     // refresh collection view before view appeared
     override func viewWillAppear(_ animated: Bool) {
@@ -197,11 +189,22 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         navigationController?.isToolbarHidden = true
         isDetailShown = false
         savedItems = Utilities.loadItems()
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.updateSavedItems() {
+                DispatchQueue.main.async {
+                    self?.isArrayEmpty()
+                    self?.collectionView.reloadData()
+                }
+            }
+        }
     }
     
     // cancel selection after view disappeared
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        savedItems.removeAll(keepingCapacity: false)
+        selectedItems.removeAll(keepingCapacity: false)
         cancelTapped()
     }
 
@@ -234,6 +237,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                 cell.transform = .identity
             }) { finished in
                 self.selectedCells.removeAll()
+                self.selectedItems.removeAll()
             }
         }
     }
@@ -349,21 +353,24 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     }
     
     // update items on load
-    func updateSavedItems(completion: @escaping (Bool) -> Void) {
-        getData() { [weak self] dict in
-            let saved = self?.savedItems ?? [Item]()
-            self?.savedItems = self?.toItemModel(dict: dict) ?? [Item]()
+    func updateSavedItems(completion: @escaping () -> Void) {
+        guard savedItems.count > 0 else { return completion() }
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.getData() { dict in
+                let oldSaved = self?.savedItems ?? [Item]()
+                let newSaved = self?.toItemModel(dict: dict) ?? [Item]()
+                self?.savedItems = newSaved
 
-            DispatchQueue.main.async {
-                Utilities.removeItems(saved)
-                
-                for item in saved {
-                    Utilities.saveItem(item)
+                DispatchQueue.main.async {
+                    Utilities.removeItems(oldSaved)
+                    
+                    for item in newSaved {
+                        Utilities.saveItem(item)
+                    }
+                    
+                    completion()
                 }
-                
-                completion(true)
-                self?.isArrayEmpty()
-                self?.collectionView.reloadData()
             }
         }
     }
@@ -409,26 +416,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         }
     }
     
-    // convert URLs into dictionary Data
-//    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
-//        var images = [String: Data]()
-//        
-//        let links = urls.sorted(by: <).map {URL(string: $0)}
-//        
-//        for (index, url) in links.enumerated() {
-//            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
-//                if let data = data {
-//                    images["image\(index)"] = data
-//                }
-//
-//                guard images.keys.count == links.count else { return }
-//                completion(images)
-//            }
-//
-//            task.resume()
-//        }
-//    }
-    
     // convert URL to a thumbnail
     func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
         guard let link = URL(string: url) else { return }
@@ -445,7 +432,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     // download active items from firebase & convert images urls to data array
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
         var items = [String: [String: Any]]()
-        var removedItems = [Item]()
+//        var removedItems = [Item]()
         var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
@@ -458,7 +445,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                         items["\(item.id)"] = value
                         
                         let photos = value["photosURL"] as! [String]
-//                        let fixedUrls = photos.sorted(by: <).map {String($0)}
                         
                         self?.convertThumbnail(url: photos[0]) { thumbnail in
                             items["\(item.id)"]?["thumbnail"] = thumbnail
@@ -471,29 +457,21 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                             completion(items)
                         }
                         
-//                        self?.convertImages(urls: photos) { images in
-//                            existedItems["\(item.id)"]?["photosURL"] = images
-//                            
-//                            if let _ = existedItems["\(item.id)"]?["photos"] as? [String: Data] {
-//                                adsReady += 1
-//                            }
-//                            
-//                            guard adsReady == existedItems.count else { return }
-//                            completion(existedItems)
-//                        }
-                        
                     } else {
-                        removedItems.append(item)
-                        
-                        guard removedItems.count == self?.savedItems.count else { return }
-                        
-                        DispatchQueue.main.async {
-                            Utilities.removeItems(removedItems)
-                            self?.savedItems.removeAll()
-                            self?.isArrayEmpty()
-                            self?.collectionView.reloadData()
-                        }
+                        completion(items)
                     }
+//                    else {
+//                        removedItems.append(item)
+//                        
+//                        guard removedItems.count == self?.savedItems.count else { return }
+//                        
+//                        DispatchQueue.main.async {
+//                            Utilities.removeItems(removedItems)
+//                            self?.savedItems.removeAll()
+//                            self?.isArrayEmpty()
+//                            self?.collectionView.reloadData()
+//                        }
+//                    }
                 }
             }
         }
@@ -530,14 +508,14 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     // update empty array view y position
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let safeAreaTop = view.safeAreaInsets.top
-        let refreshHeight = refreshControl.bounds.height
-        var offset = CGFloat()
+//        let refreshHeight = refreshControl.bounds.height
+        let offset = -scrollView.contentOffset.y - safeAreaTop
         
-        if refreshControl.isRefreshing {
-            offset = -scrollView.contentOffset.y - safeAreaTop + refreshHeight
-        } else {
-            offset = -scrollView.contentOffset.y - safeAreaTop
-        }
+//        if refreshControl.isRefreshing {
+//            offset = -scrollView.contentOffset.y - safeAreaTop + refreshHeight
+//        } else {
+//            offset = -scrollView.contentOffset.y - safeAreaTop
+//        }
 
         let screenSize = UIScreen.main.bounds.size
         emptyArrayView.frame = CGRect(x: 0, y: offset, width: screenSize.width, height: screenSize.height)

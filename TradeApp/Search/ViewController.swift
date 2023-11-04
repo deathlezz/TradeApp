@@ -74,7 +74,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
             self?.currentUnit = Utilities.loadDistanceUnit()
             
             self?.getData() { dict in
-                AppStorage.shared.items = self?.toItemModel(dict: dict) ?? [Item]()
+                AppStorage.shared.items.removeAll(keepingCapacity: false)
+                let newItems = self?.toItemModel(dict: dict) ?? [Item]()
+                AppStorage.shared.items = newItems
                 self?.loadRecentItems()
                 
                 DispatchQueue.main.async {
@@ -212,7 +214,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         
         DispatchQueue.global().async { [weak self] in
             self?.getData() { dict in
-                AppStorage.shared.items = self?.toItemModel(dict: dict) ?? [Item]()
+                AppStorage.shared.items.removeAll(keepingCapacity: false)
+                let newItems = self?.toItemModel(dict: dict) ?? [Item]()
+                AppStorage.shared.items = newItems
 
                 DispatchQueue.main.async {
                     if self?.currentFilters.isEmpty ?? Bool() {

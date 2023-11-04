@@ -385,11 +385,11 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                 if valid {
                     Utilities.forwardGeocoding(address: location) { (lat, long) in
                         if self?.isEditMode != nil {
-                            guard let itemID = self?.item?.id else { return }
+                            guard let item = self?.item else { return }
                             
-                            self?.uploadImages(images: photos, itemID: itemID) { [weak self] urls in
+                            self?.uploadImages(images: photos, itemID: item.id) { [weak self] urls in
                                 
-                                let newItem = Item(photosURL: urls, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: itemID, owner: user)
+                                let newItem = Item(photosURL: urls, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: item.views, saved: item.saved, lat: lat, long: long, id: item.id, owner: user)
                                 
                                 if self?.isAdActive == true {
                                     self?.saveItem(user: user, item: newItem, isActive: true)

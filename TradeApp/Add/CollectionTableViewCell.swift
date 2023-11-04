@@ -128,7 +128,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         }
     }
     
-    // reload collection view
+    // reload collection view with animation
     @objc func reloadView() {
         UIView.transition(with: collectionView, duration: 0.3, options: .transitionCrossDissolve, animations: {
             self.collectionView.reloadData()
