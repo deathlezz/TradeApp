@@ -137,10 +137,11 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         
         if kind == UICollectionView.elementKindSectionHeader {
             if let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeaderView {
+                let itemsNumber = collectionView.numberOfItems(inSection: 0)
                 let screenWidth = UIScreen.main.bounds.width
                 let headerX = view.readableContentGuide.layoutFrame.minX
                 headerView.frame = CGRect(x: headerX, y: 0, width: screenWidth / 1.5, height: 15)
-                headerView.textLabel.text = savedItems.count == 1 ? "Found 1 ad" : "Found \(savedItems.count) ads"
+                headerView.textLabel.text = itemsNumber == 1 ? "Found 1 ad" : "Found \(itemsNumber) ads"
                 headerView.textLabel.font = UIFont.boldSystemFont(ofSize: 14)
                 headerView.textLabel.textColor = .gray
                 return headerView
@@ -204,7 +205,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         savedItems.removeAll(keepingCapacity: false)
-        selectedItems.removeAll(keepingCapacity: false)
         cancelTapped()
     }
 
@@ -236,8 +236,8 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                 cell.layer.borderColor = UIColor.lightGray.cgColor
                 cell.transform = .identity
             }) { finished in
-                self.selectedCells.removeAll()
-                self.selectedItems.removeAll()
+                self.selectedCells.removeAll(keepingCapacity: false)
+                self.selectedItems.removeAll(keepingCapacity: false)
             }
         }
     }
@@ -291,12 +291,14 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         let header = collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader)
         let label = header[0].subviews[0] as? UILabel
         
+        let itemsNumber = collectionView.numberOfItems(inSection: 0)
+        
         if navigationItem.rightBarButtonItems != [selectButton] {
             guard let selected = collectionView.indexPathsForSelectedItems else { return }
             label?.text = selected.count == 1 ? "Selected 1 ad" : "Selected \(selected.count) ads"
             
         } else {
-            label?.text = savedItems.count == 1 ? "Found 1 ad" : "Found \(savedItems.count) ads"
+            label?.text = itemsNumber == 1 ? "Found 1 ad" : "Found \(itemsNumber) ads"
         }
     }
     
@@ -437,6 +439,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         
         DispatchQueue.global().async { [weak self] in
             guard let saved = self?.savedItems else { return }
+//            let saved = Utilities.loadItems()
             
             for item in saved {
                 self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in

@@ -265,9 +265,9 @@ class ActiveAdsView: UITableViewController {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(user).child("activeItems").child("\(itemID)").child("photos").observeSingleEvent(of: .value) { snapshot in
-                if let value = snapshot.value as? [String: String] {
-                    for i in 0..<value.keys.count {
+            self?.reference.child(user).child("activeItems").child("\(itemID)").child("photosURL").observeSingleEvent(of: .value) { snapshot in
+                if let value = snapshot.value as? [String] {
+                    for i in 0..<value.count {
                         let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(i)")
                         storageRef.delete() { _ in }
                     }

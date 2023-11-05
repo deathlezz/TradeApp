@@ -366,12 +366,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         guard let user = Auth.auth().currentUser?.uid else { return }
         sender.isUserInteractionEnabled = false
         
+        let imgs = images.filter {$0 != UIImage(systemName: "plus")}
+        
         var photos = [Data]()
         
         if isEditMode != nil {
-            photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.pngData()!}
+            photos = imgs.map {$0.jpegData(compressionQuality: 1)!}
         } else {
-            photos = images.filter {$0 != UIImage(systemName: "plus")}.map {$0.jpegData(compressionQuality: 0.8)!}
+            photos = imgs.map {$0.jpegData(compressionQuality: 0.8)!}
         }
             
         guard let title = textFieldCells[0].textField.text else { return }
@@ -636,9 +638,9 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(index)")
             guard let img = image else { return }
             
-            storageRef.putData(img) { (metadata, error) in
+            storageRef.putData(img) { (metadata, _) in
                 if metadata != nil {
-                    storageRef.downloadURL() { (url, error) in
+                    storageRef.downloadURL() { (url, _) in
                 
                         guard let urlString = url?.absoluteString else { return }
                         imagesURL.append(urlString)
