@@ -42,6 +42,7 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     // set collection view cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "detailViewCell", for: indexPath) as? PhotosCell {
+            cell.imageView.image = nil
             cell.imageView.image = imgs[indexPath.item]
             return cell
         }
@@ -80,5 +81,4 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     @objc func removeImages() {
         imgs.removeAll(keepingCapacity: false)
     }
-    
 }

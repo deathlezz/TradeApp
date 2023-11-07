@@ -368,13 +368,13 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         let imgs = images.filter {$0 != UIImage(systemName: "plus")}
         
-        var photos = [Data]()
+        let photos = imgs.map {$0.jpegData(compressionQuality: 0.6)!}
         
-        if isEditMode != nil {
-            photos = imgs.map {$0.jpegData(compressionQuality: 1)!}
-        } else {
-            photos = imgs.map {$0.jpegData(compressionQuality: 0.8)!}
-        }
+//        if isEditMode != nil {
+//            photos = imgs.map {$0.jpegData(compressionQuality: 1)!}
+//        } else {
+//            photos = imgs.map {$0.jpegData(compressionQuality: 0.8)!}
+//        }
             
         guard let title = textFieldCells[0].textField.text else { return }
         guard let price = textFieldCells[1].textField.text else { return }

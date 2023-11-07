@@ -113,15 +113,15 @@ class ActiveAdsView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            guard let itemID = activeAds[indexPath.row]?.id else { return }
+            guard let item = activeAds[indexPath.row] else { return }
             
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
-                AppStorage.shared.items.removeAll(where: {$0.id == itemID})
-                AppStorage.shared.filteredItems.removeAll(where: {$0.id == itemID})
+                AppStorage.shared.items.removeAll(where: {$0.id == item.id})
+                AppStorage.shared.filteredItems.removeAll(where: {$0.id == item.id})
                 
-                self?.deleteItem(itemID: itemID)
+                self?.deleteItem(item: item)
                 self?.activeAds.remove(at: indexPath.row)
                 
                 tableView.deleteRows(at: [indexPath], with: .fade)
@@ -261,55 +261,61 @@ class ActiveAdsView: UITableViewController {
     }
     
     // delete item from Firebase
-    func deleteItem(itemID: Int) {
+    func deleteItem(item: Item) {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(user).child("activeItems").child("\(itemID)").child("photosURL").observeSingleEvent(of: .value) { snapshot in
-                if let value = snapshot.value as? [String] {
-                    for i in 0..<value.count {
-                        let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(i)")
-                        storageRef.delete() { _ in }
+            for i in 0..<item.photosURL.count {
+                let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(item.id)").child("image\(i)")
+                storageRef.delete() { _ in }
+            }
+            
+            self?.reference.child(user).child("activeItems").child("\(item.id)").removeValue()
+            
+            self?.reference.child(user).child("chats").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
+
+                if let buyers = snapshot.value as? [String: [[String: String]]] {
+                    let keys = buyers.keys
+
+                    for key in keys {
+                        self?.reference.child(key).child("chats").child("\(item.id)").removeValue()
                     }
-                    
-                    self?.reference.child(user).child("activeItems").child("\(itemID)").removeValue()
-                    
-                    self?.reference.child(user).child("chats").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
 
-                        if let buyers = snapshot.value as? [String: [[String: String]]] {
-                            let keys = buyers.keys
-
-                            for key in keys {
-                                self?.reference.child(key).child("chats").child("\(itemID)").removeValue()
-                            }
-
-                            self?.reference.child(user).child("chats").child("\(itemID)").removeValue()
-                        }
-                    }
+                    self?.reference.child(user).child("chats").child("\(item.id)").removeValue()
                 }
             }
         }
-    }
-    
-    // convert URLs into dictionary Data
-//    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
-//        var images = [String: Data]()
-//        
-//        let links = urls.sorted(by: <).map {URL(string: $0)}
-//        
-//        for (index, url) in links.enumerated() {
-//            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
-//                if let data = data {
-//                    images["image\(index)"] = data
+        
+        
+        
+        
+//        DispatchQueue.global().async { [weak self] in
+//            self?.reference.child(user).child("activeItems").child("\(itemID)").child("photosURL").observeSingleEvent(of: .value) { snapshot in
+//                if let value = snapshot.value as? [String] {
+//                    
+//                    for i in 0..<value.count {
+//                        let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(i)")
+//                        storageRef.delete() { _ in }
+//                    }
+//                    
+//                    self?.reference.child(user).child("activeItems").child("\(item.id)").removeValue()
+//                    
+//                    self?.reference.child(user).child("chats").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
+//
+//                        if let buyers = snapshot.value as? [String: [[String: String]]] {
+//                            let keys = buyers.keys
+//
+//                            for key in keys {
+//                                self?.reference.child(key).child("chats").child("\(item.id)").removeValue()
+//                            }
+//
+//                            self?.reference.child(user).child("chats").child("\(item.id)").removeValue()
+//                        }
+//                    }
 //                }
-//
-//                guard images.keys.count == links.count else { return }
-//                completion(images)
 //            }
-//
-//            task.resume()
 //        }
-//    }
+    }
     
     // convert URL to a thumbnail
     func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
