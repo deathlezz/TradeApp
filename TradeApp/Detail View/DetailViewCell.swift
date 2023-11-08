@@ -27,6 +27,9 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
         NotificationCenter.default.addObserver(self, selector: #selector(getIndex), name: NSNotification.Name("getIndex"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(removeImages), name: NSNotification.Name("removeImages"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateImages), name: NSNotification.Name("updateImages"), object: nil)
+        
     }
     
     // set number of items in section
@@ -42,7 +45,7 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     // set collection view cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "detailViewCell", for: indexPath) as? PhotosCell {
-            cell.imageView.image = nil
+//            cell.imageView.image = nil
             cell.imageView.image = imgs[indexPath.item]
             return cell
         }
@@ -80,5 +83,40 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     // remove images before view dissappear to release memory
     @objc func removeImages() {
         imgs.removeAll(keepingCapacity: false)
+    }
+    
+    // update images after downloading from firebase
+    @objc func updateImages(_ notification: Notification) {
+        let images = notification.userInfo?["images"] as! [UIImage]
+        imgs.removeAll(keepingCapacity: false)
+        imgs = images
+        collectionView.reloadData()
+    }
+    
+    // convert URLs into images
+    func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
+        guard urls.count > 1 else { return }
+        
+        var imagesDict = [String: UIImage]()
+        
+        // get all images except the thumbnail
+        let links = urls.map {URL(string: $0)}.dropFirst()
+        
+        for (index, url) in links.enumerated() {
+            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+                if let data = data {
+                    let image = UIImage(data: data) ?? UIImage()
+                    imagesDict["image\(index)"] = image
+                }
+
+                guard imagesDict.count == links.count else { return }
+                let sorted = imagesDict.sorted {$0.key < $1.key}
+                let images = Array(sorted.map {$0.value})
+                imagesDict.removeAll(keepingCapacity: false)
+                completion(images)
+            }
+
+            task.resume()
+        }
     }
 }

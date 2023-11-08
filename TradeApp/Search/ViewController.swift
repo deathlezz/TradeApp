@@ -123,6 +123,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = AppStorage.shared.filteredItems[indexPath.item]
+            vc.images = [AppStorage.shared.filteredItems[indexPath.item].thumbnail!]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -497,36 +498,14 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
         guard let link = URL(string: url) else { return }
         
-//        var thumbnail = UIImage()
-        
         let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
             if let data = data {
                 let image = UIImage(data: data)!
-//                thumbnail = image
                 completion(image)
             }
         }
         task.resume()
     }
-    
-//    func convertImages(urls: [String], completion: @escaping ([String: Data]) -> Void) {
-//        var images = [String: Data]()
-//        
-//        let links = urls.sorted(by: <).map {URL(string: $0)}
-//        
-//        for (index, url) in links.enumerated() {
-//            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
-//                if let data = data {
-//                    images["image\(index)"] = data
-//                }
-//
-//                guard images.keys.count == links.count else { return }
-//                completion(images)
-//            }
-//
-//            task.resume()
-//        }
-//    }
     
     // download all active items & convert thumbnails to UIImage
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
@@ -573,10 +552,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         var result = [Item]()
         
         for item in dict {
-//            let dictPhotos = item.value["photos"] as! [String: Data]
-//            let sorted = dictPhotos.sorted(by: { $0.0 < $1.0 })
-//            let arrayPhotos = sorted.map {$0.value}
-            
             let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
