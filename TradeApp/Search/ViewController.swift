@@ -106,8 +106,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
             fatalError("Unable to dequeue itemCell")
         }
-        cell.image.image = nil
-        cell.image.image = AppStorage.shared.filteredItems[indexPath.item].thumbnail
+        let image = AppStorage.shared.filteredItems[indexPath.item].thumbnail?.resized(toWidth: cell.image.frame.width)
+        cell.image.image = image
         cell.title.text = AppStorage.shared.filteredItems[indexPath.item].title
         cell.price.text = "£\(AppStorage.shared.filteredItems[indexPath.item].price)"
         cell.location.text = AppStorage.shared.filteredItems[indexPath.item].location
@@ -122,8 +122,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     // set action for tapped cell
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
-            vc.item = AppStorage.shared.filteredItems[indexPath.item]
-            vc.images = [AppStorage.shared.filteredItems[indexPath.item].thumbnail!]
+            let item = AppStorage.shared.filteredItems[indexPath.item]
+            vc.item = item
+            vc.images = [item.thumbnail!]
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -606,6 +607,31 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         let minX = view.readableContentGuide.layoutFrame.minX
         return UIEdgeInsets(top: 10, left: minX, bottom: 10, right: minX)
+    }
+    
+    func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
+        guard urls.count > 1 else { return }
+        
+        var imagesDict = [String: UIImage]()
+        
+        // get all images except the thumbnail
+        let links = urls.map {URL(string: $0)}.dropFirst()
+        
+        for (index, url) in links.enumerated() {
+            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+                if let data = data {
+                    let image = UIImage(data: data) ?? UIImage()
+                    imagesDict["image\(index)"] = image
+                }
+
+                guard imagesDict.count == links.count else { return }
+                let sorted = imagesDict.sorted {$0.key < $1.key}
+                let images = Array(sorted.map {$0.value})
+                completion(images)
+            }
+
+            task.resume()
+        }
     }
 
 }

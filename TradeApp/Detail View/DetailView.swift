@@ -72,9 +72,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         isSaved()
         increaseViews()
         DetailView.isLoaded = true
-        
-//        images.append(item.thumbnail!)
-        
+ 
         DispatchQueue.global().async { [weak self] in
             guard let urls = self?.item.photosURL else { return }
             
@@ -85,7 +83,7 @@ class DetailView: UITableViewController, Index, Coordinates {
                     // send notification to detail view cell here
                     
                     NotificationCenter.default.post(name: NSNotification.Name("updateImages"), object: nil, userInfo: ["images": self?.images ?? [UIImage]()])
-                    
+
 //                    let indexSet = IndexSet(integer: 0)
 //                    self?.tableView.reloadSections(indexSet, with: .none)
                 }

@@ -45,11 +45,12 @@ class MessagesView: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
         let chatKey = Array(chats.keys)[indexPath.row]
+        let image = chatsData["\(chatKey)"]?["thumbnail"] as! UIImage
         cell.textLabel?.text = chatsData["\(chatKey)"]?["title"] as? String
         cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
-        cell.imageView?.image = chatsData["\(chatKey)"]?["thumbnail"] as? UIImage
+        cell.imageView?.image = image.resized(toWidth: (cell.imageView?.frame.width)!)
         return cell
     }
     

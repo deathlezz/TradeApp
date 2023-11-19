@@ -79,8 +79,8 @@ class EndedAdsView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "endedAdCell", for: indexPath) as? AdCell {
-//            let thumbnail = UIImage(data: (endedAds[indexPath.row].photos[0])!)
-            cell.thumbnail.image = endedAds[indexPath.row].thumbnail
+            let image = endedAds[indexPath.row].thumbnail?.resized(toWidth: (cell.imageView?.frame.width)!)
+            cell.thumbnail.image = image
             cell.thumbnail.layer.cornerRadius = 7
             cell.title.text = endedAds[indexPath.row].title
             cell.price.text = "£\(endedAds[indexPath.row].price)"

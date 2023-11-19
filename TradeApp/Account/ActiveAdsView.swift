@@ -78,7 +78,8 @@ class ActiveAdsView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "activeAdCell", for: indexPath) as? AdCell {
-            cell.thumbnail.image = activeAds[indexPath.row]?.thumbnail
+            let image = activeAds[indexPath.row]?.thumbnail?.resized(toWidth: cell.imageView?.frame.width ?? 0)
+            cell.thumbnail.image = image
             cell.thumbnail.layer.cornerRadius = 7
             cell.title.text = activeAds[indexPath.row]?.title
             cell.price.text = "£\(activeAds[indexPath.row]?.price ?? 0)"
