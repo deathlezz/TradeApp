@@ -79,7 +79,7 @@ class EndedAdsView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "endedAdCell", for: indexPath) as? AdCell {
-            let image = endedAds[indexPath.row].thumbnail?.resized(toWidth: (cell.imageView?.frame.width)!)
+            let image = endedAds[indexPath.row].thumbnail?.resized(to: (cell.imageView?.frame.size)!)
             cell.thumbnail.image = image
             cell.thumbnail.layer.cornerRadius = 7
             cell.title.text = endedAds[indexPath.row].title
@@ -107,6 +107,7 @@ class EndedAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = endedAds[indexPath.row]
+            vc.images = [(endedAds[indexPath.row].thumbnail)!]
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []
             navigationController?.pushViewController(vc, animated: true)

@@ -106,7 +106,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
             fatalError("Unable to dequeue itemCell")
         }
-        let image = AppStorage.shared.filteredItems[indexPath.item].thumbnail?.resized(toWidth: cell.image.frame.width)
+        let image = AppStorage.shared.filteredItems[indexPath.item].thumbnail?.resized(to: cell.image.frame.size)
         cell.image.image = image
         cell.title.text = AppStorage.shared.filteredItems[indexPath.item].title
         cell.price.text = "£\(AppStorage.shared.filteredItems[indexPath.item].price)"

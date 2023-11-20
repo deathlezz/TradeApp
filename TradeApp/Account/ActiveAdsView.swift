@@ -16,7 +16,7 @@ class ActiveAdsView: UITableViewController {
     
     var header: UILabel!
     
-    var activeAds = [Item?]()
+    var activeAds = [Item]()
     
     var reference: DatabaseReference!
     
@@ -78,23 +78,23 @@ class ActiveAdsView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "activeAdCell", for: indexPath) as? AdCell {
-            let image = activeAds[indexPath.row]?.thumbnail?.resized(toWidth: cell.imageView?.frame.width ?? 0)
+            let image = activeAds[indexPath.row].thumbnail?.resized(to: (cell.imageView?.frame.size)!)
             cell.thumbnail.image = image
             cell.thumbnail.layer.cornerRadius = 7
-            cell.title.text = activeAds[indexPath.row]?.title
-            cell.price.text = "£\(activeAds[indexPath.row]?.price ?? 0)"
-            cell.availability.text = setExpiryDate(activeAds[indexPath.row]?.date ?? Date())
-            cell.views.setTitle(activeAds[indexPath.row]?.views?.description, for: .normal)
+            cell.title.text = activeAds[indexPath.row].title
+            cell.price.text = "£\(activeAds[indexPath.row].price)"
+            cell.availability.text = setExpiryDate(activeAds[indexPath.row].date)
+            cell.views.setTitle(activeAds[indexPath.row].views?.description, for: .normal)
             cell.views.isUserInteractionEnabled = false
-            cell.saved.setTitle(activeAds[indexPath.row]?.saved?.description, for: .normal)
+            cell.saved.setTitle(activeAds[indexPath.row].saved?.description, for: .normal)
             cell.saved.isUserInteractionEnabled = false
             cell.stateButton.layer.borderWidth = 1.5
             cell.stateButton.layer.borderColor = UIColor.systemRed.cgColor
             cell.stateButton.layer.cornerRadius = 7
-            cell.stateButton.tag = activeAds[indexPath.row]!.id
+            cell.stateButton.tag = activeAds[indexPath.row].id
             cell.stateButton.addTarget(self, action: #selector(stateTapped), for: .touchUpInside)
             cell.editButton.addTarget(self, action: #selector(editTapped), for: .touchUpInside)
-            cell.editButton.tag = activeAds[indexPath.row]!.id
+            cell.editButton.tag = activeAds[indexPath.row].id
             cell.separatorInset = .zero
             return cell
         }
@@ -105,6 +105,7 @@ class ActiveAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = activeAds[indexPath.row]
+            vc.images = [(activeAds[indexPath.row].thumbnail)!]
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []
             navigationController?.pushViewController(vc, animated: true)
@@ -114,7 +115,7 @@ class ActiveAdsView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            guard let item = activeAds[indexPath.row] else { return }
+            let item = activeAds[indexPath.row]
             
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
@@ -145,7 +146,7 @@ class ActiveAdsView: UITableViewController {
     // set action for tapped edit button
     @objc func editTapped(_ sender: UIButton) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
-            guard let item = activeAds.first(where: {$0?.id == sender.tag}) else { return }
+            guard let item = activeAds.first(where: {$0.id == sender.tag}) else { return }
             vc.isEditMode = true
             vc.isAdActive = true
             vc.item = item
@@ -191,7 +192,7 @@ class ActiveAdsView: UITableViewController {
     
     // finish the ad
     func finishAd(_ sender: UIButton) {
-        guard let itemIndex = activeAds.firstIndex(where: {$0?.id == sender.tag}) else { return }
+        guard let itemIndex = activeAds.firstIndex(where: {$0.id == sender.tag}) else { return }
         
         let date = Date().toString(shortened: false)
         moveItem(itemID: sender.tag, date: date)

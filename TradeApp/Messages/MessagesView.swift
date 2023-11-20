@@ -50,7 +50,7 @@ class MessagesView: UITableViewController {
         cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
-        cell.imageView?.image = image.resized(toWidth: (cell.imageView?.frame.width)!)
+        cell.imageView?.image = image.resized(to: (cell.imageView?.frame.size)!)
         return cell
     }
     

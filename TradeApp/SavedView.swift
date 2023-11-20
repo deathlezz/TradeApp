@@ -68,7 +68,8 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             fatalError("Unable to dequeue itemCell")
         }
         
-        cell.image.image = savedItems[indexPath.row].thumbnail
+        let image = savedItems[indexPath.row].thumbnail?.resized(to: cell.image.frame.size)
+        cell.image.image = image
         cell.title.text = savedItems[indexPath.item].title
         cell.price.text = "£\(savedItems[indexPath.item].price)"
         cell.location.text = savedItems[indexPath.item].location
@@ -88,6 +89,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                 let item = savedItems[indexPath.item]
                 vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
 //                vc.item = item
+                vc.images = [item.thumbnail!]
                 vc.hidesBottomBarWhenPushed = true
                 isDetailShown = true
                 navigationController?.pushViewController(vc, animated: true)

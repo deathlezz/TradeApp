@@ -39,7 +39,7 @@ class ItemView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     // set collection view cell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemViewCell", for: indexPath) as? ItemViewCell {
-            let image = imgs[indexPath.item].resized(toWidth: cell.imageView.frame.width)
+            let image = imgs[indexPath.item].resized(to: cell.imageView.frame.size)
             cell.imageView.image = image
             return cell
         }

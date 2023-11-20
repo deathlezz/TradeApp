@@ -44,7 +44,7 @@ class DetailViewCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     // set collection view cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "detailViewCell", for: indexPath) as? PhotosCell {
-            let image = imgs[indexPath.item].resized(toWidth: cell.imageView.frame.width)
+            let image = imgs[indexPath.item].resized(to: cell.imageView.frame.size)
             cell.imageView.image = image
             return cell
         }

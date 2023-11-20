@@ -46,7 +46,14 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     // set collection view cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? PhotosCell {
-            let image = images[indexPath.item].resized(toWidth: cell.imageView.frame.width)
+            var image = UIImage()
+            
+            if images[indexPath.item] == UIImage(systemName: "plus") {
+                image = images[indexPath.item]
+            } else {
+                image = images[indexPath.item].resized(to: cell.imageView.frame.size)
+            }
+
             cell.layer.cornerRadius = 10
             cell.imageView.image = image
             return cell
