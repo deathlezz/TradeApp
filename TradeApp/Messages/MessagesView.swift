@@ -14,8 +14,6 @@ class MessagesView: UITableViewController {
     
     var emptyArrayView: UIView!
     
-//    var loggedUser: String!
-    
     var chats = [String: [Message]]()
     var chatsData = [String: [String: Any]]()
     
@@ -26,10 +24,6 @@ class MessagesView: UITableViewController {
 
         title = "Messages"
         navigationController?.navigationBar.prefersLargeTitles = true
-        
-//        NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: NSNotification.Name("signOut"), object: nil)
-        
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "messageCell")
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
                 
@@ -43,14 +37,19 @@ class MessagesView: UITableViewController {
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
+        var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "messageCell", for: indexPath)
+        
+        if cell == nil {
+            cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
+        }
+
         let chatKey = Array(chats.keys)[indexPath.row]
         let image = chatsData["\(chatKey)"]?["thumbnail"] as! UIImage
+        cell.imageView?.image = image.resized(to: (cell.imageView?.frame.size)!)
         cell.textLabel?.text = chatsData["\(chatKey)"]?["title"] as? String
         cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
         cell.detailTextLabel?.textColor = .darkGray
         cell.accessoryType = .disclosureIndicator
-        cell.imageView?.image = image.resized(to: (cell.imageView?.frame.size)!)
         return cell
     }
     
@@ -62,7 +61,6 @@ class MessagesView: UITableViewController {
             ChatView.buyer = ""
             ChatView.seller = ""
             vc.isPushedByChats = true
-//            vc.loggedUser = Auth.auth().currentUser.u
             vc.itemID = Int(chatId)
             vc.messages = chats[chatId] ?? [Message]()
             vc.hidesBottomBarWhenPushed = true
@@ -133,11 +131,6 @@ class MessagesView: UITableViewController {
             emptyArrayView.isHidden = false
         }
     }
-    
-    // sign out current user
-//    @objc func signOut() {
-//        navigationController?.popViewController(animated: true)
-//    }
     
     // convert message kind text into string
     func getMessageText(_ messageKind: MessageKind) -> String {
@@ -211,10 +204,9 @@ class MessagesView: UITableViewController {
                     self?.reference.child(userCase).child(itemsCase).child(id).observeSingleEvent(of: .value) { snapshot in
                         
                         if let value = snapshot.value as? [String: Any] {
-                            let photos = value["photos"] as? [String: String]
+                            let photos = value["photosURL"] as? [String]
                             let title = value["title"] as? String
-                            let url = photos?["image0"]
-                            
+                            let url = photos?[0]
                             // convert URL to UIImage here
                             self?.getThumbnail(url: url!) { thumbnail in
                                 result[id] = ["title": title!, "thumbnail": thumbnail]

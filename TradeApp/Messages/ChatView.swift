@@ -14,10 +14,8 @@ import FirebaseAuth
 class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate, InputBarAccessoryViewDelegate {
     
     var chatTitle: String!
-//    var loggedUser: String!
     var itemID: Int!
     
-//    static let shared = ChatView()
     static var buyer: String!
     static var seller: String!
     
@@ -86,9 +84,6 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // set "send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-//        let fixedBuyer = ChatView.shared.buyer.replacingOccurrences(of: ".", with: "_")
-//        let fixedSeller = ChatView.shared.seller.replacingOccurrences(of: ".", with: "_")
-        
         sendMessage(seller: ChatView.seller, buyer: ChatView.buyer, itemID: itemID, text: text) { [weak self] in
             guard let messagesCount = self?.messages.count else { return }
             
@@ -181,6 +176,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         if !isMovingFromParent {
             let notificationCenter = NotificationCenter.default
             notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        } else {
+            messages.removeAll()
         }
     }
     
@@ -189,9 +186,6 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         guard !isPushedByChats else { return }
         
         var currentChat = [Message]()
-        
-//        let fixedSeller = ChatView.shared.seller.replacingOccurrences(of: ".", with: "_")
-//        let fixedBuyer = ChatView.shared.buyer.replacingOccurrences(of: ".", with: "_")
         
         DispatchQueue.global().async { [weak self] in
             guard let itemID = self?.itemID else { return }

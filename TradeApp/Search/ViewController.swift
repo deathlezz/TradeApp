@@ -194,6 +194,15 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         collectionView.reloadData()
     }
     
+    // stop refreshing when leaving view
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if refreshControl.isRefreshing {
+            refreshControl.endRefreshing()
+        }
+    }
+    
     // show item when all items are downloaded
     func showItem(id: Int) {
         guard let item = AppStorage.shared.items.first(where: {$0.id == id}) else {
@@ -607,31 +616,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         let minX = view.readableContentGuide.layoutFrame.minX
         return UIEdgeInsets(top: 10, left: minX, bottom: 10, right: minX)
-    }
-    
-    func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
-        guard urls.count > 1 else { return }
-        
-        var imagesDict = [String: UIImage]()
-        
-        // get all images except the thumbnail
-        let links = urls.map {URL(string: $0)}.dropFirst()
-        
-        for (index, url) in links.enumerated() {
-            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
-                if let data = data {
-                    let image = UIImage(data: data) ?? UIImage()
-                    imagesDict["image\(index)"] = image
-                }
-
-                guard imagesDict.count == links.count else { return }
-                let sorted = imagesDict.sorted {$0.key < $1.key}
-                let images = Array(sorted.map {$0.value})
-                completion(images)
-            }
-
-            task.resume()
-        }
     }
 
 }

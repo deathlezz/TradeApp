@@ -314,8 +314,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         textViewCell?.textView.text = nil
         tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: 200"
-        images.removeAll(keepingCapacity: false)
-        uploadedPhotos.removeAll(keepingCapacity: false)
+        images.removeAll()
+        uploadedPhotos.removeAll()
         
         for _ in 0...7 {
             images.append(UIImage(systemName: "plus")!)

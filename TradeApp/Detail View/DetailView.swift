@@ -274,8 +274,8 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         if isMovingFromParent {
             NotificationCenter.default.post(name: NSNotification.Name("removeImages"), object: nil)
-            savedItems.removeAll(keepingCapacity: false)
-            images.removeAll(keepingCapacity: false)
+            savedItems.removeAll()
+            images.removeAll()
             phone = nil
             views = nil
             latitude = nil
@@ -399,7 +399,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // set toolbar
     func setToolbar() {
-        let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+        let callFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2.25), height: 50))
         let image = UIImage(systemName: "phone.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
         callFrame.setImage(image, for: .normal)
         callFrame.addTarget(self, action: #selector(callTapped), for: .touchUpInside)
@@ -409,7 +409,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         callFrame.layer.borderWidth = 0.2
         let callButton = UIBarButtonItem(customView: callFrame)
         
-        let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2) - 20, height: 50))
+        let messageFrame = UIButton(frame: CGRect(x: 0, y: 0, width: (UIScreen.main.bounds.width / 2.25), height: 50))
         var message = UIImage()
         
         if messageSent {

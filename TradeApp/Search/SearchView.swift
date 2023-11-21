@@ -30,14 +30,15 @@ class SearchView: UITableViewController {
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
+//        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
         
         DispatchQueue.global().async { [weak self] in
             self?.currentFilters = Utilities.loadFilters()
             self?.loadHistory()
             
             DispatchQueue.main.async {
-                self?.tableView.reloadData()
+                self?.textField.text = self?.currentFilters["Search"]
+                self?.isArrayEmpty()
             }
         }
     }
@@ -72,9 +73,17 @@ class SearchView: UITableViewController {
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "historyCell", for: indexPath)
+        var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "historyCell", for: indexPath)
+        
+        if cell == nil {
+            cell = UITableViewCell(style: .subtitle, reuseIdentifier: "historyCell")
+        }
+        
+        let conf = UIImage.SymbolConfiguration(scale: .large)
+        
         cell.textLabel?.text = recentlySearched[indexPath.row]
-        cell.imageView?.image = UIImage(systemName: "clock")
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
+        cell.imageView?.image = UIImage(systemName: "clock", withConfiguration: conf)
         cell.imageView?.tintColor = .systemBlue
         return cell
     }
@@ -151,17 +160,12 @@ class SearchView: UITableViewController {
         textField.becomeFirstResponder()
     }
     
-    // set textfield.text before view appeared
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        textField.text = currentFilters["Search"]
-        isArrayEmpty()
-    }
-    
     // finish editing texfield before view disappeared
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        textField.resignFirstResponder()
+        if textField.isFirstResponder {
+            textField.resignFirstResponder()
+        }
     }
 
     // add unique word to recently searched array

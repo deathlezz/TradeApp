@@ -16,4 +16,9 @@ class AdCell: UITableViewCell {
     @IBOutlet var saved: UIButton!
     @IBOutlet var stateButton: UIButton!
     @IBOutlet var editButton: UIButton!
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        thumbnail.image = thumbnail.image?.resized(to: thumbnail.frame.size)
+    }
 }

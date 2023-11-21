@@ -19,7 +19,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     
     var emptyArrayView: UIView!
     var reference: DatabaseReference!
-//    var refreshControl: UIRefreshControl!
     
     var selectButton: UIBarButtonItem!
     var cancelButton: UIBarButtonItem!
@@ -42,12 +41,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         deleteButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteTapped))
         
         navigationItem.rightBarButtonItems = [selectButton]
-        
-        // pull to refresh
-//        refreshControl = UIRefreshControl()
-//        refreshControl.tintColor = .lightGray
-////        refreshControl.addTarget(self, action: #selector(refresh), for: .primaryActionTriggered)
-//        collectionView.refreshControl = refreshControl
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
@@ -88,7 +81,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
                 let item = savedItems[indexPath.item]
                 vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
-//                vc.item = item
                 vc.images = [item.thumbnail!]
                 vc.hidesBottomBarWhenPushed = true
                 isDetailShown = true
@@ -166,24 +158,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             setTabBarHidden(false, animated: true)
         }
     }
-    
-    // set action for "pull to refresh"
-//    @objc func refresh(refreshControl: UIRefreshControl) {
-//        refreshControl.beginRefreshing()
-//        
-//        DispatchQueue.global().async { [weak self] in
-//            self?.updateSavedItems() { _ in
-//                refreshControl.endRefreshing()
-//                
-//                DispatchQueue.main.async {
-//                    guard self?.savedItems.count == 0 else { return }
-//                    self?.isArrayEmpty()
-//                    refreshControl.endRefreshing()
-//                }
-//            }
-//            
-//        }
-//    }
     
     // refresh collection view before view appeared
     override func viewWillAppear(_ animated: Bool) {
@@ -436,12 +410,10 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     // download active items from firebase & convert images urls to data array
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
         var items = [String: [String: Any]]()
-//        var removedItems = [Item]()
         var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
             guard let saved = self?.savedItems else { return }
-//            let saved = Utilities.loadItems()
             
             for item in saved {
                 self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
@@ -465,18 +437,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                     } else {
                         completion(items)
                     }
-//                    else {
-//                        removedItems.append(item)
-//                        
-//                        guard removedItems.count == self?.savedItems.count else { return }
-//                        
-//                        DispatchQueue.main.async {
-//                            Utilities.removeItems(removedItems)
-//                            self?.savedItems.removeAll()
-//                            self?.isArrayEmpty()
-//                            self?.collectionView.reloadData()
-//                        }
-//                    }
                 }
             }
         }
@@ -513,15 +473,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     // update empty array view y position
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let safeAreaTop = view.safeAreaInsets.top
-//        let refreshHeight = refreshControl.bounds.height
         let offset = -scrollView.contentOffset.y - safeAreaTop
-        
-//        if refreshControl.isRefreshing {
-//            offset = -scrollView.contentOffset.y - safeAreaTop + refreshHeight
-//        } else {
-//            offset = -scrollView.contentOffset.y - safeAreaTop
-//        }
-
         let screenSize = UIScreen.main.bounds.size
         emptyArrayView.frame = CGRect(x: 0, y: offset, width: screenSize.width, height: screenSize.height)
     }

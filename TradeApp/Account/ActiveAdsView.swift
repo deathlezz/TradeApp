@@ -78,8 +78,7 @@ class ActiveAdsView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "activeAdCell", for: indexPath) as? AdCell {
-            let image = activeAds[indexPath.row].thumbnail?.resized(to: (cell.imageView?.frame.size)!)
-            cell.thumbnail.image = image
+            cell.thumbnail.image = activeAds[indexPath.row].thumbnail
             cell.thumbnail.layer.cornerRadius = 7
             cell.title.text = activeAds[indexPath.row].title
             cell.price.text = "£\(activeAds[indexPath.row].price)"
@@ -167,6 +166,12 @@ class ActiveAdsView: UITableViewController {
         isArrayEmpty()
         navigationController?.isToolbarHidden = true
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
+    }
+    
+    // remove stored data
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        activeAds.removeAll()
     }
     
     // set item expiry date
@@ -287,36 +292,6 @@ class ActiveAdsView: UITableViewController {
                 }
             }
         }
-        
-        
-        
-        
-//        DispatchQueue.global().async { [weak self] in
-//            self?.reference.child(user).child("activeItems").child("\(itemID)").child("photosURL").observeSingleEvent(of: .value) { snapshot in
-//                if let value = snapshot.value as? [String] {
-//                    
-//                    for i in 0..<value.count {
-//                        let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(i)")
-//                        storageRef.delete() { _ in }
-//                    }
-//                    
-//                    self?.reference.child(user).child("activeItems").child("\(item.id)").removeValue()
-//                    
-//                    self?.reference.child(user).child("chats").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
-//
-//                        if let buyers = snapshot.value as? [String: [[String: String]]] {
-//                            let keys = buyers.keys
-//
-//                            for key in keys {
-//                                self?.reference.child(key).child("chats").child("\(item.id)").removeValue()
-//                            }
-//
-//                            self?.reference.child(user).child("chats").child("\(item.id)").removeValue()
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
     
     // convert URL to a thumbnail
