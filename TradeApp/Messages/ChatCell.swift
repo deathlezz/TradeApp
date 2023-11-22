@@ -8,16 +8,13 @@
 import UIKit
 
 class ChatCell: UITableViewCell {
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+    @IBOutlet var thumbnail: UIImageView!
+    @IBOutlet var title: UILabel!
+    @IBOutlet var subtitle: UILabel!
+    
+    // resize thumbnail
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        thumbnail.image = thumbnail.image?.resized(to: thumbnail.frame.size)
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
 }

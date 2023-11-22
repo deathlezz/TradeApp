@@ -37,20 +37,20 @@ class MessagesView: UITableViewController {
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "messageCell", for: indexPath)
-        
-        if cell == nil {
-            cell = UITableViewCell(style: .subtitle, reuseIdentifier: "messageCell")
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "chatCell", for: indexPath) as? ChatCell {
+            let chatKey = Array(chats.keys)[indexPath.row]
+            let image = chatsData["\(chatKey)"]?["thumbnail"] as! UIImage
+            cell.thumbnail.image = image
+            cell.title.text = chatsData["\(chatKey)"]?["title"] as? String
+            cell.title.font = UIFont.systemFont(ofSize: 18)
+            cell.subtitle.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
+            cell.subtitle.textColor = .darkGray
+            cell.subtitle.font = UIFont.systemFont(ofSize: 12)
+            cell.accessoryType = .disclosureIndicator
+            return cell
         }
-
-        let chatKey = Array(chats.keys)[indexPath.row]
-        let image = chatsData["\(chatKey)"]?["thumbnail"] as! UIImage
-        cell.imageView?.image = image.resized(to: (cell.imageView?.frame.size)!)
-        cell.textLabel?.text = chatsData["\(chatKey)"]?["title"] as? String
-        cell.detailTextLabel?.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
-        cell.detailTextLabel?.textColor = .darkGray
-        cell.accessoryType = .disclosureIndicator
-        return cell
+        
+        return UITableViewCell()
     }
     
     // set action for tapped cell
@@ -135,8 +135,12 @@ class MessagesView: UITableViewController {
     // convert message kind text into string
     func getMessageText(_ messageKind: MessageKind) -> String {
         if case .text(let value) = messageKind {
-            if value.count > 32 {
-                return value.prefix(32) + "..."
+            
+            let width = UIScreen.main.bounds.width
+            let maxLetters = Int(width / 14)
+            
+            if value.count > maxLetters {
+                return value.prefix(maxLetters) + "..."
             } else {
                 return value
             }
@@ -177,8 +181,8 @@ class MessagesView: UITableViewController {
                                             result[id]?.append(msg)
                                         }
                                     }
-                                    
-                                    guard result.count == conversations.count else { return }
+
+                                    guard result.count == conversations.values.count else { return }
                                     completion(result)
                                 }
                             }
