@@ -538,7 +538,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         guard let user = Auth.auth().currentUser?.uid else { return }
         
-        let newSender = Sender(senderId: user, displayName: user.components(separatedBy: "@")[0])
+        let newSender = Sender(senderId: user, displayName: "")
         
         let newMessage = Message(sender: newSender, messageId: "0", sentDate: Date(), kind: .text((messageTextField.text)!))
         
@@ -578,7 +578,7 @@ class DetailView: UITableViewController, Index, Coordinates {
             guard let itemID = self?.item.id else { return }
             
             self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observeSingleEvent(of: .value) { snapshot in
-                if let _ = snapshot.value as? [[String: String]] {
+                if snapshot.hasChildren() {
                     self?.messageSent = true
                 } else {
                     self?.messageSent = false

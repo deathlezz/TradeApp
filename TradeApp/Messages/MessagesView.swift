@@ -14,7 +14,7 @@ class MessagesView: UITableViewController {
     
     var emptyArrayView: UIView!
     
-    var chats = [String: [Message]]()
+    var chats = [String: [String: [Message]]]()
     var chatsData = [String: [String: Any]]()
     
     var reference: DatabaseReference!
@@ -32,16 +32,16 @@ class MessagesView: UITableViewController {
     
     // set number of items in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return chats.count
+        return chats.values.count
     }
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "chatCell", for: indexPath) as? ChatCell {
-            let chatKey = Array(chats.keys)[indexPath.row]
-            let image = chatsData["\(chatKey)"]?["thumbnail"] as! UIImage
+            let chatID = Array(chats.keys)[indexPath.row]
+            let image = chatsData[chatID]?["thumbnail"] as! UIImage
             cell.thumbnail.image = image
-            cell.title.text = chatsData["\(chatKey)"]?["title"] as? String
+            cell.title.text = chatsData[chatID]?["title"] as? String
             cell.title.font = UIFont.systemFont(ofSize: 18)
             cell.subtitle.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
             cell.subtitle.textColor = .darkGray
@@ -57,12 +57,13 @@ class MessagesView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
             let chatId = Array(chats.keys)[indexPath.row]
+            let chatUser = Array(chats[chatId]?.values)[indexPath.row]
             vc.chatTitle = chatsData["\(chatId)"]?["title"] as? String
             ChatView.buyer = ""
             ChatView.seller = ""
             vc.isPushedByChats = true
             vc.itemID = Int(chatId)
-            vc.messages = chats[chatId] ?? [Message]()
+            vc.messages = chats[chatId]?[""] ?? [Message]()
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
@@ -149,57 +150,86 @@ class MessagesView: UITableViewController {
     }
     
     // load user chats
-    func loadChats(completion: @escaping ([String: [Message]]) -> Void) {
+    func loadChats(completion: @escaping ([String: [String: [Message]]]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
-        var result = [String: [Message]]()
+//        var result = [String: [Message]]()
+        
+        var result = [String: [String: [Message]]]()
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
-                if let conversations = snapshot.value as? [String: [String: [[String: String]]]] {
-                    for (id, buyer) in conversations {
-                        
-                        let children = buyer.keys
-                        
-                        for child in children {
+            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot, arg in
+                if let chats = snapshot.value as? [String: [String: [[String: String]]]] {
+                    
+                    for (id, traders) in chats {
+                        print("item id: \(id)")
+                        for trader in traders {
+                            print("buyerID: \(trader.key)")
+                            print("buyerMSG: \(trader.value)")
                             
-                            self?.getChatData(child: child, id: id) { data in
-                                self?.chatsData = data
+                            self?.getChatData(trader: trader.key, id: id) { data in
+                                self?.chatsData[id] = data
                                 
-                                for chat in buyer {
-                                    for message in chat.value {
-                                        let sender = Sender(senderId: message["sender"]!, displayName: "")
-                                        let messageId = message["messageId"]!
-                                        let sentDate = message["sentDate"]!.toDate()
-                                        let kind = message["kind"]!
-                                        
-                                        let msg = Message(sender: sender, messageId: messageId, sentDate: sentDate, kind: .text(kind))
-                                        
-                                        if result.isEmpty {
-                                            result[id] = [msg]
-                                        } else {
-                                            result[id]?.append(msg)
-                                        }
-                                    }
-
-                                    guard result.count == conversations.values.count else { return }
+                                self?.toMessageModel(chat: trader.value) { messages in
+                                    result[id]?[trader.key] = messages
+                                    
+                                    guard result.values.count == traders.count else { return }
                                     completion(result)
                                 }
                             }
                         }
                     }
+                    
+                    
+                    
+//                    for (id, buyer) in chats {
+//                        print("first loop")
+//                        let children = buyer.keys
+//                        
+//                        for child in children {
+//                            print(child)
+//                            self?.getChatData(trader: child, id: id) { data in
+//                                self?.chatsData = data
+//                                
+//                                for chat in buyer {
+//                                    print("third loop")
+//                                    for message in chat.value {
+//                                        print("fourth loop")
+//                                        let sender = Sender(senderId: message["sender"]!, displayName: "")
+//                                        let messageId = message["messageId"]!
+//                                        let sentDate = message["sentDate"]!.toDate()
+//                                        let kind = message["kind"]!
+//                                        
+//                                        let msg = Message(sender: sender, messageId: messageId, sentDate: sentDate, kind: .text(kind))
+//                                        
+//                                        if result[id] == nil {
+//                                            result[id] = [msg]
+//                                        } else {
+//                                            result[id]?.append(msg)
+//                                        }
+//                                        
+//                                        print(result)
+//                                        guard result.keys.count == 2 else { return }
+//                                        
+//                                        completion(result)
+//                                        
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
                 }
             }
         }
     }
     
     // get chat title and thumbnail
-    func getChatData(child: String, id: String, completion: @escaping ([String: [String: Any]]) -> Void) {
+    func getChatData(trader: String, id: String, completion: @escaping ([String: [String: Any]]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
         var result = [String: [String: Any]]()
         
-        let userCases = [child, user]
+        let userCases = [trader, user]
         let itemsCases = ["activeItems", "endedItems"]
         
         DispatchQueue.global().async { [weak self] in
@@ -211,6 +241,7 @@ class MessagesView: UITableViewController {
                             let photos = value["photosURL"] as? [String]
                             let title = value["title"] as? String
                             let url = photos?[0]
+
                             // convert URL to UIImage here
                             self?.getThumbnail(url: url!) { thumbnail in
                                 result[id] = ["title": title!, "thumbnail": thumbnail]
@@ -240,6 +271,24 @@ class MessagesView: UITableViewController {
 
             task.resume()
         }
+    }
+    
+    // convert array of dictionaries chat to array of messages
+    func toMessageModel(chat: [[String: String]], completion: @escaping ([Message]) -> Void) {
+        var result = [Message]()
+        
+        for message in chat {
+            let sender = Sender(senderId: message["sender"]!, displayName: "")
+            let messageId = message["messageId"]!
+            let sentDate = message["sentDate"]!.toDate()
+            let kind = message["kind"]!
+            
+            let msg = Message(sender: sender, messageId: messageId, sentDate: sentDate, kind: .text(kind))
+            result.append(msg)
+        }
+        
+        guard result.count == chat.count else { return }
+        completion(result)
     }
 
 }
