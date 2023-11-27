@@ -6,3 +6,11 @@
 //
 
 import Foundation
+import UIKit
+
+struct Chat {
+    var messages: [Message]
+    var itemID: Int
+    var seller: String
+    var buyer: String
+}

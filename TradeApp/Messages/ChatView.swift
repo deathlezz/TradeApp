@@ -145,17 +145,20 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         let sender = Sender(senderId: user, displayName: "")
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(seller).child("chats").child("\(itemID)").child(buyer).observeSingleEvent(of: .value) { snapshot in
-                let messagesCount = snapshot.childrenCount
+            self?.reference.child(seller).child("chats").child("\(itemID)").child(buyer).queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
                 
-                let message = Message(sender: sender, messageId: "\(messagesCount)", sentDate: Date(), kind: .text(text))
-                self?.messages.append(message)
-                
-                let msg = message.toAnyObject()
-                self?.reference.child(seller).child("chats").child("\(itemID)").child(buyer).child(message.messageId).setValue(msg)
-                self?.reference.child(buyer).child("chats").child("\(itemID)").child(seller).child(message.messageId).setValue(msg)
-                
-                completion()
+                if let lastMessage = snapshot.value as? [String: String] {
+                    let lastMessageId = Int(lastMessage["messageId"]!)!
+                    
+                    let message = Message(sender: sender, messageId: "\(lastMessageId + 1)", sentDate: Date(), kind: .text(text))
+                    self?.messages.append(message)
+                    
+                    let msg = message.toAnyObject()
+                    self?.reference.child(seller).child("chats").child("\(itemID)").child(buyer).child(message.messageId).setValue(msg)
+                    self?.reference.child(buyer).child("chats").child("\(itemID)").child(seller).child(message.messageId).setValue(msg)
+                    
+                    completion()
+                }
             }
         }
     }

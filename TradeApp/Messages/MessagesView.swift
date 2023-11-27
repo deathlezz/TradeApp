@@ -14,7 +14,8 @@ class MessagesView: UITableViewController {
     
     var emptyArrayView: UIView!
     
-    var chats = [String: [String: [Message]]]()
+    var chats = [String: [String: [Chat]]]()
+//    var chats = [String: [String: [Message]]]()
     var chatsData = [String: [String: Any]]()
     
     var reference: DatabaseReference!
@@ -39,11 +40,13 @@ class MessagesView: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "chatCell", for: indexPath) as? ChatCell {
             let chatID = Array(chats.keys)[indexPath.row]
+            let chatsValues = chats.values
+            
             let image = chatsData[chatID]?["thumbnail"] as! UIImage
             cell.thumbnail.image = image
             cell.title.text = chatsData[chatID]?["title"] as? String
             cell.title.font = UIFont.systemFont(ofSize: 18)
-            cell.subtitle.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
+//            cell.subtitle.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
             cell.subtitle.textColor = .darkGray
             cell.subtitle.font = UIFont.systemFont(ofSize: 12)
             cell.accessoryType = .disclosureIndicator
@@ -56,14 +59,17 @@ class MessagesView: UITableViewController {
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
-            let chatId = Array(chats.keys)[indexPath.row]
-            let chatUser = Array(chats[chatId]?.values)[indexPath.row]
-            vc.chatTitle = chatsData["\(chatId)"]?["title"] as? String
+            
+            let chatsTemp = chats.values
+            let chatID = Array(chats.keys)[indexPath.row]
+            let traderID = Array(chatsTemp)[indexPath.row]
+//            let chatUser = Array(chats[chatId]?.values)[indexPath.row]
+            vc.chatTitle = chatsData["\(chatID)"]?["title"] as? String
             ChatView.buyer = ""
             ChatView.seller = ""
             vc.isPushedByChats = true
-            vc.itemID = Int(chatId)
-            vc.messages = chats[chatId]?[""] ?? [Message]()
+            vc.itemID = Int(chatID)
+//            vc.messages = chats[chatID]?[traderID] ?? [Message]()
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
@@ -98,6 +104,7 @@ class MessagesView: UITableViewController {
         DispatchQueue.global().async { [weak self] in
             self?.loadChats() { conv in
                 self?.chats = conv
+                print(self?.chats.values)
                 
                 DispatchQueue.main.async {
                     self?.isArrayEmpty()
@@ -158,22 +165,19 @@ class MessagesView: UITableViewController {
         var result = [String: [String: [Message]]]()
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot, arg in
+            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
                 if let chats = snapshot.value as? [String: [String: [[String: String]]]] {
                     
                     for (id, traders) in chats {
-                        print("item id: \(id)")
                         for trader in traders {
-                            print("buyerID: \(trader.key)")
-                            print("buyerMSG: \(trader.value)")
-                            
                             self?.getChatData(trader: trader.key, id: id) { data in
                                 self?.chatsData[id] = data
                                 
                                 self?.toMessageModel(chat: trader.value) { messages in
-                                    result[id]?[trader.key] = messages
+                                    let dict = [trader.key: messages]
+                                    result[id] = dict
                                     
-                                    guard result.values.count == traders.count else { return }
+                                    guard result.values.count == chats.values.count else { return }
                                     completion(result)
                                 }
                             }
