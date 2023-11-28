@@ -24,9 +24,6 @@ class ChangeNumberView: UITableViewController {
     var currentNumber: UITableViewCell!
     var newNumber: TextFieldCell!
     
-//    var mail: String!
-//    var currentNumber: Int!
-    
     var reference: DatabaseReference!
 
     override func viewDidLoad() {
@@ -190,27 +187,6 @@ class ChangeNumberView: UITableViewController {
         let phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneRegex)
         return phoneTest.evaluate(with: newNumber.textField.text)
     }
-    
-    // load user's current phone number
-//    func loadCurrentNumber() {
-//        guard let phoneNumber = Auth.auth().currentUser?.phoneNumber else { return }
-////        guard let user = Auth.auth().currentUser?.uid else { return }
-//
-////        currentNumber = Int(phoneNumber)
-//        updateRows()
-//
-////        DispatchQueue.global().async { [weak self] in
-////            self?.reference.child(user).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
-////                if let number = snapshot.value as? String {
-////                    self?.currentNumber = Int(number)
-////
-////                    DispatchQueue.main.async {
-////                        self?.updateRows()
-////                    }
-////                }
-////            }
-////        }
-//    }
     
     // update table view rows
     func updateRows() {

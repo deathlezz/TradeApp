@@ -6,7 +6,6 @@
 //
 
 import UIKit
-//import Firebase
 import FirebaseAuth
 
 class ChangeEmailView: UITableViewController {
@@ -15,10 +14,6 @@ class ChangeEmailView: UITableViewController {
     
     var currentEmail: TextFieldCell!
     var newEmail: TextFieldCell!
-    
-//    var loggedUser: String!
-    
-//    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,8 +23,6 @@ class ChangeEmailView: UITableViewController {
 
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
-        
-//        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // set number of sections

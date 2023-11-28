@@ -214,7 +214,7 @@ class EndedAdsView: UITableViewController {
         guard let itemIndex = endedAds.firstIndex(where: {$0.id == sender.tag}) else { return }
         
         let date = Date().toString(shortened: false)
-        moveItem(itemID: sender.tag, date: date)
+        moveItem(itemId: sender.tag, date: date)
         endedAds.remove(at: itemIndex)
         
         let indexPath = IndexPath(row: itemIndex, section: 0)
@@ -250,17 +250,17 @@ class EndedAdsView: UITableViewController {
     }
     
     // move item from endedItems to activeItems folder in Firebase
-    func moveItem(itemID: Int, date: String) {
+    func moveItem(itemId: Int, date: String) {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(user).child("endedItems").child("\(itemID)").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("endedItems").child("\(itemId)").observeSingleEvent(of: .value) { snapshot in
                 if let value = snapshot.value as? [String: Any] {
-                    self?.reference.child(user).child("activeItems").child("\(itemID)").setValue(value)
-                    self?.reference.child(user).child("activeItems").child("\(itemID)").child("date").setValue(date)
-                    self?.reference.child(user).child("activeItems").child("\(itemID)").child("views").setValue(0)
-                    self?.reference.child(user).child("activeItems").child("\(itemID)").child("saved").setValue(0)
-                    self?.reference.child(user).child("endedItems").child("\(itemID)").removeValue()
+                    self?.reference.child(user).child("activeItems").child("\(itemId)").setValue(value)
+                    self?.reference.child(user).child("activeItems").child("\(itemId)").child("date").setValue(date)
+                    self?.reference.child(user).child("activeItems").child("\(itemId)").child("views").setValue(0)
+                    self?.reference.child(user).child("activeItems").child("\(itemId)").child("saved").setValue(0)
+                    self?.reference.child(user).child("endedItems").child("\(itemId)").removeValue()
                 }
             }
         }
@@ -271,23 +271,28 @@ class EndedAdsView: UITableViewController {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
-            for i in 0..<item.photosURL.count {
-                let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(item.id)").child("image\(i)")
-                storageRef.delete() { _ in }
-            }
+//            for i in 0..<item.photosURL.count {
+//                let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(item.id)").child("image\(i)")
+//                storageRef.delete() { _ in }
+//            }
+//            
+//            self?.reference.child(user).child("endedItems").child("\(item.id)").removeValue()
             
-            self?.reference.child(user).child("endedItems").child("\(item.id)").removeValue()
-            
-            self?.reference.child(user).child("chats").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
+            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(item.id)")
+            storageRef.delete() { _ in
+                self?.reference.child(user).child("endedItems").child("\(item.id)").removeValue()
+                
+                self?.reference.child(user).child("chats").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
 
-                if let buyers = snapshot.value as? [String: [[String: String]]] {
-                    let keys = buyers.keys
+                    if let buyers = snapshot.value as? [String: Any] {
+                        let keys = buyers.keys
 
-                    for key in keys {
-                        self?.reference.child(key).child("chats").child("\(item.id)").removeValue()
+                        for key in keys {
+                            self?.reference.child(key).child("chats").child("\(item.id)").removeValue()
+                        }
+
+                        self?.reference.child(user).child("chats").child("\(item.id)").removeValue()
                     }
-
-                    self?.reference.child(user).child("chats").child("\(item.id)").removeValue()
                 }
             }
         }

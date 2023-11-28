@@ -457,7 +457,6 @@ class DetailView: UITableViewController, Index, Coordinates {
             self?.reference.child(owner).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
                 if let number = snapshot.value as? String {
                     self?.phone = Int(number)
-                    print(number)
                 }
             }
         }

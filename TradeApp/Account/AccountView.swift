@@ -15,8 +15,6 @@ class AccountView: UITableViewController {
     let sections = ["User", "Your ads", "Settings", "Sign out"]
     let settingsSection = ["Change distance unit", "Change phone number", "Change email", "Change password", "Delete account"]
     
-//    var loggedUser: String!
-    
     var active: Int!
     var ended: Int!
     
@@ -153,16 +151,13 @@ class AccountView: UITableViewController {
             }
             
         default:
-//            Utilities.setUser(nil)
             do {
                 try Auth.auth().signOut()
-//                NotificationCenter.default.post(name: NSNotification.Name("signOut"), object: nil)
                 navigationController?.popToRootViewController(animated: true)
             } catch {
                 let ac = UIAlertController(title: "Sign out failed", message: "An internal error occurred", preferredStyle: .alert)
                 ac.addAction(UIAlertAction(title: "OK", style: .default))
                 present(ac, animated: true)
-//                showAlert(title: "Sign out failed", message: "An internal error occurred")
             }
             
         }
@@ -190,8 +185,9 @@ class AccountView: UITableViewController {
                     return
                 }
                 
-                self?.deleteUser(user: user)
-                self?.showAlert(title: "Success", message: "Your account has been deleted")
+                self?.deleteUser(user: user) {
+                    self?.showAlert(title: "Success", message: "Your account has been deleted")
+                }
             }
         })
         
@@ -205,7 +201,6 @@ class AccountView: UITableViewController {
     // push vc to ActiveAdsView
     func pushToActiveAdsView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ActiveAdsView") as? ActiveAdsView {
-//            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -214,7 +209,6 @@ class AccountView: UITableViewController {
     // push vc to EndedAdsView
     func pushToEndedAdsView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "EndedAdsView") as? EndedAdsView {
-//            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -232,7 +226,6 @@ class AccountView: UITableViewController {
     // push vc to ChangeNumberView
     func pushToChangeNumberView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeNumberView") as? ChangeNumberView {
-//            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
@@ -242,7 +235,6 @@ class AccountView: UITableViewController {
     // push vc to ChangeEmailView
     func pushToChangeEmailView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangeEmailView") as? ChangeEmailView {
-//            vc.loggedUser = loggedUser
             vc.hidesBottomBarWhenPushed = true
             willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
@@ -252,7 +244,6 @@ class AccountView: UITableViewController {
     // push vc to ChangePasswordView
     func pushToChangePasswordView() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChangePasswordView") as? ChangePasswordView {
-//            vc.mail = loggedUser
             vc.hidesBottomBarWhenPushed = true
             willLoadAds = false
             navigationController?.pushViewController(vc, animated: true)
@@ -277,33 +268,43 @@ class AccountView: UITableViewController {
     }
     
     // delete user images from Firebase Storage
-    func deleteUser(user: String) {
+    func deleteUser(user: String, completion: @escaping () -> Void) {
+//        DispatchQueue.global().async { [weak self] in
+//            self?.reference.child(user).observeSingleEvent(of: .value) { snapshot in
+//                if let data = snapshot.value as? [String: Any] {
+//
+//                    let active = data["activeItems"] as? [String: [String: Any]] ?? [:]
+//                    let ended = data["endedItems"] as? [String: [String: Any]] ?? [:]
+//                    let items = active.merging(ended) { (_, new) in new }
+//                    
+//                    for item in items {
+//                        guard let photos = item.value["photos"] as? [String: String] else { return }
+//                        let itemID = item.key
+//                        
+//                        for i in 0..<photos.count {
+//                            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child(itemID).child("image\(i)")
+//                            storageRef.delete(completion: nil)
+//                        }
+//                        
+//                        // remove user's items from the app
+//                        AppStorage.shared.items.removeAll(where: {$0.id == Int(itemID)})
+//                        AppStorage.shared.filteredItems.removeAll(where: {$0.id == Int(itemID)})
+//                    }
+//                    
+//                    DispatchQueue.main.async {
+//                        self?.reference.child(user).removeValue()
+//                    }
+//                }
+//            }
+//        }
+        
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(user).observeSingleEvent(of: .value) { snapshot in
-                if let data = snapshot.value as? [String: Any] {
-
-                    let active = data["activeItems"] as? [String: [String: Any]] ?? [:]
-                    let ended = data["endedItems"] as? [String: [String: Any]] ?? [:]
-                    let items = active.merging(ended) { (_, new) in new }
-                    
-                    for item in items {
-                        guard let photos = item.value["photos"] as? [String: String] else { return }
-                        let itemID = item.key
-                        
-                        for i in 0..<photos.count {
-                            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child(itemID).child("image\(i)")
-                            storageRef.delete(completion: nil)
-                        }
-                        
-                        // remove user's items from the app
-                        AppStorage.shared.items.removeAll(where: {$0.id == Int(itemID)})
-                        AppStorage.shared.filteredItems.removeAll(where: {$0.id == Int(itemID)})
-                    }
-                    
-                    DispatchQueue.main.async {
-                        self?.reference.child(user).removeValue()
-//                        Utilities.setUser(nil)
-                    }
+            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user)
+            storageRef.delete { _ in
+                self?.reference.child(user).removeValue()
+                
+                DispatchQueue.main.async {
+                    completion()
                 }
             }
         }
@@ -314,8 +315,7 @@ class AccountView: UITableViewController {
         guard willLoadAds else { return }
         
         guard let user = Auth.auth().currentUser?.uid else { return }
-        
-//        let fixedMail = loggedUser.replacingOccurrences(of: ".", with: "_")
+
         let userItems = ["activeItems", "endedItems"]
         
         DispatchQueue.global().async { [weak self] in

@@ -24,8 +24,6 @@ class LoginView: UITableViewController {
     
     var sections = ["Segment", "Email", "Password", "Button"]
     
-//    var loggedUser: String!
-    
     let monitor = NWPathMonitor()
     var isPushed = false
     
@@ -266,15 +264,14 @@ class LoginView: UITableViewController {
     // load login status before view appeared
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        loginPush(after: .load)
         
-        DispatchQueue.global().async { [weak self] in
-//            self?.loggedUser = Utilities.loadUser()
-            
-            DispatchQueue.main.async {
-//                print(self?.loggedUser ?? "nil")
-                self?.loginPush(after: .load)
-            }
-        }
+//        DispatchQueue.global().async { [weak self] in
+//            
+//            DispatchQueue.main.async {
+//                self?.loginPush(after: .load)
+//            }
+//        }
     }
     
     // set tab bar item title after view appeared
@@ -287,28 +284,24 @@ class LoginView: UITableViewController {
     func loginPush(after: LoginPushType) {
         if after == .load {
             guard Auth.auth().currentUser != nil else { return }
-//            guard loggedUser != nil else { return }
         }
         
         guard monitor.currentPath.status == .satisfied else { return }
         
         if tabBarController?.selectedIndex == 2 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AddItemView") as? AddItemView {
-//                vc.loggedUser = Auth.auth().currentUser?.uid
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }
             
         } else if tabBarController?.selectedIndex == 3 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "MessagesView") as? MessagesView {
-//                vc.loggedUser = Auth.auth().currentUser?.uid
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }
             
         } else if tabBarController?.selectedIndex == 4 {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "AccountView") as? AccountView {
-//                vc.loggedUser = Auth.auth().currentUser?.uid
                 vc.navigationItem.hidesBackButton = true
                 navigationController?.pushViewController(vc, animated: true)
             }

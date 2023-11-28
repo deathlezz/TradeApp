@@ -14,9 +14,9 @@ class MessagesView: UITableViewController {
     
     var emptyArrayView: UIView!
     
-    var chats = [String: [String: [Chat]]]()
+    var chats = [Chat]()
 //    var chats = [String: [String: [Message]]]()
-    var chatsData = [String: [String: Any]]()
+//    var chatsData = [String: [String: Any]]()
     
     var reference: DatabaseReference!
 
@@ -33,20 +33,16 @@ class MessagesView: UITableViewController {
     
     // set number of items in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return chats.values.count
+        return chats.count
     }
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "chatCell", for: indexPath) as? ChatCell {
-            let chatID = Array(chats.keys)[indexPath.row]
-            let chatsValues = chats.values
-            
-            let image = chatsData[chatID]?["thumbnail"] as! UIImage
-            cell.thumbnail.image = image
-            cell.title.text = chatsData[chatID]?["title"] as? String
+            cell.thumbnail.image = chats[indexPath.row].thumbnail
+            cell.title.text = chats[indexPath.row].title
             cell.title.font = UIFont.systemFont(ofSize: 18)
-//            cell.subtitle.text = "\(getMessageText((chats[chatKey]?.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[chatKey]?.last?.sentDate)!))"
+            cell.subtitle.text = "\(getMessageText((chats[indexPath.row].messages.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[indexPath.row].messages.last?.sentDate)!))"
             cell.subtitle.textColor = .darkGray
             cell.subtitle.font = UIFont.systemFont(ofSize: 12)
             cell.accessoryType = .disclosureIndicator
@@ -59,17 +55,11 @@ class MessagesView: UITableViewController {
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
-            
-            let chatsTemp = chats.values
-            let chatID = Array(chats.keys)[indexPath.row]
-            let traderID = Array(chatsTemp)[indexPath.row]
-//            let chatUser = Array(chats[chatId]?.values)[indexPath.row]
-            vc.chatTitle = chatsData["\(chatID)"]?["title"] as? String
-            ChatView.buyer = ""
-            ChatView.seller = ""
+            ChatView.buyer = chats[indexPath.row].buyer
+            ChatView.seller = chats[indexPath.row].itemOwner
+            vc.chatTitle = chats[indexPath.row].title
             vc.isPushedByChats = true
-            vc.itemID = Int(chatID)
-//            vc.messages = chats[chatID]?[traderID] ?? [Message]()
+            vc.itemID = Int(chats[indexPath.row].itemId)
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
@@ -87,11 +77,14 @@ class MessagesView: UITableViewController {
         if editingStyle == .delete {
             let ac = UIAlertController(title: "Delete chat", message: "Are you sure, you want to delete this chat?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-            ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
-                let chatKey = Array(self.chats.keys)[indexPath.row]
-                self.chats.removeValue(forKey: chatKey)
-                tableView.deleteRows(at: [indexPath], with: .automatic)
-                self.isArrayEmpty()
+            ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
+                guard let chat = self?.chats[indexPath.row] else { return }
+                
+                self?.deleteChat(itemId: chat.itemId, buyer: chat.buyer, seller: chat.itemOwner) {
+                    self?.chats.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .automatic)
+                    self?.isArrayEmpty()
+                }
             })
             present(ac, animated: true)
         }
@@ -104,7 +97,6 @@ class MessagesView: UITableViewController {
         DispatchQueue.global().async { [weak self] in
             self?.loadChats() { conv in
                 self?.chats = conv
-                print(self?.chats.values)
                 
                 DispatchQueue.main.async {
                     self?.isArrayEmpty()
@@ -157,81 +149,48 @@ class MessagesView: UITableViewController {
     }
     
     // load user chats
-    func loadChats(completion: @escaping ([String: [String: [Message]]]) -> Void) {
+    func loadChats(completion: @escaping ([Chat]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
-        
-//        var result = [String: [Message]]()
-        
-        var result = [String: [String: [Message]]]()
+            
+        var result = [Chat]()
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
-                if let chats = snapshot.value as? [String: [String: [[String: String]]]] {
+            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot,arg  in
+                if let chats = snapshot.value as? [String: [String: [[String: Any]]]] {
                     
                     for (id, traders) in chats {
                         for trader in traders {
                             self?.getChatData(trader: trader.key, id: id) { data in
-                                self?.chatsData[id] = data
+                                let chatTitle = data["title"] as? String
+                                let chatThumbnail = data["thumbnail"] as? UIImage
                                 
-                                self?.toMessageModel(chat: trader.value) { messages in
-                                    let dict = [trader.key: messages]
-                                    result[id] = dict
+                                for chat in trader.value {
+                                    let chatData = chat["messages"] as! [[String: String]]
+                                    let itemOwner = chat["itemOwner"] as! String
+                                    let buyer = chat["buyer"] as! String
                                     
-                                    guard result.values.count == chats.values.count else { return }
-                                    completion(result)
+                                    self?.toMessageModel(chat: chatData) { messages in
+                                        
+                                        let chat = Chat(messages: messages, itemId: id, itemOwner: itemOwner, buyer: buyer, title: chatTitle, thumbnail: chatThumbnail)
+                                        result.append(chat)
+                                        
+                                        guard result.count == chats.values.count else { return }
+                                        completion(result)
+                                    }
                                 }
                             }
                         }
                     }
-                    
-                    
-                    
-//                    for (id, buyer) in chats {
-//                        print("first loop")
-//                        let children = buyer.keys
-//                        
-//                        for child in children {
-//                            print(child)
-//                            self?.getChatData(trader: child, id: id) { data in
-//                                self?.chatsData = data
-//                                
-//                                for chat in buyer {
-//                                    print("third loop")
-//                                    for message in chat.value {
-//                                        print("fourth loop")
-//                                        let sender = Sender(senderId: message["sender"]!, displayName: "")
-//                                        let messageId = message["messageId"]!
-//                                        let sentDate = message["sentDate"]!.toDate()
-//                                        let kind = message["kind"]!
-//                                        
-//                                        let msg = Message(sender: sender, messageId: messageId, sentDate: sentDate, kind: .text(kind))
-//                                        
-//                                        if result[id] == nil {
-//                                            result[id] = [msg]
-//                                        } else {
-//                                            result[id]?.append(msg)
-//                                        }
-//                                        
-//                                        print(result)
-//                                        guard result.keys.count == 2 else { return }
-//                                        
-//                                        completion(result)
-//                                        
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
                 }
             }
         }
     }
     
     // get chat title and thumbnail
-    func getChatData(trader: String, id: String, completion: @escaping ([String: [String: Any]]) -> Void) {
+    func getChatData(trader: String, id: String, completion: @escaping ([String: Any]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
-        var result = [String: [String: Any]]()
+        var result = [String: Any]()
         
         let userCases = [trader, user]
         let itemsCases = ["activeItems", "endedItems"]
@@ -248,7 +207,7 @@ class MessagesView: UITableViewController {
 
                             // convert URL to UIImage here
                             self?.getThumbnail(url: url!) { thumbnail in
-                                result[id] = ["title": title!, "thumbnail": thumbnail]
+                                result = ["title": title!, "thumbnail": thumbnail]
                                 completion(result)
                             }
                         }
@@ -294,5 +253,29 @@ class MessagesView: UITableViewController {
         guard result.count == chat.count else { return }
         completion(result)
     }
+    
+    // delete chat from Firebase
+    func deleteChat(itemId: String, buyer: String, seller: String, completion: @escaping () -> Void) {
+        guard let user = Auth.auth().currentUser?.uid else { return }
+        
+        var child: String
+        
+        if user == buyer {
+            child = seller
+        } else {
+            child = buyer
+        }
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(user).child("chats").child(child).removeValue() {error, _ in
+                guard error == nil else { return }
+                
+                DispatchQueue.main.async {
+                    completion()
+                }
+            }
+        }
+    }
+    
 
 }

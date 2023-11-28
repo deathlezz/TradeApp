@@ -6,17 +6,13 @@
 //
 
 import UIKit
-//import Firebase
 import FirebaseAuth
 
 class ChangePasswordView: UITableViewController {
     
     let sections = ["Current password", "New password", "Repeat password", "Button"]
     
-    var cells = [TextFieldCell]()    
-//    var mail: String!
-    
-//    var reference: DatabaseReference!
+    var cells = [TextFieldCell]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,8 +22,6 @@ class ChangePasswordView: UITableViewController {
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
-        
-//        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // set number of sections
