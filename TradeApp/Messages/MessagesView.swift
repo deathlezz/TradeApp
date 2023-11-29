@@ -59,7 +59,7 @@ class MessagesView: UITableViewController {
             ChatView.seller = chats[indexPath.row].itemOwner
             vc.chatTitle = chats[indexPath.row].title
             vc.isPushedByChats = true
-            vc.itemID = Int(chats[indexPath.row].itemId)
+            vc.itemId = chats[indexPath.row].itemId
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
@@ -267,7 +267,7 @@ class MessagesView: UITableViewController {
         }
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(user).child("chats").child(child).removeValue() {error, _ in
+            self?.reference.child(user).child("chats").child(itemId).child(child).removeValue() {error, _ in
                 guard error == nil else { return }
                 
                 DispatchQueue.main.async {

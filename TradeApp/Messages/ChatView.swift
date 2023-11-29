@@ -14,7 +14,7 @@ import FirebaseAuth
 class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate, InputBarAccessoryViewDelegate {
     
     var chatTitle: String!
-    var itemID: Int!
+    var itemId: String!
     
     static var buyer: String!
     static var seller: String!
@@ -84,7 +84,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // set "send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        sendMessage(seller: ChatView.seller, buyer: ChatView.buyer, itemID: itemID, text: text) { [weak self] in
+        sendMessage(seller: ChatView.seller, buyer: ChatView.buyer, itemId: itemId, text: text) { [weak self] in
             guard let messagesCount = self?.messages.count else { return }
             
             var indexPath = IndexPath()
@@ -140,12 +140,12 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     }
     
     // save message to Firebase Database
-    func sendMessage(seller: String, buyer: String, itemID: Int, text: String, completion: @escaping () -> Void) {
+    func sendMessage(seller: String, buyer: String, itemId: String, text: String, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
         let sender = Sender(senderId: user, displayName: "")
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(seller).child("chats").child("\(itemID)").child(buyer).queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(seller).child("chats").child(itemId).child(buyer).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
                 
                 if let lastMessage = snapshot.value as? [String: String] {
                     let lastMessageId = Int(lastMessage["messageId"]!)!
@@ -154,8 +154,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                     self?.messages.append(message)
                     
                     let msg = message.toAnyObject()
-                    self?.reference.child(seller).child("chats").child("\(itemID)").child(buyer).child(message.messageId).setValue(msg)
-                    self?.reference.child(buyer).child("chats").child("\(itemID)").child(seller).child(message.messageId).setValue(msg)
+                    self?.reference.child(seller).child("chats").child(itemId).child(buyer).child(message.messageId).setValue(msg)
+                    self?.reference.child(buyer).child("chats").child(itemId).child(seller).child(message.messageId).setValue(msg)
                     
                     completion()
                 }
@@ -191,7 +191,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         var currentChat = [Message]()
         
         DispatchQueue.global().async { [weak self] in
-            guard let itemID = self?.itemID else { return }
+            guard let itemID = self?.itemId else { return }
             
             self?.reference.child(ChatView.seller).child("chats").child("\(itemID)").child(ChatView.buyer).observeSingleEvent(of: .value) { snapshot in
                 if let chats = snapshot.value as? [[String: String]] {

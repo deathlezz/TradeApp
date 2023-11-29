@@ -320,7 +320,7 @@ class DetailView: UITableViewController, Index, Coordinates {
                 vc.isPushedByChats = false
                 ChatView.buyer = Auth.auth().currentUser?.uid
                 ChatView.seller = item.owner
-                vc.itemID = item.id
+                vc.itemId = String(item.id)
                 present(vc, animated: true)
             }
         } else {
@@ -536,13 +536,31 @@ class DetailView: UITableViewController, Index, Coordinates {
         guard !messageTextField.text!.isEmpty else { return }
         
         guard let user = Auth.auth().currentUser?.uid else { return }
+        guard let item = item else { return }
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(item.owner).child("chats").child("\(item.id)").child(user).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
+                
+                var messageId: Int
+                
+                if snapshot.hasChildren() {
+                    let lastMessage = snapshot.value as? [String: String]
+                    messageId = Int((lastMessage?["messageId"])!)! + 1
+                    
+                }
+                
+                
+            }
+        }
         
         let newSender = Sender(senderId: user, displayName: "")
         
         let newMessage = Message(sender: newSender, messageId: "0", sentDate: Date(), kind: .text((messageTextField.text)!))
         
-        let chat = [newMessage]
-        let anyChat = chat.map {$0.toAnyObject()}
+        let chat = Chat(messages: [newMessage], itemId: String(item.id), itemOwner: item.owner, buyer: user)
+        
+//        let chat = [newMessage]
+        let anyChat = chat.toAnyObject()
         
         DispatchQueue.global().async { [weak self] in
             guard let owner = self?.item.owner else { return }
@@ -574,9 +592,9 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         DispatchQueue.global().async { [weak self] in
             guard let owner = self?.item.owner else { return }
-            guard let itemID = self?.item.id else { return }
+            guard let itemId = self?.item.id else { return }
             
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("chats").child("\(itemId)").child(owner).observeSingleEvent(of: .value) { snapshot in
                 if snapshot.hasChildren() {
                     self?.messageSent = true
                 } else {
