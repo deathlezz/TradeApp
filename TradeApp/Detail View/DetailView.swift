@@ -536,43 +536,46 @@ class DetailView: UITableViewController, Index, Coordinates {
         guard !messageTextField.text!.isEmpty else { return }
         
         guard let user = Auth.auth().currentUser?.uid else { return }
-        guard let item = item else { return }
+        let itemId = item.id
+        let itemOwner = item.owner
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(item.owner).child("chats").child("\(item.id)").child(user).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
                 
-                var messageId: Int
+                var ownerMessageId = 0
                 
                 if snapshot.hasChildren() {
                     let lastMessage = snapshot.value as? [String: String]
-                    messageId = Int((lastMessage?["messageId"])!)! + 1
-                    
+                    ownerMessageId = Int((lastMessage?["messageId"])!)! + 1
                 }
                 
-                
-            }
-        }
-        
-        let newSender = Sender(senderId: user, displayName: "")
-        
-        let newMessage = Message(sender: newSender, messageId: "0", sentDate: Date(), kind: .text((messageTextField.text)!))
-        
-        let chat = Chat(messages: [newMessage], itemId: String(item.id), itemOwner: item.owner, buyer: user)
-        
-//        let chat = [newMessage]
-        let anyChat = chat.toAnyObject()
-        
-        DispatchQueue.global().async { [weak self] in
-            guard let owner = self?.item.owner else { return }
-            guard let itemID = self?.item.id else { return }
-            
-            self?.reference.child(owner).child("chats").child("\(itemID)").child(user).setValue(anyChat)
-            self?.reference.child(user).child("chats").child("\(itemID)").child(owner).setValue(anyChat)
-            
-            DispatchQueue.main.async {
-                self?.messageSent = true
-                self?.setToolbar()
-                self?.messageTextField.resignFirstResponder()
+                self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
+                    
+                    var buyerMessageId = 0
+                    
+                    if snapshot.hasChildren() {
+                        let lastMessage = snapshot.value as? [String: String]
+                        buyerMessageId = Int((lastMessage?["messageId"])!)! + 1
+                    }
+                    
+                    let sender = Sender(senderId: user, displayName: "")
+                    
+                    let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                    let buyerMessage = Message(sender: sender, messageId: "\(buyerMessageId)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                    
+                    let ownerChat = Chat(messages: [ownerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
+                    let buyerChat = Chat(messages: [buyerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
+                    
+                    self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).setValue(ownerChat.toAnyObject())
+                    
+                    self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).setValue(buyerChat.toAnyObject())
+                    
+                    DispatchQueue.main.async {
+                        self?.messageSent = true
+                        self?.setToolbar()
+                        self?.messageTextField.resignFirstResponder()
+                    }
+                }
             }
         }
     }
@@ -590,11 +593,16 @@ class DetailView: UITableViewController, Index, Coordinates {
             return
         }
         
+        guard user != item.owner else {
+            setToolbar()
+            return
+        }
+        
+        let owner = item.owner
+        let itemId = item.id
+        
         DispatchQueue.global().async { [weak self] in
-            guard let owner = self?.item.owner else { return }
-            guard let itemId = self?.item.id else { return }
-            
-            self?.reference.child(user).child("chats").child("\(itemId)").child(owner).observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("chats").child("\(itemId)").child(owner).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
                 if snapshot.hasChildren() {
                     self?.messageSent = true
                 } else {

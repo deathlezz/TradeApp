@@ -155,7 +155,7 @@ class MessagesView: UITableViewController {
         var result = [Chat]()
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot,arg  in
+            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
                 if let chats = snapshot.value as? [String: [String: [[String: Any]]]] {
                     
                     for (id, traders) in chats {
