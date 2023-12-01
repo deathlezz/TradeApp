@@ -156,7 +156,7 @@ class MessagesView: UITableViewController {
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
-                if let chats = snapshot.value as? [String: [String: [[String: Any]]]] {
+                if let chats = snapshot.value as? [String: [String: [String: Any]]] {
                     
                     for (id, traders) in chats {
                         for trader in traders {
@@ -164,19 +164,17 @@ class MessagesView: UITableViewController {
                                 let chatTitle = data["title"] as? String
                                 let chatThumbnail = data["thumbnail"] as? UIImage
                                 
-                                for chat in trader.value {
-                                    let chatData = chat["messages"] as! [[String: String]]
-                                    let itemOwner = chat["itemOwner"] as! String
-                                    let buyer = chat["buyer"] as! String
+                                let chatData = trader.value["messages"] as! [[String: String]]
+                                let itemOwner = trader.value["itemOwner"] as! String
+                                let buyer = trader.value["buyer"] as! String
+                                
+                                self?.toMessageModel(chat: chatData) { messages in
                                     
-                                    self?.toMessageModel(chat: chatData) { messages in
-                                        
-                                        let chat = Chat(messages: messages, itemId: id, itemOwner: itemOwner, buyer: buyer, title: chatTitle, thumbnail: chatThumbnail)
-                                        result.append(chat)
-                                        
-                                        guard result.count == chats.values.count else { return }
-                                        completion(result)
-                                    }
+                                    let chat = Chat(messages: messages, itemId: id, itemOwner: itemOwner, buyer: buyer, title: chatTitle, thumbnail: chatThumbnail)
+                                    result.append(chat)
+                                    
+                                    guard result.count == chats.values.count else { return }
+                                    completion(result)
                                 }
                             }
                         }

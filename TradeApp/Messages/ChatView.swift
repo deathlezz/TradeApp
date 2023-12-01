@@ -84,6 +84,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // set "send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
+        guard !text.isEmpty else { return }
+        
         sendMessage(seller: ChatView.seller, buyer: ChatView.buyer, itemId: itemId, text: text) { [weak self] in
             guard let messagesCount = self?.messages.count else { return }
             
@@ -140,24 +142,69 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     }
     
     // save message to Firebase Database
-    func sendMessage(seller: String, buyer: String, itemId: String, text: String, completion: @escaping () -> Void) {
+//    func sendMessage(seller: String, buyer: String, itemId: String, text: String, completion: @escaping () -> Void) {
+//        guard let user = Auth.auth().currentUser?.uid else { return }
+//        let sender = Sender(senderId: user, displayName: "")
+//        
+//        DispatchQueue.global().async { [weak self] in
+//            self?.reference.child(seller).child("chats").child(itemId).child(buyer).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
+//                
+//                if let lastMessage = snapshot.value as? [String: String] {
+//                    let lastMessageId = Int(lastMessage["messageId"]!)!
+//                    
+//                    let message = Message(sender: sender, messageId: "\(lastMessageId + 1)", sentDate: Date(), kind: .text(text))
+//                    self?.messages.append(message)
+//                    
+//                    let msg = message.toAnyObject()
+//                    self?.reference.child(seller).child("chats").child(itemId).child(buyer).child(message.messageId).setValue(msg)
+//                    self?.reference.child(buyer).child("chats").child(itemId).child(seller).child(message.messageId).setValue(msg)
+//                    
+//                    completion()
+//                }
+//            }
+//        }
+//    }
+    
+    // send message function
+    @objc func sendMessage(seller: String, buyer: String, itemId: String, text: String, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
-        let sender = Sender(senderId: user, displayName: "")
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(seller).child("chats").child(itemId).child(buyer).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
                 
-                if let lastMessage = snapshot.value as? [String: String] {
-                    let lastMessageId = Int(lastMessage["messageId"]!)!
+                var ownerMessageId = 0
+                
+                print(snapshot.value)
+                
+                if snapshot.hasChildren() {
+                    let lastMessage = snapshot.value as? [String: String]
+                    ownerMessageId = Int((lastMessage?["messageId"])!)! + 1
+                }
+                
+                self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
                     
-                    let message = Message(sender: sender, messageId: "\(lastMessageId + 1)", sentDate: Date(), kind: .text(text))
-                    self?.messages.append(message)
+                    var buyerMessageId = 0
                     
-                    let msg = message.toAnyObject()
-                    self?.reference.child(seller).child("chats").child(itemId).child(buyer).child(message.messageId).setValue(msg)
-                    self?.reference.child(buyer).child("chats").child(itemId).child(seller).child(message.messageId).setValue(msg)
+                    if snapshot.hasChildren() {
+                        let lastMessage = snapshot.value as? [String: String]
+                        buyerMessageId = Int((lastMessage?["messageId"])!)! + 1
+                    }
                     
-                    completion()
+                    let sender = Sender(senderId: user, displayName: "")
+                    
+                    let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text(text))
+                    let buyerMessage = Message(sender: sender, messageId: "\(buyerMessageId)", sentDate: Date(), kind: .text(text))
+                    
+                    let ownerChat = Chat(messages: [ownerMessage], itemId: String(itemId), itemOwner: seller, buyer: buyer)
+                    let buyerChat = Chat(messages: [buyerMessage], itemId: String(itemId), itemOwner: seller, buyer: buyer)
+                    
+                    self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).setValue(ownerChat.toAnyObject())
+                    
+                    self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).setValue(buyerChat.toAnyObject())
+                    
+                    DispatchQueue.main.async {
+                        completion()
+                    }
                 }
             }
         }
@@ -190,10 +237,10 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         
         var currentChat = [Message]()
         
+        guard let itemId = itemId else { return }
+        
         DispatchQueue.global().async { [weak self] in
-            guard let itemID = self?.itemId else { return }
-            
-            self?.reference.child(ChatView.seller).child("chats").child("\(itemID)").child(ChatView.buyer).observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(ChatView.buyer).child("chats").child("\(itemId)").child(ChatView.seller).child("messages").observeSingleEvent(of: .value) { snapshot in
                 if let chats = snapshot.value as? [[String: String]] {
                     for chat in chats {
                         let sender = Sender(senderId: chat["sender"]!, displayName: "")
@@ -201,6 +248,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                         currentChat.append(message)
                     }
                     
+                    guard currentChat.count == chats.count else { return }
                     completion(currentChat)
                 }
             }
