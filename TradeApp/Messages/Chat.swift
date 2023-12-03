@@ -17,8 +17,11 @@ struct Chat {
     var thumbnail: UIImage?
     
     func toAnyObject() -> [String: Any] {
+//        let dict = ["0": messages[0].toAnyObject()] as! [String: [String: String]]
+        
         return [
-            "messages": messages.map {$0.toAnyObject()},
+//            ["0": messages[0].toAnyObject()]
+            "messages": ["m0": messages[0].toAnyObject()],
             "itemId": itemId,
             "itemOwner": itemOwner,
             "buyer": buyer

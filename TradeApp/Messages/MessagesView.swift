@@ -15,8 +15,6 @@ class MessagesView: UITableViewController {
     var emptyArrayView: UIView!
     
     var chats = [Chat]()
-//    var chats = [String: [String: [Message]]]()
-//    var chatsData = [String: [String: Any]]()
     
     var reference: DatabaseReference!
 
@@ -58,7 +56,7 @@ class MessagesView: UITableViewController {
             ChatView.buyer = chats[indexPath.row].buyer
             ChatView.seller = chats[indexPath.row].itemOwner
             vc.chatTitle = chats[indexPath.row].title
-            vc.isPushedByChats = true
+//            vc.isPushedByChats = true
             vc.itemId = chats[indexPath.row].itemId
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never
@@ -164,16 +162,22 @@ class MessagesView: UITableViewController {
                                 let chatTitle = data["title"] as? String
                                 let chatThumbnail = data["thumbnail"] as? UIImage
                                 
-                                let chatData = trader.value["messages"] as! [[String: String]]
+                                let chatData = trader.value["messages"] as! [String: [String: String]]
+                                let sortedChatData = chatData.sorted {$0.key < $1.key}
+                                let arrayChatData = sortedChatData.map {$0.value}
                                 let itemOwner = trader.value["itemOwner"] as! String
                                 let buyer = trader.value["buyer"] as! String
                                 
-                                self?.toMessageModel(chat: chatData) { messages in
-                                    
+                                self?.toMessageModel(chat: arrayChatData) { messages in
                                     let chat = Chat(messages: messages, itemId: id, itemOwner: itemOwner, buyer: buyer, title: chatTitle, thumbnail: chatThumbnail)
                                     result.append(chat)
                                     
                                     guard result.count == chats.values.count else { return }
+                                    
+                                    if result.count > 1 {
+                                        result.sort {$0.messages.last!.sentDate > $1.messages.last!.sentDate}
+                                    }
+
                                     completion(result)
                                 }
                             }
@@ -274,6 +278,5 @@ class MessagesView: UITableViewController {
             }
         }
     }
-    
 
 }

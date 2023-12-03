@@ -317,7 +317,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         if messageSent {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
                 vc.chatTitle = item.title
-                vc.isPushedByChats = false
+//                vc.isPushedByChats = false
                 ChatView.buyer = Auth.auth().currentUser?.uid
                 ChatView.seller = item.owner
                 vc.itemId = String(item.id)
@@ -545,8 +545,9 @@ class DetailView: UITableViewController, Index, Coordinates {
                 var ownerMessageId = 0
                 
                 if snapshot.hasChildren() {
-                    let lastMessage = snapshot.value as? [String: String]
-                    ownerMessageId = Int((lastMessage?["messageId"])!)! + 1
+                    if let lastMessage = snapshot.value as? [String: [String: String]] {
+                        ownerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
+                    }
                 }
                 
                 self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
@@ -554,8 +555,9 @@ class DetailView: UITableViewController, Index, Coordinates {
                     var buyerMessageId = 0
                     
                     if snapshot.hasChildren() {
-                        let lastMessage = snapshot.value as? [String: String]
-                        buyerMessageId = Int((lastMessage?["messageId"])!)! + 1
+                        if let lastMessage = snapshot.value as? [String: [String: String]] {
+                            buyerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
+                        }
                     }
                     
                     let sender = Sender(senderId: user, displayName: "")
