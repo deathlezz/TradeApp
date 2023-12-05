@@ -14,13 +14,11 @@ struct Chat {
     var itemOwner: String
     var buyer: String
     var title: String?
+    var thumbnailUrl: String?
     var thumbnail: UIImage?
     
-    func toAnyObject() -> [String: Any] {
-//        let dict = ["0": messages[0].toAnyObject()] as! [String: [String: String]]
-        
+    func toAnyObject() -> [String: Any] {        
         return [
-//            ["0": messages[0].toAnyObject()]
             "messages": ["m0": messages[0].toAnyObject()],
             "itemId": itemId,
             "itemOwner": itemOwner,

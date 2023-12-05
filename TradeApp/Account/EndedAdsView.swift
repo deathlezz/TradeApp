@@ -79,7 +79,21 @@ class EndedAdsView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "endedAdCell", for: indexPath) as? AdCell {
-            cell.thumbnail.image = endedAds[indexPath.row].thumbnail
+            if endedAds[indexPath.row].thumbnail != nil {
+                cell.thumbnail.image = endedAds[indexPath.row].thumbnail?.resized(to: cell.thumbnail.frame.size)
+            } else {
+                cell.thumbnail.image = nil
+                
+                let url = endedAds[indexPath.row].photosURL[0]
+                convertThumbnail(url: url) { [weak self] thumbnail in
+                    self?.endedAds[indexPath.row].thumbnail = thumbnail
+
+                    DispatchQueue.main.async {
+                        cell.thumbnail.image = thumbnail.resized(to: cell.thumbnail.frame.size)
+                    }
+                }
+            }
+            
             cell.thumbnail.layer.cornerRadius = 7
             cell.title.text = endedAds[indexPath.row].title
             cell.price.text = "£\(endedAds[indexPath.row].price)"
@@ -187,7 +201,9 @@ class EndedAdsView: UITableViewController {
     // remove stored data
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        endedAds.removeAll()
+        if isMovingFromParent {
+            endedAds.removeAll()
+        }
     }
     
     // set item expiry date
@@ -225,6 +241,7 @@ class EndedAdsView: UITableViewController {
     
     // set up empty array view
     func addEmptyArrayView() {
+        guard emptyArrayView == nil else { return }
         let screenSize = UIScreen.main.bounds.size
         let safeArea = (navigationController?.navigationBar.frame.maxY)!
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
@@ -302,39 +319,44 @@ class EndedAdsView: UITableViewController {
     func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
         guard let link = URL(string: url) else { return }
         
-        let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
-            if let data = data {
-                let image = UIImage(data: data)!
-                completion(image)
+        DispatchQueue.global().async {
+            let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
+                if let data = data {
+                    DispatchQueue.main.async {
+                        let image = UIImage(data: data)!
+                        completion(image)
+                    }
+                }
             }
+            task.resume()
         }
-        task.resume()
     }
     
     // download ended ads from Firebase
     func getEndedAds(completion: @escaping ([String: [String: Any]]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
-        var items = [String: [String: Any]]()
-        var adsReady = 0
+//        var items = [String: [String: Any]]()
+//        var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("endedItems").observeSingleEvent(of: .value) { snapshot in
                 if let data = snapshot.value as? [String: [String: Any]] {
-                    items = data
-                    for (key, value) in data {
-                        let photos = value["photosURL"] as! [String]
-                        
-                        self?.convertThumbnail(url: photos[0]) { thumbnail in
-                            items[key]?["thumbnail"] = thumbnail
-                            
-                            if let _ = items[key]?["thumbnail"] as? UIImage {
-                                adsReady += 1
-                            }
-                            
-                            guard adsReady == items.count else { return }
-                            completion(items)
-                        }
-                    }
+                    completion(data)
+//                    items = data
+//                    for (key, value) in data {
+//                        let photos = value["photosURL"] as! [String]
+//                        
+//                        self?.convertThumbnail(url: photos[0]) { thumbnail in
+//                            items[key]?["thumbnail"] = thumbnail
+//                            
+//                            if let _ = items[key]?["thumbnail"] as? UIImage {
+//                                adsReady += 1
+//                            }
+//                            
+//                            guard adsReady == items.count else { return }
+//                            completion(items)
+//                        }
+//                    }
                 }
             }
         }
@@ -345,7 +367,7 @@ class EndedAdsView: UITableViewController {
         var result = [Item]()
         
         for item in dict {
-            let thumbnail = item.value["thumbnail"] as? UIImage
+//            let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int
@@ -360,7 +382,7 @@ class EndedAdsView: UITableViewController {
             let id = item.value["id"] as? Int
             let owner = item.value["owner"] as? String
             
-            let model = Item(thumbnail: thumbnail!, photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
+            let model = Item(photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
             
             result.append(model)
         }

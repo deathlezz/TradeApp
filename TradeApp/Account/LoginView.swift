@@ -334,7 +334,6 @@ class LoginView: UITableViewController {
         monitor.pathUpdateHandler = { path in
             if path.status != .satisfied {
                 // show connection alert on main thread
-                print("Connection is not satisfied")
                 guard !self.isPushed else { return }
                 DispatchQueue.main.async { [weak self] in
                     if let vc = self?.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
@@ -344,7 +343,6 @@ class LoginView: UITableViewController {
                     }
                 }
             } else {
-                print("Connection is satisfied")
                 guard self.isPushed else { return }
                 DispatchQueue.main.async { [weak self] in
                     self?.navigationController?.popViewController(animated: false)

@@ -74,7 +74,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
             self?.currentUnit = Utilities.loadDistanceUnit()
             
             self?.getData() { dict in
-                AppStorage.shared.items.removeAll(keepingCapacity: false)
                 let newItems = self?.toItemModel(dict: dict) ?? [Item]()
                 AppStorage.shared.items = newItems
                 self?.loadRecentItems()
@@ -102,21 +101,34 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     }
     
     // set collection view cell
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
-            fatalError("Unable to dequeue itemCell")
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {        
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell {
+            if AppStorage.shared.filteredItems[indexPath.item].thumbnail != nil {
+                cell.image.image = AppStorage.shared.filteredItems[indexPath.item].thumbnail?.resized(to: cell.image.frame.size)
+            } else {
+                cell.image.image = nil
+                
+                let url = AppStorage.shared.filteredItems[indexPath.item].photosURL[0]
+                convertThumbnail(url: url) { thumbnail in
+                    AppStorage.shared.filteredItems[indexPath.item].thumbnail = thumbnail
+
+                    DispatchQueue.main.async {
+                        cell.image.image = thumbnail.resized(to: cell.image.frame.size)
+                    }
+                }
+            }
+            
+            cell.title.text = AppStorage.shared.filteredItems[indexPath.item].title
+            cell.price.text = "£\(AppStorage.shared.filteredItems[indexPath.item].price)"
+            cell.location.text = AppStorage.shared.filteredItems[indexPath.item].location
+            cell.date.text = AppStorage.shared.filteredItems[indexPath.item].date.toString(shortened: true)
+            cell.layer.borderWidth = 0.2
+            cell.layer.borderColor = UIColor.lightGray.cgColor
+            cell.layer.cornerRadius = 10
+            cell.backgroundColor = .white
+            return cell
         }
-        let image = AppStorage.shared.filteredItems[indexPath.item].thumbnail?.resized(to: cell.image.frame.size)
-        cell.image.image = image
-        cell.title.text = AppStorage.shared.filteredItems[indexPath.item].title
-        cell.price.text = "£\(AppStorage.shared.filteredItems[indexPath.item].price)"
-        cell.location.text = AppStorage.shared.filteredItems[indexPath.item].location
-        cell.date.text = AppStorage.shared.filteredItems[indexPath.item].date.toString(shortened: true)
-        cell.layer.borderWidth = 0.2
-        cell.layer.borderColor = UIColor.lightGray.cgColor
-        cell.layer.cornerRadius = 10
-        cell.backgroundColor = .white
-        return cell
+        return UICollectionViewCell()
     }
     
     // set action for tapped cell
@@ -194,10 +206,9 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         collectionView.reloadData()
     }
     
-    // stop refreshing when leaving view
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
+    // stop refreshing after leaving view
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         if refreshControl.isRefreshing {
             refreshControl.endRefreshing()
         }
@@ -432,7 +443,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         monitor.pathUpdateHandler = { path in
             if path.status != .satisfied {
                 // show connection alert on main thread
-                print("Connection is not satisfied")
                 guard !self.isPushed else { return }
                 DispatchQueue.main.async { [weak self] in
                     if let vc = self?.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
@@ -442,7 +452,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                     }
                 }
             } else {
-                print("Connection is satisfied")
                 guard self.isPushed else { return }
                 DispatchQueue.main.async { [weak self] in
                     self?.navigationController?.popViewController(animated: false)
@@ -478,6 +487,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     
     // set up empty array view
     func addEmptyArrayView() {
+        guard emptyArrayView == nil else { return }
         let screenSize = UIScreen.main.bounds.size
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
         myView.backgroundColor = .clear
@@ -508,13 +518,17 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
         guard let link = URL(string: url) else { return }
         
-        let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
-            if let data = data {
-                let image = UIImage(data: data)!
-                completion(image)
+        DispatchQueue.global().async {
+            let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
+                if let data = data {
+                    DispatchQueue.main.async {
+                        let thumbnail = UIImage(data: data)!
+                        completion(thumbnail)
+                    }
+                }
             }
+            task.resume()
         }
-        task.resume()
     }
     
     // download all active items & convert thumbnails to UIImage
@@ -532,18 +546,21 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                         for item in activeItems {
                             items["\(item.key)"] = item.value
                             
-                            let photos = item.value["photosURL"] as! [String]
+//                            let photos = item.value["photosURL"] as! [String]
+                            adsReady += 1
+                            guard adsReady == items.count else { return }
+                            completion(items)
                             
-                            self?.convertThumbnail(url: photos[0]) { thumbnail in
-                                items[item.key]?["thumbnail"] = thumbnail
-                                
-                                if let _ = items[item.key]?["thumbnail"] as? UIImage {
-                                    adsReady += 1
-                                }
-                                
-                                guard adsReady == items.count else { return }
-                                completion(items)
-                            }
+//                            self?.convertThumbnail(url: photos[0]) { thumbnail in
+//                                items[item.key]?["thumbnail"] = thumbnail
+//                                
+//                                if let _ = items[item.key]?["thumbnail"] as? UIImage {
+//                                    adsReady += 1
+//                                }
+//                                
+//                                guard adsReady == items.count else { return }
+//                                completion(items)
+//                            }
                         }
                     }
                 } else {
@@ -562,7 +579,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         var result = [Item]()
         
         for item in dict {
-            let thumbnail = item.value["thumbnail"] as? UIImage
+//            let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int
@@ -577,7 +594,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
             let id = item.value["id"] as? Int
             let owner = item.value["owner"] as? String
             
-            let model = Item(thumbnail: thumbnail!, photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
+            let model = Item(photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
             
             result.append(model)
         }

@@ -67,7 +67,6 @@ class SearchView: UITableViewController {
         label.textColor = .systemGray
         
         headerView.addSubview(label)
-        
         return headerView
     }
     
@@ -233,6 +232,7 @@ class SearchView: UITableViewController {
     
     // set up empty array view
     func addEmptyArrayView() {
+        guard emptyArrayView == nil else { return }
         let screenSize = UIScreen.main.bounds.size
         let safeArea = (navigationController?.navigationBar.frame.maxY)!
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))

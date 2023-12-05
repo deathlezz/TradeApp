@@ -37,7 +37,6 @@ class ChangeNumberView: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CurrentNumberCell")
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
-        
     }
     
     // set number of sections

@@ -232,7 +232,10 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                     }
                     
                     guard currentChat.count == chat.count else { return }
-                    completion(currentChat)
+                    
+                    DispatchQueue.main.async {
+                        completion(currentChat)
+                    }
                 }
             }
         }

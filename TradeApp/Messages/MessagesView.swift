@@ -37,16 +37,29 @@ class MessagesView: UITableViewController {
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "chatCell", for: indexPath) as? ChatCell {
-            cell.thumbnail.image = chats[indexPath.row].thumbnail
+            if chats[indexPath.row].thumbnail != nil {
+                cell.thumbnail.image = chats[indexPath.row].thumbnail?.resized(to: cell.thumbnail.frame.size)
+            } else {
+                cell.thumbnail.image = nil
+                
+                let url = chats[indexPath.row].thumbnailUrl!
+                getThumbnail(url: url) { [weak self] thumbnail in
+                    self?.chats[indexPath.row].thumbnail = thumbnail
+
+                    DispatchQueue.main.async {
+                        cell.thumbnail.image = thumbnail.resized(to: cell.thumbnail.frame.size)
+                    }
+                }
+            }
+            
             cell.title.text = chats[indexPath.row].title
             cell.title.font = UIFont.systemFont(ofSize: 18)
-            cell.subtitle.text = "\(getMessageText((chats[indexPath.row].messages.last?.kind)!)) •  \(MessageKitDateFormatter.shared.string(from: (chats[indexPath.row].messages.last?.sentDate)!))"
+            cell.subtitle.text = "\(getMessageText((chats[indexPath.row].messages.last?.kind)!)) • \(convertDate((chats[indexPath.row].messages.last?.sentDate)!))"
             cell.subtitle.textColor = .darkGray
             cell.subtitle.font = UIFont.systemFont(ofSize: 12)
             cell.accessoryType = .disclosureIndicator
             return cell
         }
-        
         return UITableViewCell()
     }
     
@@ -106,6 +119,7 @@ class MessagesView: UITableViewController {
     
     // set up empty array view
     func addEmptyArrayView() {
+        guard emptyArrayView == nil else { return }
         let screenSize = UIScreen.main.bounds.size
         let safeArea = (navigationController?.navigationBar.frame.maxY)!
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
@@ -135,7 +149,7 @@ class MessagesView: UITableViewController {
         if case .text(let value) = messageKind {
             
             let width = UIScreen.main.bounds.width
-            let maxLetters = Int(width / 14)
+            let maxLetters = Int(width / 17)
             
             if value.count > maxLetters {
                 return value.prefix(maxLetters) + "..."
@@ -160,7 +174,7 @@ class MessagesView: UITableViewController {
                         for trader in traders {
                             self?.getChatData(trader: trader.key, id: id) { data in
                                 let chatTitle = data["title"] as? String
-                                let chatThumbnail = data["thumbnail"] as? UIImage
+                                let chatThumbnail = data["thumbnailURL"] as? String
                                 
                                 let chatData = trader.value["messages"] as! [String: [String: String]]
                                 let sortedChatData = chatData.sorted {$0.key < $1.key}
@@ -169,7 +183,7 @@ class MessagesView: UITableViewController {
                                 let buyer = trader.value["buyer"] as! String
                                 
                                 self?.toMessageModel(chat: arrayChatData) { messages in
-                                    let chat = Chat(messages: messages, itemId: id, itemOwner: itemOwner, buyer: buyer, title: chatTitle, thumbnail: chatThumbnail)
+                                    let chat = Chat(messages: messages, itemId: id, itemOwner: itemOwner, buyer: buyer, title: chatTitle, thumbnailUrl: chatThumbnail)
                                     result.append(chat)
                                     
                                     guard result.count == chats.values.count else { return }
@@ -203,15 +217,11 @@ class MessagesView: UITableViewController {
                     self?.reference.child(userCase).child(itemsCase).child(id).observeSingleEvent(of: .value) { snapshot in
                         
                         if let value = snapshot.value as? [String: Any] {
-                            let photos = value["photosURL"] as? [String]
+                            let photosURL = value["photosURL"] as? [String]
                             let title = value["title"] as? String
-                            let url = photos?[0]
 
-                            // convert URL to UIImage here
-                            self?.getThumbnail(url: url!) { thumbnail in
-                                result = ["title": title!, "thumbnail": thumbnail]
-                                completion(result)
-                            }
+                            result = ["title": title!, "thumbnailURL": photosURL![0]]
+                            completion(result)
                         }
                     }
                 }
@@ -222,13 +232,13 @@ class MessagesView: UITableViewController {
     // convert image URL to UIImage
     func getThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
         DispatchQueue.global().async {
-            guard let url = URL(string: url) else { return }
+            guard let link = URL(string: url) else { return }
             
-            let task = URLSession.shared.dataTask(with: url) { (data, _, _) in
+            let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
                 
                 if let data = data {
                     DispatchQueue.main.async {
-                        guard let thumbnail = UIImage(data: data) else { return }
+                        let thumbnail = UIImage(data: data)!
                         completion(thumbnail)
                     }
                 }
@@ -277,6 +287,31 @@ class MessagesView: UITableViewController {
                 }
             }
         }
+    }
+    
+    // show converted last message sent date
+    func convertDate(_ date: Date) -> String {
+        let calendar = Calendar.current
+        let dateFormatter = DateFormatter()
+        dateFormatter.calendar = .current
+        dateFormatter.locale = Locale(identifier: "en")
+        
+        var result = ""
+        
+        if calendar.isDateInToday(date) {
+            // show "10:00"
+            dateFormatter.dateFormat = "HH:mm"
+            result = dateFormatter.string(from: date)
+        } else if calendar.isDateInYesterday(date) {
+            // show "Yesterday"
+            result = "Yesterday"
+        } else {
+            // show "May 26"
+            dateFormatter.dateFormat = "MMM d"
+            result = dateFormatter.string(from: date)
+        }
+        
+        return result
     }
 
 }

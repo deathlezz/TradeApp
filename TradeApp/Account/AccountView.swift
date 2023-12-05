@@ -63,9 +63,17 @@ class AccountView: UITableViewController {
     
     // set table view cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let accountCell = tableView.dequeueReusableCell(withIdentifier: "AccountCell", for: indexPath)
+        var accountCell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "AccountCell", for: indexPath)
         
-        let userItemsCell = tableView.dequeueReusableCell(withIdentifier: "UserItemsCell", for: indexPath)
+        if accountCell == nil {
+            accountCell = UITableViewCell(style: .default, reuseIdentifier: "AccountCell")
+        }
+        
+        var userItemsCell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "UserItemsCell", for: indexPath)
+        
+        if userItemsCell == nil {
+            userItemsCell = UITableViewCell(style: .value1, reuseIdentifier: "UserItemsCell")
+        }
 
         switch sections[indexPath.section] {
         case "User":

@@ -57,22 +57,30 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     
     // set collection view cell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell else {
-            fatalError("Unable to dequeue itemCell")
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell {
+            cell.image.image = savedItems[indexPath.row].thumbnail?.resized(to: cell.image.frame.size)
+            
+            let url = savedItems[indexPath.row].photosURL[0]
+            convertThumbnail(url: url) { [weak self] thumbnail in
+                self?.savedItems[indexPath.row].thumbnail = thumbnail
+
+                DispatchQueue.main.async {
+                    cell.image.image = nil
+                    cell.image.image = thumbnail.resized(to: cell.image.frame.size)
+                }
+            }
+            
+            cell.title.text = savedItems[indexPath.item].title
+            cell.price.text = "£\(savedItems[indexPath.item].price)"
+            cell.location.text = savedItems[indexPath.item].location
+            cell.date.text = savedItems[indexPath.item].date.toString(shortened: true)
+            cell.layer.cornerRadius = 10
+            cell.layer.borderWidth = 0.2
+            cell.layer.borderColor = UIColor.lightGray.cgColor
+            cell.backgroundColor = .white
+            return cell
         }
-        
-        let image = savedItems[indexPath.row].thumbnail?.resized(to: cell.image.frame.size)
-        cell.image.image = image
-        cell.title.text = savedItems[indexPath.item].title
-        cell.price.text = "£\(savedItems[indexPath.item].price)"
-        cell.location.text = savedItems[indexPath.item].location
-        cell.date.text = savedItems[indexPath.item].date.toString(shortened: true)
-        cell.layer.cornerRadius = 10
-        cell.layer.borderWidth = 0.2
-        cell.layer.borderColor = UIColor.lightGray.cgColor
-        cell.backgroundColor = .white
-        
-        return cell
+        return UICollectionViewCell()
     }
     
     // set action for selected cell
@@ -180,7 +188,10 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     // cancel selection after view disappeared
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        savedItems.removeAll(keepingCapacity: false)
+        if isMovingFromParent {
+            savedItems.removeAll(keepingCapacity: false)
+        }
+        
         cancelTapped()
     }
 
@@ -300,7 +311,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             
             if path.status != .satisfied && self.isDetailShown {
                 // show connection alert on main thread
-                print("Connection is not satisfied")
                 guard !self.isPushed else { return }
                 DispatchQueue.main.async { [weak self] in
                     if let vc = self?.storyboard?.instantiateViewController(withIdentifier: "NoConnectionView") as? NoConnectionView {
@@ -310,7 +320,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                     }
                 }
             } else if path.status == .satisfied && self.isDetailShown {
-                print("Connection is satisfied")
                 guard self.isPushed else { return }
                 DispatchQueue.main.async { [weak self] in
                     self?.navigationController?.popViewController(animated: false)
@@ -355,6 +364,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     
     // set up empty array view
     func addEmptyArrayView() {
+        guard emptyArrayView == nil else { return }
         let screenSize = UIScreen.main.bounds.size
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height))
         myView.backgroundColor = .clear
@@ -398,13 +408,17 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
         guard let link = URL(string: url) else { return }
         
-        let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
-            if let data = data {
-                let image = UIImage(data: data)!
-                completion(image)
+        DispatchQueue.global().async {
+            let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
+                if let data = data {
+                    DispatchQueue.main.async {
+                        let image = UIImage(data: data)!
+                        completion(image)
+                    }
+                }
             }
+            task.resume()
         }
-        task.resume()
     }
     
     // download active items from firebase & convert images urls to data array
@@ -420,19 +434,23 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                     if let value = snapshot.value as? [String: Any] {
                         // add item to existed items
                         items["\(item.id)"] = value
+                        adsReady += 1
                         
-                        let photos = value["photosURL"] as! [String]
+                        guard adsReady == items.count else { return }
+                        completion(items)
                         
-                        self?.convertThumbnail(url: photos[0]) { thumbnail in
-                            items["\(item.id)"]?["thumbnail"] = thumbnail
-                            
-                            if let _ = items["\(item.id)"]?["thumbnail"] as? UIImage {
-                                adsReady += 1
-                            }
-                            
-                            guard adsReady == items.count else { return }
-                            completion(items)
-                        }
+//                        let photos = value["photosURL"] as! [String]
+//                        
+//                        self?.convertThumbnail(url: photos[0]) { thumbnail in
+//                            items["\(item.id)"]?["thumbnail"] = thumbnail
+//                            
+//                            if let _ = items["\(item.id)"]?["thumbnail"] as? UIImage {
+//                                adsReady += 1
+//                            }
+//                            
+//                            guard adsReady == items.count else { return }
+//                            completion(items)
+//                        }
                         
                     } else {
                         completion(items)
@@ -447,7 +465,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         var result = [Item]()
         
         for item in dict {
-            let thumbnail = item.value["thumbnail"] as? UIImage
+//            let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int
@@ -462,7 +480,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             let id = item.value["id"] as? Int
             let owner = item.value["owner"] as? String
             
-            let model = Item(thumbnail: thumbnail!, photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
+            let model = Item(photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
             
             result.append(model)
         }
