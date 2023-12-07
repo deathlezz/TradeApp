@@ -258,20 +258,23 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         // get all images except the thumbnail
         let links = urls.map {URL(string: $0)}.dropFirst()
         
-        for (index, url) in links.enumerated() {
-            let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
-                if let data = data {
-                    let image = UIImage(data: data) ?? UIImage()
-                    imagesDict["image\(index + 1)"] = image
+        DispatchQueue.global().async {
+            for (index, url) in links.enumerated() {
+                let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+                    if let data = data {
+                        DispatchQueue.main.async {
+                            let image = UIImage(data: data) ?? UIImage()
+                            imagesDict["image\(index + 1)"] = image
+                            
+                            guard imagesDict.count == links.count + 1 else { return }
+                            let sorted = imagesDict.sorted {$0.key < $1.key}
+                            let images = Array(sorted.map {$0.value})
+                            completion(images)
+                        }
+                    }
                 }
-
-                guard imagesDict.count == links.count + 1 else { return }
-                let sorted = imagesDict.sorted {$0.key < $1.key}
-                let images = Array(sorted.map {$0.value})
-                completion(images)
+                task.resume()
             }
-
-            task.resume()
         }
     }
     

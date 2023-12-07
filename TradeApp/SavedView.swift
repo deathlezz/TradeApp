@@ -58,16 +58,19 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     // set collection view cell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell {
-            cell.image.image = savedItems[indexPath.row].thumbnail?.resized(to: cell.image.frame.size)
             
-            let url = savedItems[indexPath.row].photosURL[0]
-            convertThumbnail(url: url) { [weak self] thumbnail in
-                self?.savedItems[indexPath.row].thumbnail = thumbnail
+            if monitor.currentPath.status == .satisfied {
+                let url = savedItems[indexPath.row].photosURL[0]
+                convertThumbnail(url: url) { [weak self] thumbnail in
+                    self?.savedItems[indexPath.row].thumbnail = thumbnail
 
-                DispatchQueue.main.async {
-                    cell.image.image = nil
-                    cell.image.image = thumbnail.resized(to: cell.image.frame.size)
+                    DispatchQueue.main.async {
+                        cell.image.image = nil
+                        cell.image.image = thumbnail.resized(to: cell.image.frame.size)
+                    }
                 }
+            } else {
+                cell.image.image = savedItems[indexPath.row].thumbnail?.resized(to: cell.image.frame.size)
             }
             
             cell.title.text = savedItems[indexPath.item].title
@@ -343,6 +346,8 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     func updateSavedItems(completion: @escaping () -> Void) {
         guard savedItems.count > 0 else { return completion() }
         
+        guard monitor.currentPath.status == .satisfied else { return }
+        
         DispatchQueue.global().async { [weak self] in
             self?.getData() { dict in
                 let oldSaved = self?.savedItems ?? [Item]()
@@ -434,23 +439,23 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                     if let value = snapshot.value as? [String: Any] {
                         // add item to existed items
                         items["\(item.id)"] = value
-                        adsReady += 1
-                        
-                        guard adsReady == items.count else { return }
-                        completion(items)
-                        
-//                        let photos = value["photosURL"] as! [String]
+//                        adsReady += 1
 //                        
-//                        self?.convertThumbnail(url: photos[0]) { thumbnail in
-//                            items["\(item.id)"]?["thumbnail"] = thumbnail
-//                            
-//                            if let _ = items["\(item.id)"]?["thumbnail"] as? UIImage {
-//                                adsReady += 1
-//                            }
-//                            
-//                            guard adsReady == items.count else { return }
-//                            completion(items)
-//                        }
+//                        guard adsReady == items.count else { return }
+//                        completion(items)
+                        
+                        let photos = value["photosURL"] as! [String]
+                        
+                        self?.convertThumbnail(url: photos[0]) { thumbnail in
+                            items["\(item.id)"]?["thumbnail"] = thumbnail
+                            
+                            if let _ = items["\(item.id)"]?["thumbnail"] as? UIImage {
+                                adsReady += 1
+                            }
+                            
+                            guard adsReady == items.count else { return }
+                            completion(items)
+                        }
                         
                     } else {
                         completion(items)
@@ -465,7 +470,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         var result = [Item]()
         
         for item in dict {
-//            let thumbnail = item.value["thumbnail"] as? UIImage
+            let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int
@@ -480,7 +485,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             let id = item.value["id"] as? Int
             let owner = item.value["owner"] as? String
             
-            let model = Item(photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
+            let model = Item(thumbnail: thumbnail, photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
             
             result.append(model)
         }
