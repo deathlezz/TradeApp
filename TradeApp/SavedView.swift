@@ -77,6 +77,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             cell.price.text = "£\(savedItems[indexPath.item].price)"
             cell.location.text = savedItems[indexPath.item].location
             cell.date.text = savedItems[indexPath.item].date.toString(shortened: true)
+            cell.contentView.layer.cornerRadius = 10
             cell.layer.cornerRadius = 10
             cell.layer.borderWidth = 0.2
             cell.layer.borderColor = UIColor.lightGray.cgColor
@@ -103,8 +104,13 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             
             if cell.isSelected {
                 UIView.animate(withDuration: 0.1, animations: {
-                    cell.layer.borderWidth = 1
-                    cell.layer.borderColor = UIColor.systemRed.cgColor
+                    cell.layer.masksToBounds = false
+                    cell.layer.shadowColor = UIColor.systemRed.cgColor
+                    cell.layer.shadowOpacity = 0.5
+                    cell.layer.shadowOffset = CGSize(width: 0, height: 0)
+                    cell.layer.shadowRadius = 4
+                    cell.layer.borderWidth = 0
+                    cell.layer.borderColor = UIColor.clear.cgColor
                     cell.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
                 }) { finished in
                     self.selectedCells.append(cell)
@@ -125,12 +131,18 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         
         if !cell.isSelected {
             UIView.animate(withDuration: 0.1, animations: {
+                cell.layer.masksToBounds = true
+                cell.layer.shadowColor = UIColor.clear.cgColor
+                cell.layer.shadowOpacity = 0
+                cell.layer.shadowOffset = CGSize(width: 0, height: 0)
+                cell.layer.shadowRadius = 0
                 cell.layer.borderWidth = 0.2
                 cell.layer.borderColor = UIColor.lightGray.cgColor
                 cell.transform = .identity
             }) { finished in
                 guard let index = self.selectedCells.firstIndex(of: cell) else { return }
                 self.selectedCells.remove(at: index)
+                self.selectedItems.remove(at: index)
                 self.showButton()
                 self.updateHeader()
             }
@@ -222,12 +234,17 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         
         for cell in selectedCells {
             UIView.animate(withDuration: 0.1, animations: {
+                cell.layer.masksToBounds = true
+                cell.layer.shadowColor = UIColor.clear.cgColor
+                cell.layer.shadowOpacity = 0
+                cell.layer.shadowOffset = CGSize(width: 0, height: 0)
+                cell.layer.shadowRadius = 0
                 cell.layer.borderWidth = 0.2
                 cell.layer.borderColor = UIColor.lightGray.cgColor
                 cell.transform = .identity
             }) { finished in
-                self.selectedCells.removeAll(keepingCapacity: false)
-                self.selectedItems.removeAll(keepingCapacity: false)
+                self.selectedCells.removeAll()
+                self.selectedItems.removeAll()
             }
         }
     }
@@ -251,6 +268,11 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         
         for cell in selectedCells {
             UIView.animate(withDuration: 0.1, animations: {
+                cell.layer.masksToBounds = true
+                cell.layer.shadowColor = UIColor.clear.cgColor
+                cell.layer.shadowOpacity = 0
+                cell.layer.shadowOffset = CGSize(width: 0, height: 0)
+                cell.layer.shadowRadius = 0
                 cell.layer.borderWidth = 0.2
                 cell.layer.borderColor = UIColor.lightGray.cgColor
                 cell.transform = .identity
@@ -352,7 +374,8 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             self?.getData() { dict in
                 let oldSaved = self?.savedItems ?? [Item]()
                 let newSaved = self?.toItemModel(dict: dict) ?? [Item]()
-                self?.savedItems = newSaved
+                let sorted = newSaved.sorted {$0.views! > $1.views!}
+                self?.savedItems = sorted
 
                 DispatchQueue.main.async {
                     Utilities.removeItems(oldSaved)

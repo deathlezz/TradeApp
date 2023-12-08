@@ -539,6 +539,8 @@ class DetailView: UITableViewController, Index, Coordinates {
         let itemId = item.id
         let itemOwner = item.owner
         
+        let sender = Sender(senderId: user, displayName: "")
+        
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
                 
@@ -547,36 +549,25 @@ class DetailView: UITableViewController, Index, Coordinates {
                 if snapshot.hasChildren() {
                     if let lastMessage = snapshot.value as? [String: [String: String]] {
                         ownerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
+                        
+                        let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                        
+                        self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("messages").child("m\(ownerMessageId)").setValue(ownerMessage.toAnyObject())
                     }
+                } else {
+                    let ownerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                    let ownerChat = Chat(messages: [ownerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
+                    self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).setValue(ownerChat.toAnyObject())
                 }
                 
-                self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
-                    
-                    var buyerMessageId = 0
-                    
-                    if snapshot.hasChildren() {
-                        if let lastMessage = snapshot.value as? [String: [String: String]] {
-                            buyerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
-                        }
-                    }
-                    
-                    let sender = Sender(senderId: user, displayName: "")
-                    
-                    let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
-                    let buyerMessage = Message(sender: sender, messageId: "\(buyerMessageId)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
-                    
-                    let ownerChat = Chat(messages: [ownerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
-                    let buyerChat = Chat(messages: [buyerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
-                    
-                    self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).setValue(ownerChat.toAnyObject())
-                    
-                    self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).setValue(buyerChat.toAnyObject())
-                    
-                    DispatchQueue.main.async {
-                        self?.messageSent = true
-                        self?.setToolbar()
-                        self?.messageTextField.resignFirstResponder()
-                    }
+                let buyerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                let buyerChat = Chat(messages: [buyerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
+                self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).setValue(buyerChat.toAnyObject())
+                
+                DispatchQueue.main.async {
+                    self?.messageSent = true
+                    self?.setToolbar()
+                    self?.messageTextField.resignFirstResponder()
                 }
             }
         }

@@ -145,41 +145,44 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     @objc func sendMessage(seller: String, buyer: String, itemId: String, text: String, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
+        let sender = Sender(senderId: user, displayName: "")
+        
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
                 
-                var ownerMessageId = 0
-                
                 if snapshot.hasChildren() {
                     if let lastMessage = snapshot.value as? [String: [String: String]] {
-                        ownerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
+                        let ownerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
+                        
+                        let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text(text))
+                        self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("messages").child("m\(ownerMessageId)").setValue(ownerMessage.toAnyObject())
                     }
+                } else {
+                    let ownerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text(text))
+                    let ownerChat = Chat(messages: [ownerMessage], itemId: String(itemId), itemOwner: seller, buyer: user)
+                    self?.reference.child(seller).child("chats").child("\(itemId)").child(user).setValue(ownerChat.toAnyObject())
                 }
                 
                 self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
                     
-                    var buyerMessageId = 0
-                    
                     if snapshot.hasChildren() {
                         if let lastMessage = snapshot.value as? [String: [String: String]] {
-                            buyerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
+                            let buyerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
+                            
+                            let buyerMessage = Message(sender: sender, messageId: "\(buyerMessageId)", sentDate: Date(), kind: .text(text))
+                            self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("messages").child("m\(buyerMessageId)").setValue(buyerMessage.toAnyObject())
                         }
-                    }
-                    
-                    let sender = Sender(senderId: user, displayName: "")
-                    
-                    let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text(text))
-                    let buyerMessage = Message(sender: sender, messageId: "\(buyerMessageId)", sentDate: Date(), kind: .text(text))
-                    
-                    self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("messages").child("m\(ownerMessageId)").setValue(ownerMessage.toAnyObject())
-                    
-                    self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("messages").child("m\(buyerMessageId)").setValue(buyerMessage.toAnyObject())
-                    
-                    if user == seller {
-                        self?.messages.append(ownerMessage)
                     } else {
-                        self?.messages.append(buyerMessage)
+                        let buyerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text(text))
+                        let buyerChat = Chat(messages: [buyerMessage], itemId: String(itemId), itemOwner: seller, buyer: user)
+                        self?.reference.child(seller).child("chats").child("\(itemId)").child(user).setValue(buyerChat.toAnyObject())
                     }
+                    
+//                    if user == seller {
+//                        self?.messages.append(ownerMessage)
+//                    } else {
+//                        self?.messages.append(buyerMessage)
+//                    }
                     
                     DispatchQueue.main.async {
                         completion()
