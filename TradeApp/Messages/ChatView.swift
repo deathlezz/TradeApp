@@ -156,11 +156,19 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                         
                         let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text(text))
                         self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("messages").child("m\(ownerMessageId)").setValue(ownerMessage.toAnyObject())
+                        
+                        if user == seller {
+                            self?.messages.append(ownerMessage)
+                        }
                     }
                 } else {
                     let ownerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text(text))
                     let ownerChat = Chat(messages: [ownerMessage], itemId: String(itemId), itemOwner: seller, buyer: user)
                     self?.reference.child(seller).child("chats").child("\(itemId)").child(user).setValue(ownerChat.toAnyObject())
+                    
+                    if user == seller {
+                        self?.messages.append(ownerMessage)
+                    }
                 }
                 
                 self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
@@ -171,18 +179,20 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                             
                             let buyerMessage = Message(sender: sender, messageId: "\(buyerMessageId)", sentDate: Date(), kind: .text(text))
                             self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("messages").child("m\(buyerMessageId)").setValue(buyerMessage.toAnyObject())
+                            
+                            if user == buyer {
+                                self?.messages.append(buyerMessage)
+                            }
                         }
                     } else {
                         let buyerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text(text))
                         let buyerChat = Chat(messages: [buyerMessage], itemId: String(itemId), itemOwner: seller, buyer: user)
                         self?.reference.child(seller).child("chats").child("\(itemId)").child(user).setValue(buyerChat.toAnyObject())
+                        
+                        if user == buyer {
+                            self?.messages.append(buyerMessage)
+                        }
                     }
-                    
-//                    if user == seller {
-//                        self?.messages.append(ownerMessage)
-//                    } else {
-//                        self?.messages.append(buyerMessage)
-//                    }
                     
                     DispatchQueue.main.async {
                         completion()

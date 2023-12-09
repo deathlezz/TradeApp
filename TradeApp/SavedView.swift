@@ -92,6 +92,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         if navigationItem.rightBarButtonItems == [selectButton] && monitor.currentPath.status == .satisfied {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
                 let item = savedItems[indexPath.item]
+                guard AppStorage.shared.items.first(where: {$0.id == item.id}) != nil else { return }
                 vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
                 vc.images = [item.thumbnail!]
                 vc.hidesBottomBarWhenPushed = true
