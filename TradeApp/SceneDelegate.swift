@@ -55,6 +55,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UINavigationControllerD
 
         if let vc = storyboard.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = item
+            vc.isOpenedByLink = true
             vc.hidesBottomBarWhenPushed = true
             navController?.pushViewController(vc, animated: true)
         }

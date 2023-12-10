@@ -1458,7 +1458,7 @@
         <scene sceneID="YJ1-pm-bYc">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="VL8-10-7Zg" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Account" image="person" catalog="system" id="zBl-Sh-KI4"/>
+                    <tabBarItem key="tabBarItem" tag="4" title="Account" image="person" catalog="system" id="zBl-Sh-KI4"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="LMt-ba-yIG">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>
@@ -1809,7 +1809,7 @@
         <scene sceneID="E72-tD-25r">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="0g4-ZW-dPx" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Messages" image="ellipsis.message" catalog="system" id="qay-QU-4uF"/>
+                    <tabBarItem key="tabBarItem" tag="3" title="Messages" image="ellipsis.message" catalog="system" id="qay-QU-4uF"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Oxr-1N-sZY">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>

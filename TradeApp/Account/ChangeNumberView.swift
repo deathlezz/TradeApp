@@ -145,7 +145,7 @@ class ChangeNumberView: UITableViewController {
             ac.addAction(UIAlertAction(title: "Continue", style: .default) { [weak self] _ in
                 Auth.auth().currentUser?.unlink(fromProvider: PhoneAuthProviderID) { _, error in
                     guard error == nil else {
-                        self?.showAlert(title: "Remove phone failed", message: error!.localizedDescription)
+                        self?.showAlert(title: "Remove number failed", message: error!.localizedDescription)
                         return
                     }
                     self?.updateRows()

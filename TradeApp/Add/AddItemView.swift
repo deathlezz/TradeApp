@@ -220,6 +220,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // upload images on load
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        guard Auth.auth().currentUser != nil else {
+            navigationController?.popToRootViewController(animated: false)
+            return
+        }
+        
         if title == "Add" && uploadedPhotos.count > 0 {
             NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": uploadedPhotos])
         }
@@ -641,16 +647,21 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(itemID)").child("image\(index)")
             guard let img = image else { return }
             
-            storageRef.putData(img) { (metadata, _) in
-                if metadata != nil {
-                    storageRef.downloadURL() { (url, _) in
-                
-                        guard let urlString = url?.absoluteString else { return }
-                        imagesURL.append(urlString)
-                        urlsReady += 1
-                        guard urlsReady == images.count else { return }
-                        imagesURL.sort(by: <)
-                        completion(imagesURL)
+            DispatchQueue.global().async {
+                storageRef.putData(img) { (metadata, _) in
+                    if metadata != nil {
+                        storageRef.downloadURL() { (url, _) in
+                    
+                            guard let urlString = url?.absoluteString else { return }
+                            imagesURL.append(urlString)
+                            urlsReady += 1
+                            guard urlsReady == images.count else { return }
+                            imagesURL.sort(by: <)
+                            
+                            DispatchQueue.main.async {
+                                completion(imagesURL)
+                            }
+                        }
                     }
                 }
             }

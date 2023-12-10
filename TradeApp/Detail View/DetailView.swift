@@ -36,6 +36,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     var longitude: Double!
     
     var reference: DatabaseReference!
+    var isOpenedByLink: Bool!
     
     var item: Item!
     var images = [UIImage]()
@@ -80,12 +81,8 @@ class DetailView: UITableViewController, Index, Coordinates {
                 self?.images.append(contentsOf: imgs)
                 
                 DispatchQueue.main.async {
-                    // send notification to detail view cell here
-                    
+                    // send notification to detail view cell
                     NotificationCenter.default.post(name: NSNotification.Name("updateImages"), object: nil, userInfo: ["images": self?.images ?? [UIImage]()])
-
-//                    let indexSet = IndexSet(integer: 0)
-//                    self?.tableView.reloadSections(indexSet, with: .none)
                 }
             }
         }
@@ -426,7 +423,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         messageFrame.layer.borderWidth = 0.2
         let messageButton = UIBarButtonItem(customView: messageFrame)
         
-        if Auth.auth().currentUser == nil && phone == 0 {
+        if Auth.auth().currentUser == nil && phone == nil {
             // show disabled message button only
             messageButton.customView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 20, height: 50)
             messageButton.isEnabled = false
@@ -434,7 +431,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         } else if Auth.auth().currentUser == nil {
             // show call button and disabled message button
             messageButton.isEnabled = false
-        } else if phone == 0 {
+        } else if phone == nil {
             // show message button only
             messageButton.customView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 20, height: 50)
             callButton.isHidden = true
@@ -611,16 +608,22 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // convert URLs into images
     func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
-        guard urls.count > 1 else { return }
+        var links = [URL]()
+        
+        if !isOpenedByLink {
+            // get all images except the thumbnail
+            guard urls.count > 1 else { return }
+            links = Array(urls.map {URL(string: $0)!}.dropFirst())
+        } else {
+            // get all images
+            links = urls.map {URL(string: $0)!}
+        }
         
         var imagesDict = [String: UIImage]()
-        
-        // get all images except the thumbnail
-        let links = urls.map {URL(string: $0)}.dropFirst()
-        
+
         DispatchQueue.global().async {
             for (index, url) in links.enumerated() {
-                let task = URLSession.shared.dataTask(with: url!) { (data, _, _) in
+                let task = URLSession.shared.dataTask(with: url) { (data, _, _) in
                     if let data = data {
                         DispatchQueue.main.async {
                             let image = UIImage(data: data) ?? UIImage()

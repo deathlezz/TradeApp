@@ -95,6 +95,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                 guard AppStorage.shared.items.first(where: {$0.id == item.id}) != nil else { return }
                 vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
                 vc.images = [item.thumbnail!]
+                vc.isOpenedByLink = false
                 vc.hidesBottomBarWhenPushed = true
                 isDetailShown = true
                 navigationController?.pushViewController(vc, animated: true)
@@ -453,21 +454,14 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     // download active items from firebase & convert images urls to data array
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
         var items = [String: [String: Any]]()
+        let saved = savedItems
         var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
-            guard let saved = self?.savedItems else { return }
-            
             for item in saved {
                 self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
                     if let value = snapshot.value as? [String: Any] {
-                        // add item to existed items
-                        items["\(item.id)"] = value
-//                        adsReady += 1
-//                        
-//                        guard adsReady == items.count else { return }
-//                        completion(items)
-                        
+                        items["\(item.id)"] = value                        
                         let photos = value["photosURL"] as! [String]
                         
                         self?.convertThumbnail(url: photos[0]) { thumbnail in
@@ -480,9 +474,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                             guard adsReady == items.count else { return }
                             completion(items)
                         }
-                        
-                    } else {
-                        completion(items)
                     }
                 }
             }

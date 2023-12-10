@@ -137,6 +137,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
             let item = AppStorage.shared.filteredItems[indexPath.item]
             vc.item = item
             vc.images = [item.thumbnail!]
+            vc.isOpenedByLink = false
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -236,7 +237,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         
         DispatchQueue.global().async { [weak self] in
             self?.getData() { dict in
-                AppStorage.shared.items.removeAll(keepingCapacity: false)
+                AppStorage.shared.items.removeAll()
                 let newItems = self?.toItemModel(dict: dict) ?? [Item]()
                 AppStorage.shared.items = newItems
 
@@ -534,33 +535,22 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     // download all active items & convert thumbnails to UIImage
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
         var items = [String: [String: Any]]()
-        var adsReady = 0
+        
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.observeSingleEvent(of: .value) { snapshot in
+                defer {
+                    dispatchGroup.leave()
+                }
+                
                 if let data = snapshot.value as? [String: [String: Any]] {
-                    
                     for user in data {
-                        guard let activeItems = data[user.key]?["activeItems"] as? [String: [String: Any]] else { return }
-                        
-                        for item in activeItems {
-                            items["\(item.key)"] = item.value
-                            
-//                            let photos = item.value["photosURL"] as! [String]
-                            adsReady += 1
-                            guard adsReady == items.count else { return }
-                            completion(items)
-                            
-//                            self?.convertThumbnail(url: photos[0]) { thumbnail in
-//                                items[item.key]?["thumbnail"] = thumbnail
-//                                
-//                                if let _ = items[item.key]?["thumbnail"] as? UIImage {
-//                                    adsReady += 1
-//                                }
-//                                
-//                                guard adsReady == items.count else { return }
-//                                completion(items)
-//                            }
+                        if let activeItems = data[user.key]?["activeItems"] as? [String: [String: Any]] {
+                            for item in activeItems {
+                                items["\(item.key)"] = item.value
+                            }
                         }
                     }
                 } else {
@@ -572,6 +562,10 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                 }
             }
         }
+        
+        dispatchGroup.notify(queue: .main) {
+            completion(items)
+        }
     }
     
     // convert dictionary to [Item] model
@@ -579,7 +573,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         var result = [Item]()
         
         for item in dict {
-//            let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int

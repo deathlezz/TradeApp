@@ -15,10 +15,10 @@ enum AccountAction {
     case register
 }
 
-enum LoginPushType {
-    case load
-    case signIn
-}
+//enum LoginPushType {
+//    case load
+//    case signIn
+//}
 
 class LoginView: UITableViewController {
     
@@ -198,7 +198,7 @@ class LoginView: UITableViewController {
                 
                 self?.resetView(after: .login)
                 sender.isUserInteractionEnabled = true
-                self?.loginPush(after: .signIn)
+                self?.loginPush()
             }
         } else {
             guard let rePassText = repeatPassword.textField.text else { return }
@@ -261,31 +261,16 @@ class LoginView: UITableViewController {
         handleSegmentChange(segment.segment)
     }
     
-    // load login status before view appeared
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        loginPush(after: .load)
-        
-//        DispatchQueue.global().async { [weak self] in
-//            
-//            DispatchQueue.main.async {
-//                self?.loginPush(after: .load)
-//            }
-//        }
-    }
-    
     // set tab bar item title after view appeared
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         changeTitle()
+        loginPush()
     }
     
     // push vc if user is signed in
-    func loginPush(after: LoginPushType) {
-        if after == .load {
-            guard Auth.auth().currentUser != nil else { return }
-        }
-        
+    func loginPush() {
+        guard Auth.auth().currentUser != nil else { return }
         guard monitor.currentPath.status == .satisfied else { return }
         
         if tabBarController?.selectedIndex == 2 {

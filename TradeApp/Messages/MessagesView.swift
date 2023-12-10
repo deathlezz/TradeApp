@@ -105,6 +105,11 @@ class MessagesView: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        guard Auth.auth().currentUser != nil else {
+            navigationController?.popToRootViewController(animated: false)
+            return
+        }
+        
         DispatchQueue.global().async { [weak self] in
             self?.loadChats() { conv in
                 self?.chats = conv

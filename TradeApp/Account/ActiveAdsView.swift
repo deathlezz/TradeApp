@@ -119,6 +119,7 @@ class ActiveAdsView: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = activeAds[indexPath.row]
             vc.images = [(activeAds[indexPath.row].thumbnail)!]
+            vc.isOpenedByLink = false
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []
             navigationController?.pushViewController(vc, animated: true)
