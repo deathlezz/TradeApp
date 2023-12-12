@@ -563,7 +563,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
             }
         }
         
-        dispatchGroup.notify(queue: .main) {
+        dispatchGroup.notify(queue: .global()) {
             completion(items)
         }
     }

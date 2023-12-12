@@ -498,6 +498,14 @@ class DetailView: UITableViewController, Index, Coordinates {
                     } else {
                         self?.reference.child(owner).child("activeItems").child("\(itemID)").child("saved").setValue(saved - 1)
                     }
+                } else {
+                    self?.reference.child(owner).child("endedItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
+                        if let saved = snapshot.value as? Int {
+                            if action == .remove {
+                                self?.reference.child(owner).child("endedItems").child("\(itemID)").child("saved").setValue(saved - 1)
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -225,14 +225,21 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     // load current chat
     func getChat(completion: @escaping ([Message]) -> Void) {
-//        guard !isPushedByChats else { return }
+        guard let user = Auth.auth().currentUser?.uid else { return }
+        guard let itemId = itemId else { return }
         
         var currentChat = [Message]()
         
-        guard let itemId = itemId else { return }
+        var child: String
+        
+        if user == ChatView.seller {
+            child = ChatView.buyer
+        } else {
+            child = ChatView.seller
+        }
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(ChatView.buyer).child("chats").child("\(itemId)").child(ChatView.seller).child("messages").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(user).child("chats").child("\(itemId)").child(child).child("messages").observeSingleEvent(of: .value) { snapshot in
                 if let chat = snapshot.value as? [String: [String: String]] {
                     
                     let sortedChat = chat.sorted {$0.key < $1.key}

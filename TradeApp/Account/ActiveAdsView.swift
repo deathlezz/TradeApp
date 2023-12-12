@@ -34,7 +34,6 @@ class ActiveAdsView: UITableViewController {
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         addEmptyArrayView()
-        loadUserAds()
     }
     
     // set number of sections
@@ -178,7 +177,8 @@ class ActiveAdsView: UITableViewController {
     // hide toolbar before view appears
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        isArrayEmpty()
+        loadUserAds()
+//        isArrayEmpty()
         navigationController?.isToolbarHidden = true
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
     }
@@ -349,28 +349,11 @@ class ActiveAdsView: UITableViewController {
     // download active ads from Firebase
     func getActiveAds(completion: @escaping ([String: [String: Any]]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
-//        var items = [String: [String: Any]]()
-//        var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("activeItems").observeSingleEvent(of: .value) { snapshot in
                 if let data = snapshot.value as? [String: [String: Any]] {
-//                    items = data
                     completion(data)
-//                    for (key, value) in data {
-//                        let photos = value["photosURL"] as! [String]
-//                        
-//                        self?.convertThumbnail(url: photos[0]) { thumbnail in
-//                            items[key]?["thumbnail"] = thumbnail
-//                            
-//                            if let _ = items[key]?["thumbnail"] as? UIImage {
-//                                adsReady += 1
-//                            }
-//                            
-//                            guard adsReady == items.count else { return }
-//                            completion(items)
-//                        }
-//                    }
                 }
             }
         }
@@ -381,7 +364,6 @@ class ActiveAdsView: UITableViewController {
         var result = [Item]()
         
         for item in dict {
-//            let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int

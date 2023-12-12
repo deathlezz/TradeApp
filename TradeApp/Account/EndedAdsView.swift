@@ -35,7 +35,6 @@ class EndedAdsView: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(loadUserAds), name: NSNotification.Name("reloadEndedAds"), object: nil)
         
         addEmptyArrayView()
-        loadUserAds()
     }
     
     // set number of sections
@@ -194,7 +193,8 @@ class EndedAdsView: UITableViewController {
     // hide toolbar before view appears
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        isArrayEmpty()
+        loadUserAds()
+//        isArrayEmpty()
         navigationController?.isToolbarHidden = true
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
     }
@@ -277,7 +277,7 @@ class EndedAdsView: UITableViewController {
                     self?.reference.child(user).child("activeItems").child("\(itemId)").setValue(value)
                     self?.reference.child(user).child("activeItems").child("\(itemId)").child("date").setValue(date)
                     self?.reference.child(user).child("activeItems").child("\(itemId)").child("views").setValue(0)
-                    self?.reference.child(user).child("activeItems").child("\(itemId)").child("saved").setValue(0)
+//                    self?.reference.child(user).child("activeItems").child("\(itemId)").child("saved").setValue(0)
                     self?.reference.child(user).child("endedItems").child("\(itemId)").removeValue()
                 }
             }
@@ -336,28 +336,11 @@ class EndedAdsView: UITableViewController {
     // download ended ads from Firebase
     func getEndedAds(completion: @escaping ([String: [String: Any]]) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
-//        var items = [String: [String: Any]]()
-//        var adsReady = 0
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("endedItems").observeSingleEvent(of: .value) { snapshot in
                 if let data = snapshot.value as? [String: [String: Any]] {
                     completion(data)
-//                    items = data
-//                    for (key, value) in data {
-//                        let photos = value["photosURL"] as! [String]
-//                        
-//                        self?.convertThumbnail(url: photos[0]) { thumbnail in
-//                            items[key]?["thumbnail"] = thumbnail
-//                            
-//                            if let _ = items[key]?["thumbnail"] as? UIImage {
-//                                adsReady += 1
-//                            }
-//                            
-//                            guard adsReady == items.count else { return }
-//                            completion(items)
-//                        }
-//                    }
                 }
             }
         }
@@ -368,7 +351,6 @@ class EndedAdsView: UITableViewController {
         var result = [Item]()
         
         for item in dict {
-//            let thumbnail = item.value["thumbnail"] as? UIImage
             let photosURL = item.value["photosURL"] as? [String]
             let title = item.value["title"] as? String
             let price = item.value["price"] as? Int

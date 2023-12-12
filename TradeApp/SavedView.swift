@@ -376,6 +376,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             self?.getData() { dict in
                 let oldSaved = self?.savedItems ?? [Item]()
                 let newSaved = self?.toItemModel(dict: dict) ?? [Item]()
+                self?.removeNotMatched(old: oldSaved, new: newSaved)
                 let sorted = newSaved.sorted {$0.views! > $1.views!}
                 self?.savedItems = sorted
 
@@ -420,6 +421,25 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
             emptyArrayView.isHidden = false
         }
     }
+
+    // remove not matching saved items from Firebase
+    func removeNotMatched(old: [Item], new: [Item]) {
+        let notMatchedItems = old.filter { oldItem in
+            !new.contains { newItem in
+                newItem.id == oldItem.id
+            }
+        }
+        
+        for item in notMatchedItems {
+            DispatchQueue.global().async { [weak self] in
+                self?.reference.child(item.owner).child("endedItems").child("\(item.id)").child("saved").observeSingleEvent(of: .value) { snapshot in
+                    if let saved = snapshot.value as? Int {
+                        self?.reference.child(item.owner).child("endedItems").child("\(item.id)").child("saved").setValue(saved - 1)
+                    }
+                }
+            }
+        }
+    }
     
     // update number of saved in Firebase
     func removeFromSaved() {
@@ -428,6 +448,14 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                 self?.reference.child(item.owner).child("activeItems").child("\(item.id)").child("saved").observeSingleEvent(of: .value) { snapshot in
                     if let saved = snapshot.value as? Int {
                         self?.reference.child(item.owner).child("activeItems").child("\(item.id)").child("saved").setValue(saved - 1)
+                        
+                    } else {
+                        self?.reference.child(item.owner).child("endedItems").child("\(item.id)").child("saved").observeSingleEvent(of: .value) { snapshot in
+                            if let saved = snapshot.value as? Int {
+                                self?.reference.child(item.owner).child("endedItems").child("\(item.id)").child("saved").setValue(saved - 1)
+                                
+                            }
+                        }
                     }
                 }
             }
@@ -455,27 +483,32 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     func getData(completion: @escaping ([String: [String: Any]]) -> Void) {
         var items = [String: [String: Any]]()
         let saved = savedItems
-        var adsReady = 0
+        
+        let dispatchGroup = DispatchGroup()
         
         DispatchQueue.global().async { [weak self] in
             for item in saved {
+                dispatchGroup.enter()
+                
                 self?.reference.child(item.owner).child("activeItems").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
                     if let value = snapshot.value as? [String: Any] {
-                        items["\(item.id)"] = value                        
+                        items["\(item.id)"] = value
+                        
                         let photos = value["photosURL"] as! [String]
                         
                         self?.convertThumbnail(url: photos[0]) { thumbnail in
                             items["\(item.id)"]?["thumbnail"] = thumbnail
                             
-                            if let _ = items["\(item.id)"]?["thumbnail"] as? UIImage {
-                                adsReady += 1
-                            }
-                            
-                            guard adsReady == items.count else { return }
-                            completion(items)
+                            dispatchGroup.leave()
                         }
+                    } else {
+                        dispatchGroup.leave()
                     }
                 }
+            }
+            
+            dispatchGroup.notify(queue: .global()) {
+                completion(items)
             }
         }
     }

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-struct Item {
+struct Item: Equatable {
     var thumbnail: UIImage?
     var photosURL: [String]
     var title: String

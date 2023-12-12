@@ -171,12 +171,17 @@ class MessagesView: UITableViewController {
             
         var result = [Chat]()
         
+        let dispatchGroup = DispatchGroup()
+        
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
                 if let chats = snapshot.value as? [String: [String: [String: Any]]] {
                     
                     for (id, traders) in chats {
                         for trader in traders {
+                            
+                            dispatchGroup.enter()
+                            
                             self?.getChatData(trader: trader.key, id: id) { data in
                                 let chatTitle = data["title"] as? String
                                 let chatThumbnail = data["thumbnailURL"] as? String
@@ -191,16 +196,18 @@ class MessagesView: UITableViewController {
                                     let chat = Chat(messages: messages, itemId: id, itemOwner: itemOwner, buyer: buyer, title: chatTitle, thumbnailUrl: chatThumbnail)
                                     result.append(chat)
                                     
-                                    guard result.count == chats.values.count else { return }
-                                    
-                                    if result.count > 1 {
-                                        result.sort {$0.messages.last!.sentDate > $1.messages.last!.sentDate}
-                                    }
-
-                                    completion(result)
+                                    dispatchGroup.leave()
                                 }
                             }
                         }
+                    }
+                    
+                    dispatchGroup.notify(queue: .global()) {
+                        if result.count > 1 {
+                            result.sort {$0.messages.last!.sentDate > $1.messages.last!.sentDate}
+                        }
+
+                        completion(result)
                     }
                 }
             }
