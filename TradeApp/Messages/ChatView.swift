@@ -50,7 +50,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                 
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.reloadData()
-                    self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
+                    self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: false)
                 }
             }
         }
@@ -146,6 +146,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         guard let user = Auth.auth().currentUser?.uid else { return }
         
         let sender = Sender(senderId: user, displayName: "")
+        let timestamp = Int(Date().timeIntervalSince1970 * 1000)
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
@@ -155,7 +156,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                         let ownerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
                         
                         let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text(text))
-                        self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("messages").child("m\(ownerMessageId)").setValue(ownerMessage.toAnyObject())
+                        self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("messages").child("\(timestamp)").setValue(ownerMessage.toAnyObject())
                         
                         if user == seller {
                             self?.messages.append(ownerMessage)
@@ -178,7 +179,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                             let buyerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
                             
                             let buyerMessage = Message(sender: sender, messageId: "\(buyerMessageId)", sentDate: Date(), kind: .text(text))
-                            self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("messages").child("m\(buyerMessageId)").setValue(buyerMessage.toAnyObject())
+                            self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("messages").child("\(timestamp)").setValue(buyerMessage.toAnyObject())
                             
                             if user == buyer {
                                 self?.messages.append(buyerMessage)

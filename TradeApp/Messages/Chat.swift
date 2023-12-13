@@ -17,9 +17,11 @@ struct Chat {
     var thumbnailUrl: String?
     var thumbnail: UIImage?
     
-    func toAnyObject() -> [String: Any] {        
+    func toAnyObject() -> [String: Any] { 
+        let timestamp = Int(Date().timeIntervalSince1970 * 1000)
+        
         return [
-            "messages": ["m0": messages[0].toAnyObject()],
+            "messages": ["\(timestamp)": messages[0].toAnyObject()],
             "itemId": itemId,
             "itemOwner": itemOwner,
             "buyer": buyer

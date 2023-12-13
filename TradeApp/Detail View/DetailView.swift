@@ -555,9 +555,11 @@ class DetailView: UITableViewController, Index, Coordinates {
                     if let lastMessage = snapshot.value as? [String: [String: String]] {
                         ownerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
                         
+                        let timestamp = Int(Date().timeIntervalSince1970 * 1000)
+                        
                         let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
                         
-                        self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("messages").child("m\(ownerMessageId)").setValue(ownerMessage.toAnyObject())
+                        self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("messages").child("\(timestamp)").setValue(ownerMessage.toAnyObject())
                     }
                 } else {
                     let ownerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
