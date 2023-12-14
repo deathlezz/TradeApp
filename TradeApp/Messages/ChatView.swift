@@ -47,6 +47,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         DispatchQueue.global().async { [weak self] in
             self?.getChat() { chat in
                 self?.messages = chat
+                self?.chatRead()
                 
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.reloadData()
@@ -160,6 +161,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                         
                         if user == seller {
                             self?.messages.append(ownerMessage)
+                            self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("read").setValue(true)
+                            self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("read").setValue(false)
                         }
                     }
                 } else {
@@ -169,6 +172,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                     
                     if user == seller {
                         self?.messages.append(ownerMessage)
+                        self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("read").setValue(true)
+                        self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("read").setValue(false)
                     }
                 }
                 
@@ -183,6 +188,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                             
                             if user == buyer {
                                 self?.messages.append(buyerMessage)
+                                self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("read").setValue(true)
+                                self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("read").setValue(false)
                             }
                         }
                     } else {
@@ -192,6 +199,8 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                         
                         if user == buyer {
                             self?.messages.append(buyerMessage)
+                            self?.reference.child(buyer).child("chats").child("\(itemId)").child(seller).child("read").setValue(true)
+                            self?.reference.child(seller).child("chats").child("\(itemId)").child(buyer).child("read").setValue(false)
                         }
                     }
                     
@@ -259,6 +268,24 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                     }
                 }
             }
+        }
+    }
+    
+    // update chat "read" value on Firebase
+    func chatRead() {
+        guard let user = Auth.auth().currentUser?.uid else { return }
+        guard let itemId = itemId else { return }
+        
+        var child: String
+        
+        if user == ChatView.seller {
+            child = ChatView.buyer
+        } else {
+            child = ChatView.seller
+        }
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(user).child("chats").child("\(itemId)").child(child).child("read").setValue(true)
         }
     }
     

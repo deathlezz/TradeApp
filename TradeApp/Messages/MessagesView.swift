@@ -52,11 +52,26 @@ class MessagesView: UITableViewController {
                 }
             }
             
+            let image = UIImage(systemName: "circlebadge.fill")
+            cell.accessoryView = UIImageView(image: image)
+            
+            if chats[indexPath.row].read! == true {
+                cell.title.font = UIFont.systemFont(ofSize: 18)
+                cell.subtitle.font = UIFont.systemFont(ofSize: 12)
+                cell.accessoryView?.tintColor = .clear
+                cell.accessoryView?.sizeToFit()
+            } else {
+                cell.title.font = UIFont.boldSystemFont(ofSize: 18)
+                cell.subtitle.font = UIFont.boldSystemFont(ofSize: 12)
+                cell.accessoryView?.tintColor = .systemBlue
+                cell.accessoryView?.sizeToFit()
+            }
+            
             cell.title.text = chats[indexPath.row].title
-            cell.title.font = UIFont.systemFont(ofSize: 18)
+//            cell.title.font = UIFont.systemFont(ofSize: 18)
             cell.subtitle.text = "\(getMessageText((chats[indexPath.row].messages.last?.kind)!).trimmingCharacters(in: .whitespacesAndNewlines)) • \(convertDate((chats[indexPath.row].messages.last?.sentDate)!))"
             cell.subtitle.textColor = .darkGray
-            cell.subtitle.font = UIFont.systemFont(ofSize: 12)
+//            cell.subtitle.font = UIFont.systemFont(ofSize: 12)
             cell.accessoryType = .disclosureIndicator
             return cell
         }
@@ -69,7 +84,6 @@ class MessagesView: UITableViewController {
             ChatView.buyer = chats[indexPath.row].buyer
             ChatView.seller = chats[indexPath.row].itemOwner
             vc.chatTitle = chats[indexPath.row].title
-//            vc.isPushedByChats = true
             vc.itemId = chats[indexPath.row].itemId
             vc.hidesBottomBarWhenPushed = true
             vc.navigationItem.largeTitleDisplayMode = .never
@@ -191,9 +205,10 @@ class MessagesView: UITableViewController {
                                 let arrayChatData = sortedChatData.map {$0.value}
                                 let itemOwner = trader.value["itemOwner"] as! String
                                 let buyer = trader.value["buyer"] as! String
+                                let read = trader.value["read"] as! Bool
                                 
                                 self?.toMessageModel(chat: arrayChatData) { messages in
-                                    let chat = Chat(messages: messages, itemId: id, itemOwner: itemOwner, buyer: buyer, title: chatTitle, thumbnailUrl: chatThumbnail)
+                                    let chat = Chat(messages: messages, itemId: id, itemOwner: itemOwner, buyer: buyer, title: chatTitle, thumbnailUrl: chatThumbnail, read: read)
                                     result.append(chat)
                                     
                                     dispatchGroup.leave()
@@ -205,6 +220,7 @@ class MessagesView: UITableViewController {
                     dispatchGroup.notify(queue: .global()) {
                         if result.count > 1 {
                             result.sort {$0.messages.last!.sentDate > $1.messages.last!.sentDate}
+                            result.sort {!$0.read! && $1.read!}
                         }
 
                         completion(result)

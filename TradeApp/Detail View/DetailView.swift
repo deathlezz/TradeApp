@@ -68,8 +68,11 @@ class DetailView: UITableViewController, Index, Coordinates {
         navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
         
         savedItems = Utilities.loadItems()
-        checkForMessage()
-        loadPhoneNumber()
+        
+        loadPhoneNumber { [weak self] in
+            self?.checkForMessage()
+        }
+        
         isSaved()
         increaseViews()
         DetailView.isLoaded = true
@@ -447,13 +450,17 @@ class DetailView: UITableViewController, Index, Coordinates {
     }
     
     // load item's phone number
-    func loadPhoneNumber() {
+    func loadPhoneNumber(completion: @escaping () -> Void) {
         let owner = item.owner
 
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(owner).child("phoneNumber").observeSingleEvent(of: .value) { snapshot in
                 if let number = snapshot.value as? String {
                     self?.phone = Int(number)
+                }
+                
+                DispatchQueue.main.async {
+                    completion()
                 }
             }
         }
@@ -560,16 +567,19 @@ class DetailView: UITableViewController, Index, Coordinates {
                         let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
                         
                         self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("messages").child("\(timestamp)").setValue(ownerMessage.toAnyObject())
+                        self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("read").setValue(false)
                     }
                 } else {
                     let ownerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
                     let ownerChat = Chat(messages: [ownerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
                     self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).setValue(ownerChat.toAnyObject())
+                    self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("read").setValue(false)
                 }
                 
                 let buyerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
                 let buyerChat = Chat(messages: [buyerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
                 self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).setValue(buyerChat.toAnyObject())
+                self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).child("read").setValue(true)
                 
                 DispatchQueue.main.async {
                     self?.messageSent = true

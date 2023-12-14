@@ -16,6 +16,7 @@ struct Chat {
     var title: String?
     var thumbnailUrl: String?
     var thumbnail: UIImage?
+    var read: Bool?
     
     func toAnyObject() -> [String: Any] { 
         let timestamp = Int(Date().timeIntervalSince1970 * 1000)
