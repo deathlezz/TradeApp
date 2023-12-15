@@ -194,7 +194,9 @@ class AccountView: UITableViewController {
                 }
                 
                 self?.deleteUser(user: user) {
-                    self?.showAlert(title: "Success", message: "Your account has been deleted")
+                    self?.deleteAllChats {
+                        self?.showAlert(title: "Success", message: "Your account has been deleted")
+                    }
                 }
             }
         })
@@ -342,6 +344,36 @@ class AccountView: UITableViewController {
                     }
                 }
             }
+        }
+    }
+    
+    // delete all chats done with you
+    func deleteAllChats(completion: @escaping () -> Void) {
+        guard let user = Auth.auth().currentUser?.uid else { return }
+
+        let dispatchGroup = DispatchGroup()
+
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
+                if let chats = snapshot.value as? [String: [String: [String: Any]]] {
+                    
+                    for (id, traders) in chats {
+                        for trader in traders {
+                            dispatchGroup.enter()
+                            self?.reference.child(trader.key).child("chats").child(id).child(user).removeValue { error, _ in
+                                if let error = error {
+                                    print("Error removing chat: \(error)")
+                                }
+                                dispatchGroup.leave()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        dispatchGroup.notify(queue: .global()) {
+            completion()
         }
     }
     

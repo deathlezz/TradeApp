@@ -68,10 +68,8 @@ class MessagesView: UITableViewController {
             }
             
             cell.title.text = chats[indexPath.row].title
-//            cell.title.font = UIFont.systemFont(ofSize: 18)
             cell.subtitle.text = "\(getMessageText((chats[indexPath.row].messages.last?.kind)!).trimmingCharacters(in: .whitespacesAndNewlines)) • \(convertDate((chats[indexPath.row].messages.last?.sentDate)!))"
             cell.subtitle.textColor = .darkGray
-//            cell.subtitle.font = UIFont.systemFont(ofSize: 12)
             cell.accessoryType = .disclosureIndicator
             return cell
         }
