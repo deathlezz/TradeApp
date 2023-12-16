@@ -12,6 +12,7 @@ import Firebase
 class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     var savedItems = [Item]()
+    var viewAppeared = false
     
     let monitor = NWPathMonitor()
     var isPushed = false
@@ -57,20 +58,23 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     
     // set collection view cell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as? ItemCell {
             
-            if monitor.currentPath.status == .satisfied {
-                let url = savedItems[indexPath.row].photosURL[0]
-                convertThumbnail(url: url) { [weak self] thumbnail in
-                    self?.savedItems[indexPath.row].thumbnail = thumbnail
+            if viewAppeared {
+                if monitor.currentPath.status == .satisfied {
+                    let url = savedItems[indexPath.row].photosURL[0]
+                    convertThumbnail(url: url) { [weak self] thumbnail in
+                        self?.savedItems[indexPath.row].thumbnail = thumbnail
 
-                    DispatchQueue.main.async {
-                        cell.image.image = nil
-                        cell.image.image = thumbnail.resized(to: cell.image.frame.size)
+                        DispatchQueue.main.async {
+                            cell.image.image = nil
+                            cell.image.image = thumbnail.resized(to: cell.image.frame.size)
+                        }
                     }
+                } else {
+                    cell.image.image = savedItems[indexPath.row].thumbnail?.resized(to: cell.image.frame.size)
                 }
-            } else {
-                cell.image.image = savedItems[indexPath.row].thumbnail?.resized(to: cell.image.frame.size)
             }
             
             cell.title.text = savedItems[indexPath.item].title
@@ -195,6 +199,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         DispatchQueue.global().async { [weak self] in
             self?.updateSavedItems() {
                 DispatchQueue.main.async {
+                    self?.viewAppeared = true
                     self?.isArrayEmpty()
                     self?.collectionView.reloadData()
                 }
@@ -206,6 +211,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if isMovingFromParent {
+            viewAppeared = false
             savedItems.removeAll(keepingCapacity: false)
         }
         
@@ -554,7 +560,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         let screenWidth = UIScreen.main.bounds.width
         let minX = view.readableContentGuide.layoutFrame.minX
         
-        let cellWidth = screenWidth / 2 - minX * 1.5
+        let cellWidth = screenWidth / 2 - minX * 1.4
         let cellHeight = cellWidth * 1.3
         
         return CGSize(width: cellWidth, height: cellHeight)

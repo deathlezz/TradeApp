@@ -616,7 +616,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         let screenWidth = UIScreen.main.bounds.width
         let minX = view.readableContentGuide.layoutFrame.minX
         
-        let cellWidth = screenWidth / 2 - minX * 1.5
+        let cellWidth = screenWidth / 2 - minX * 1.4
         let cellHeight = cellWidth * 1.3
         
         return CGSize(width: cellWidth, height: cellHeight)

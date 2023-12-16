@@ -279,45 +279,46 @@ class AccountView: UITableViewController {
     
     // delete user images from Firebase Storage
     func deleteUser(user: String, completion: @escaping () -> Void) {
-//        DispatchQueue.global().async { [weak self] in
-//            self?.reference.child(user).observeSingleEvent(of: .value) { snapshot in
-//                if let data = snapshot.value as? [String: Any] {
-//
-//                    let active = data["activeItems"] as? [String: [String: Any]] ?? [:]
-//                    let ended = data["endedItems"] as? [String: [String: Any]] ?? [:]
-//                    let items = active.merging(ended) { (_, new) in new }
-//                    
-//                    for item in items {
-//                        guard let photos = item.value["photos"] as? [String: String] else { return }
-//                        let itemID = item.key
-//                        
-//                        for i in 0..<photos.count {
-//                            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child(itemID).child("image\(i)")
-//                            storageRef.delete(completion: nil)
-//                        }
-//                        
-//                        // remove user's items from the app
-//                        AppStorage.shared.items.removeAll(where: {$0.id == Int(itemID)})
-//                        AppStorage.shared.filteredItems.removeAll(where: {$0.id == Int(itemID)})
-//                    }
-//                    
-//                    DispatchQueue.main.async {
-//                        self?.reference.child(user).removeValue()
-//                    }
-//                }
-//            }
-//        }
-        
         DispatchQueue.global().async { [weak self] in
-            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user)
-            storageRef.delete { _ in
-                self?.reference.child(user).removeValue()
-                
-                DispatchQueue.main.async {
-                    completion()
+            self?.reference.child(user).observeSingleEvent(of: .value) { snapshot in
+                if let data = snapshot.value as? [String: Any] {
+
+                    let active = data["activeItems"] as? [String: [String: Any]] ?? [:]
+                    let ended = data["endedItems"] as? [String: [String: Any]] ?? [:]
+                    let items = active.merging(ended) { (_, new) in new }
+                    
+                    for item in items {
+                        guard let photos = item.value["photosURL"] as? [String] else { return }
+                        let itemID = item.key
+                        
+                        for i in 0..<photos.count {
+                            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child(itemID).child("image\(i)")
+                            storageRef.delete() { _ in }
+                        }
+                        
+                        // remove user's items from the app
+                        AppStorage.shared.items.removeAll(where: {$0.id == Int(itemID)})
+                        AppStorage.shared.filteredItems.removeAll(where: {$0.id == Int(itemID)})
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self?.reference.child(user).removeValue()
+                        completion()
+                    }
                 }
             }
         }
+        
+//        DispatchQueue.global().async { [weak self] in
+//            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user)
+//            storageRef.delete { _ in
+//                self?.reference.child(user).removeValue()
+//                
+//                DispatchQueue.main.async {
+//                    completion()
+//                }
+//            }
+//        }
     }
     
     // download user's ads amount

@@ -331,7 +331,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
 
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // set action for "return" keyboard button
@@ -523,7 +523,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         index = nil
         
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
 
         dismiss(animated: true)
     }
@@ -566,7 +566,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         index = nil
         
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // change indexPath
@@ -580,14 +580,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         images[index] = photo.rotate(radians: -.pi / 2)!
         
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // swap current image with the first one
     func setAsFirst() {
         (images[0], images[index]) = (images[index], images[0])
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
+//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // create unique item ID

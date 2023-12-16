@@ -140,7 +140,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         UIView.transition(with: collectionView, duration: 0.3, options: .transitionCrossDissolve, animations: {
             self.collectionView.reloadData()
         }) { finished in
-            print("collection view reloaded")
+            print("collection view reload")
         }
     }
     

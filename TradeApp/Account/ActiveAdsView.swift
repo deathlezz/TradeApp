@@ -233,7 +233,9 @@ class ActiveAdsView: UITableViewController {
     @objc func loadUserAds() {
         DispatchQueue.global().async { [weak self] in
             self?.getActiveAds() { dict in
-                self?.activeAds = self?.toItemModel(dict: dict) ?? [Item]()
+                let ads = self?.toItemModel(dict: dict) ?? [Item]()
+                let sorted = ads.sorted {$0.date > $1.date}
+                self?.activeAds = sorted
                 
                 DispatchQueue.main.async {
                     self?.isArrayEmpty()
@@ -290,42 +292,25 @@ class ActiveAdsView: UITableViewController {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
-            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(item.id)")
-            storageRef.delete() { _ in
-                self?.reference.child(user).child("activeItems").child("\(item.id)").removeValue()
-                
-                self?.reference.child(user).child("chats").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
+            for i in 0..<item.photosURL.count {
+                let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(item.id)").child("image\(i)")
+                storageRef.delete() { _ in }
+            }
+            
+            self?.reference.child(user).child("activeItems").child("\(item.id)").removeValue()
+            
+            self?.reference.child(user).child("chats").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
 
-                    if let buyers = snapshot.value as? [String: Any] {
-                        let keys = buyers.keys
+                if let buyers = snapshot.value as? [String: Any] {
+                    let keys = buyers.keys
 
-                        for key in keys {
-                            self?.reference.child(key).child("chats").child("\(item.id)").removeValue()
-                        }
-
-                        self?.reference.child(user).child("chats").child("\(item.id)").removeValue()
+                    for key in keys {
+                        self?.reference.child(key).child("chats").child("\(item.id)").removeValue()
                     }
+
+                    self?.reference.child(user).child("chats").child("\(item.id)").removeValue()
                 }
             }
-//            for i in 0..<item.photosURL.count {
-//                let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child("\(item.id)").child("image\(i)")
-//                storageRef.delete() { _ in }
-//            }
-//            
-//            self?.reference.child(user).child("activeItems").child("\(item.id)").removeValue()
-//            
-//            self?.reference.child(user).child("chats").child("\(item.id)").observeSingleEvent(of: .value) { snapshot in
-//
-//                if let buyers = snapshot.value as? [String: [[String: String]]] {
-//                    let keys = buyers.keys
-//
-//                    for key in keys {
-//                        self?.reference.child(key).child("chats").child("\(item.id)").removeValue()
-//                    }
-//
-//                    self?.reference.child(user).child("chats").child("\(item.id)").removeValue()
-//                }
-//            }
         }
     }
     
