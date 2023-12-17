@@ -100,6 +100,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                 vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
                 vc.images = [item.thumbnail!]
                 vc.isOpenedByLink = false
+                vc.isAdActive = true
                 vc.hidesBottomBarWhenPushed = true
                 isDetailShown = true
                 navigationController?.pushViewController(vc, animated: true)

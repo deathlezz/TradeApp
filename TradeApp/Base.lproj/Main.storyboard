@@ -613,7 +613,7 @@
                                             <rect key="frame" x="20" y="4" width="353" height="34.333333333333336"/>
                                             <color key="backgroundColor" systemColor="systemGray5Color"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done"/>
                                         </textField>
                                     </subviews>
                                     <constraints>
@@ -891,7 +891,7 @@
                                             <rect key="frame" x="20" y="5" width="353" height="34.333333333333336"/>
                                             <color key="backgroundColor" systemColor="systemGray5Color"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done"/>
                                         </textField>
                                     </subviews>
                                     <constraints>
@@ -1826,7 +1826,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="vBw-Pp-8T1"/>
+        <segue reference="pb1-23-32d"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="ellipsis.message" catalog="system" width="128" height="116"/>

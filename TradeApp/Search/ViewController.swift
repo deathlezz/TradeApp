@@ -138,6 +138,7 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
             vc.item = item
             vc.images = [item.thumbnail!]
             vc.isOpenedByLink = false
+            vc.isAdActive = true
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }

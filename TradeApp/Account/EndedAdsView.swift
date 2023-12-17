@@ -121,6 +121,7 @@ class EndedAdsView: UITableViewController {
             vc.item = endedAds[indexPath.row]
             vc.images = [(endedAds[indexPath.row].thumbnail)!]
             vc.isOpenedByLink = false
+            vc.isAdActive = false
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []
             navigationController?.pushViewController(vc, animated: true)

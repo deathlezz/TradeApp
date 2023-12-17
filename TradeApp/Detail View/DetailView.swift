@@ -37,6 +37,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     var reference: DatabaseReference!
     var isOpenedByLink: Bool!
+    var isAdActive: Bool!
     
     var item: Item!
     var images = [UIImage]()
@@ -55,19 +56,22 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
-        actionButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareTapped))
+        if isAdActive {
+            actionButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareTapped))
+            
+            saveButton = UIBarButtonItem(image: .init(systemName: "heart"), style: .plain, target: self, action: #selector(saveTapped))
+            
+            removeButton = UIBarButtonItem(image: .init(systemName: "heart.fill"), style: .plain, target: self, action: #selector(removeTapped))
+            
+            navigationItem.rightBarButtonItems = [saveButton, actionButton]
+            
+            savedItems = Utilities.loadItems()
+        }
         
-        saveButton = UIBarButtonItem(image: .init(systemName: "heart"), style: .plain, target: self, action: #selector(saveTapped))
-        
-        removeButton = UIBarButtonItem(image: .init(systemName: "heart.fill"), style: .plain, target: self, action: #selector(removeTapped))
-        
-        navigationItem.rightBarButtonItems = [saveButton, actionButton]
         tableView.separatorStyle = .none
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 83, right: 0)
         
         navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
-        
-        savedItems = Utilities.loadItems()
         
         loadPhoneNumber { [weak self] in
             self?.checkForMessage()
@@ -390,6 +394,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // define if item is saved or not
     func isSaved() {
+        guard isAdActive else { return }
         if savedItems.contains(where: {$0.id == item.id}) {
             navigationItem.rightBarButtonItems = [removeButton, actionButton]
         } else {
