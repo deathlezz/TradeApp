@@ -185,9 +185,10 @@ class AccountView: UITableViewController {
                 
                 if token?.claims["user_id"] as? String == user {
                     // user can be deleted
-                    self?.deleteUser(user: user) {
-                        print("delete user func finished")
+                    self?.deleteUserPhotos(user: user) {
                         self?.deleteAllChats(user: user) {
+                            self?.reference.child(user).removeValue()
+                            
                             Auth.auth().currentUser?.delete() { error in
                                 if let error = error {
                                     self?.showAlert(title: "Error", message: "Delete account failed: \(error.localizedDescription)")
@@ -195,8 +196,6 @@ class AccountView: UITableViewController {
                                     self?.showAlert(title: "Success", message: "Your account has been deleted")
                                 }
                             }
-//                            print("delete chats finished")
-//                            self?.showAlert(title: "Success", message: "Your account has been deleted")
                         }
                     }
                 } else {
@@ -213,33 +212,7 @@ class AccountView: UITableViewController {
                     self?.present(ac, animated: true)
                     return
                 }
-                
             }
-            
-            // remove user from database
-//            Auth.auth().currentUser?.delete() { error in
-//                guard error == nil else {
-//                    let ac = UIAlertController(title: "Delete account failed", message: error!.localizedDescription, preferredStyle: .alert)
-//                    ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-//                        do {
-//                            try Auth.auth().signOut()
-//                            self?.navigationController?.popToRootViewController(animated: true)
-//                        } catch {
-//                            self?.showAlert(title: "Sign out failed", message: "Internal error occurred")
-//                        }
-//                    })
-//                    self?.present(ac, animated: true)
-//                    return
-//                }
-//                
-//                self?.deleteUser(user: user) {
-//                    print("delete user func finished")
-//                    self?.deleteAllChats(user: user) {
-//                        print("delete chats finished")
-//                        self?.showAlert(title: "Success", message: "Your account has been deleted")
-//                    }
-//                }
-//            }
         })
         
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
@@ -319,56 +292,46 @@ class AccountView: UITableViewController {
     }
     
     // delete user images from Firebase Storage
-    func deleteUser(user: String, completion: @escaping () -> Void) {
-        let dispatchGroup = DispatchGroup()
-
+    func deleteUserPhotos(user: String, completion: @escaping () -> Void) {
+        var photosRemoved = 0
+        
         DispatchQueue.global().async { [weak self] in
-            dispatchGroup.enter()
-
             self?.reference.child(user).observeSingleEvent(of: .value) { snapshot in
-                defer {
-                    dispatchGroup.leave()
-                }
-
                 if let data = snapshot.value as? [String: Any] {
                     
                     let active = data["activeItems"] as? [String: [String: Any]] ?? [:]
                     let ended = data["endedItems"] as? [String: [String: Any]] ?? [:]
                     let items = active.merging(ended) { (_, new) in new }
                     
+                    let photos = items.map {$0.value["photosURL"]} as? [[String]]
+                    let photosCount = photos!.joined().count
 
                     for item in items {
                         guard let photos = item.value["photosURL"] as? [String] else { return }
                         
-                        let itemID = item.key
-                        print(itemID)
-
                         for i in 0..<photos.count {
-                            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child(itemID).child("image\(i)")
-                            dispatchGroup.enter()
+                            let storageRef = Storage.storage(url: "gs://trade-app-4fc85.appspot.com/").reference().child(user).child(item.key).child("image\(i)")
+                            
                             storageRef.delete() { error in
-                                defer {
-                                    dispatchGroup.leave()
-                                }
-
                                 guard error == nil else {
-                                    print(error!.localizedDescription)
+                                    print("Error removing user's photos: \(error!.localizedDescription)")
                                     return
                                 }
-                                print("image\(i) removed")
+
+                                photosRemoved += 1
+                                
+                                if photosRemoved == photosCount {
+                                    completion()
+                                }
                             }
                         }
 
                         // remove user's items from the app
-                        AppStorage.shared.items.removeAll(where: { $0.id == Int(itemID) })
-                        AppStorage.shared.filteredItems.removeAll(where: { $0.id == Int(itemID) })
+                        AppStorage.shared.items.removeAll(where: { $0.id == Int(item.key) })
+                        AppStorage.shared.filteredItems.removeAll(where: { $0.id == Int(item.key) })
                     }
                 }
             }
-        }
-
-        dispatchGroup.notify(queue: .global()) {
-            completion()
         }
     }
     
@@ -401,32 +364,31 @@ class AccountView: UITableViewController {
     
     // delete all chats done with you
     func deleteAllChats(user: String, completion: @escaping () -> Void) {
-        let dispatchGroup = DispatchGroup()
-
+        var chatsRemoved = 0
+        
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
                 
                 if let chats = snapshot.value as? [String: [String: Any]] {
-                    
+                    let chatsCount = chats.map {$0.value}.joined().count
+
                     for (id, traders) in chats {
                         for trader in traders {
-                            
-                            dispatchGroup.enter()
                             self?.reference.child(trader.key).child("chats").child(id).child(user).removeValue { error, _ in
                                 if let error = error {
                                     print("Error removing chat: \(error.localizedDescription)")
+                                } else {
+                                    chatsRemoved += 1
+                                    
+                                    if chatsRemoved == chatsCount {
+                                        completion()
+                                    }
                                 }
-                                dispatchGroup.leave()
                             }
                         }
                     }
                 }
             }
-        }
-
-        dispatchGroup.notify(queue: .global()) {
-            self.reference.child(user).removeValue()
-            completion()
         }
     }
     
