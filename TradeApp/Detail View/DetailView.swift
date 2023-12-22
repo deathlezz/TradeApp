@@ -321,7 +321,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         if messageSent {
             if let vc = storyboard?.instantiateViewController(withIdentifier: "ChatView") as? ChatView {
                 vc.chatTitle = item.title
-//                vc.isPushedByChats = false
                 ChatView.buyer = Auth.auth().currentUser?.uid
                 ChatView.seller = item.owner
                 vc.itemId = String(item.id)

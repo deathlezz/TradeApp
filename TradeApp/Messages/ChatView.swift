@@ -19,8 +19,6 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     static var buyer: String!
     static var seller: String!
     
-//    var isPushedByChats: Bool!
-    
     var reference: DatabaseReference!
     
     var messages = [Message]()
@@ -37,8 +35,6 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messageInputBar.delegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-        
-//        NotificationCenter.default.addObserver(self, selector: #selector(insertMessage), name: NSNotification.Name("newMessage"), object: nil)
         
         setLayout()
         
@@ -288,16 +284,5 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
             self?.reference.child(user).child("chats").child("\(itemId)").child(child).child("read").setValue(true)
         }
     }
-    
-    // get new message and add it to messages array
-//    @objc func insertMessage(_ notification: NSNotification) {
-//        guard let message = notification.userInfo!["message"] as? [String: String] else { return }
-//        let sender = Sender(senderId: message["sender"]!, displayName: "")
-//        let msg = Message(sender: sender, messageId: message["messageId"]!, sentDate: (message["sentDate"]?.toDate())!, kind: .text(message["kind"]!))
-//
-//        let indexPath = IndexPath(index: messages.count)
-//        messages.append(msg)
-//        messagesCollectionView.insertItems(at: [indexPath])
-//    }
     
 }

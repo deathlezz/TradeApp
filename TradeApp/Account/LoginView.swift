@@ -15,11 +15,6 @@ enum AccountAction {
     case register
 }
 
-//enum LoginPushType {
-//    case load
-//    case signIn
-//}
-
 class LoginView: UITableViewController {
     
     var sections = ["Segment", "Email", "Password", "Button"]

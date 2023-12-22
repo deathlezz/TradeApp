@@ -460,7 +460,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                         self?.reference.child(item.owner).child("endedItems").child("\(item.id)").child("saved").observeSingleEvent(of: .value) { snapshot in
                             if let saved = snapshot.value as? Int {
                                 self?.reference.child(item.owner).child("endedItems").child("\(item.id)").child("saved").setValue(saved - 1)
-                                
                             }
                         }
                     }

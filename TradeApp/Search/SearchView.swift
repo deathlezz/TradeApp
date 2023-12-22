@@ -30,7 +30,6 @@ class SearchView: UITableViewController {
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
-//        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "historyCell")
         
         DispatchQueue.global().async { [weak self] in
             self?.currentFilters = Utilities.loadFilters()

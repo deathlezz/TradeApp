@@ -179,7 +179,6 @@ class ActiveAdsView: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         loadUserAds()
-//        isArrayEmpty()
         navigationController?.isToolbarHidden = true
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
     }

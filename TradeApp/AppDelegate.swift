@@ -64,7 +64,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDel
             if  let vc = storyboard.instantiateViewController(withIdentifier: "ChatView") as? ChatView,
                 let tabBarController = rootViewController as? UITabBarController,
                 let navController = tabBarController.selectedViewController as? UINavigationController {
-//                vc.isPushedByChats = false
                 navController.pushViewController(vc, animated: true)
             }
         }

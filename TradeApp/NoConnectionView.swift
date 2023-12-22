@@ -14,9 +14,6 @@ class NoConnectionView: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-        
         imageView.image = UIImage(systemName: "wifi.slash")
         textLabel.text = "No Connection"
     }
