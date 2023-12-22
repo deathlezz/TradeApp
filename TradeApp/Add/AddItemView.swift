@@ -61,7 +61,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         NotificationCenter.default.addObserver(self, selector: #selector(reorderImages), name: NSNotification.Name("reorderImages"), object: nil)
         
         for _ in 0...7 {
-            images.append(UIImage(systemName: "plus")!)
+            let image = UIImage(systemName: "plus")?.withTintColor(.systemGray)
+            images.append(image!)
         }
         
         if isEditMode != nil {
@@ -289,9 +290,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         DispatchQueue.global().async { [weak self] in
             guard let urls = self?.item?.photosURL else { return }
             
-            self?.uploadedPhotos.removeAll(keepingCapacity: false)
             self?.convertImages(urls: urls) { imgs in
-                
+                self?.uploadedPhotos.removeAll()
                 self?.uploadedPhotos = imgs
                 self?.images.removeFirst(imgs.count)
                 self?.images.insert(contentsOf: imgs, at: 0)
@@ -312,7 +312,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             return
         }
         
+        UIView.setAnimationsEnabled(false)
+        tableView.beginUpdates()
         tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: \(200 - charsUsed)"
+        tableView.footerView(forSection: 5)?.sizeToFit()
+        tableView.endUpdates()
+        UIView.setAnimationsEnabled(true)
     }
     
     // set action for clear button
@@ -322,16 +327,25 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
         
         textViewCell?.textView.text = nil
-        tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: 200"
+        
+        if !isMovingFromParent {
+            UIView.setAnimationsEnabled(false)
+            tableView.beginUpdates()
+            tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: 200"
+            tableView.footerView(forSection: 5)?.sizeToFit()
+            tableView.endUpdates()
+            UIView.setAnimationsEnabled(true)
+        }
+        
         images.removeAll()
         uploadedPhotos.removeAll()
         
         for _ in 0...7 {
-            images.append(UIImage(systemName: "plus")!)
+            let image = UIImage(systemName: "plus")?.withTintColor(.systemGray)
+            images.append(image!)
         }
 
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // set action for "return" keyboard button
@@ -378,12 +392,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         let imgs = images.filter {$0 != UIImage(systemName: "plus")}
         
         let photos = imgs.map {$0.jpegData(compressionQuality: 0.6)!}
-        
-//        if isEditMode != nil {
-//            photos = imgs.map {$0.jpegData(compressionQuality: 1)!}
-//        } else {
-//            photos = imgs.map {$0.jpegData(compressionQuality: 0.8)!}
-//        }
             
         guard let title = textFieldCells[0].textField.text else { return }
         guard let price = textFieldCells[1].textField.text else { return }
@@ -523,8 +531,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         index = nil
         
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
-
         dismiss(animated: true)
     }
     
@@ -566,7 +572,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         index = nil
         
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // change indexPath
@@ -580,14 +585,12 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         images[index] = photo.rotate(radians: -.pi / 2)!
         
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // swap current image with the first one
     func setAsFirst() {
         (images[0], images[index]) = (images[index], images[0])
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-//        NotificationCenter.default.post(name: NSNotification.Name("reload"), object: nil)
     }
     
     // create unique item ID
@@ -634,6 +637,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // get reordered images
     @objc func reorderImages(_ notification: NSNotification) {
         let reorderedImages = notification.userInfo?["images"] as! [UIImage]
+        images.removeAll()
         images = reorderedImages
     }
     

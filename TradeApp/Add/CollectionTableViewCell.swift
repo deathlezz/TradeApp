@@ -34,7 +34,8 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         NotificationCenter.default.addObserver(self, selector: #selector(reloadView), name: NSNotification.Name("reload"), object: nil)
         
         for _ in 0...7 {
-            images.append(UIImage(systemName: "plus")!)
+            let image = UIImage(systemName: "plus")?.withTintColor(.systemGray)
+            images.append(image!)
         }
     }
     
@@ -46,16 +47,9 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     // set collection view cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? PhotosCell {
-            var image = UIImage()
-            
-            if images[indexPath.item] == UIImage(systemName: "plus") {
-                image = images[indexPath.item]
-            } else {
-                image = images[indexPath.item].resized(to: cell.imageView.frame.size)
-            }
-
             cell.layer.cornerRadius = 10
-            cell.imageView.image = image
+            cell.imageView.image = nil
+            cell.imageView.image = images[indexPath.item].resized(to: cell.imageView.frame.size)
             return cell
         }
         
@@ -140,14 +134,14 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         UIView.transition(with: collectionView, duration: 0.3, options: .transitionCrossDissolve, animations: {
             self.collectionView.reloadData()
         }) { finished in
-            print("collection view reload")
+            print("collection view reloaded")
         }
     }
     
     // load item images on load
     @objc func loadImages(_ notification: NSNotification) {
         let itemPhotos = notification.userInfo?["images"] as! [UIImage]
-        images.removeAll(keepingCapacity: false)
+        images.removeAll()
         images.append(contentsOf: itemPhotos)
         reloadView()
     }

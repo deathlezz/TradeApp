@@ -850,6 +850,7 @@
                                                                     <constraint firstAttribute="width" secondItem="QdQ-pt-y75" secondAttribute="height" multiplier="1:1" id="B50-RT-6hy"/>
                                                                 </constraints>
                                                                 <imageReference key="image" image="plus" catalog="system" symbolScale="small" variableValue="0.0"/>
+                                                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
                                                             </imageView>
                                                         </subviews>
                                                     </view>
@@ -973,7 +974,7 @@
         <scene sceneID="Ovq-lU-UlN">
             <objects>
                 <tableViewController storyboardIdentifier="MessagesView" id="xn1-ZW-hbW" customClass="MessagesView" customModule="TradeApp" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="70" estimatedRowHeight="70" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" id="OY3-9A-h4q">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleAspectFit" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="70" estimatedRowHeight="70" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" id="OY3-9A-h4q">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

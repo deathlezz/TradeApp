@@ -236,6 +236,7 @@ class ActiveAdsView: UITableViewController {
             self?.getActiveAds() { dict in
                 let ads = self?.toItemModel(dict: dict) ?? [Item]()
                 let sorted = ads.sorted {$0.date > $1.date}
+                self?.activeAds.removeAll()
                 self?.activeAds = sorted
                 
                 DispatchQueue.main.async {

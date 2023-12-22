@@ -183,6 +183,7 @@ class EndedAdsView: UITableViewController {
             self?.getEndedAds() { dict in
                 let ads = self?.toItemModel(dict: dict) ?? [Item]()
                 let sorted = ads.sorted {$0.date > $1.date}
+                self?.endedAds.removeAll()
                 self?.endedAds = sorted
                 
                 DispatchQueue.main.async {
