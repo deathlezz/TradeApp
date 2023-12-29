@@ -6,30 +6,30 @@
 //
 
 import XCTest
+@testable import TradeApp
 
 final class ViewControllerTests: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    
+    // check if item was added in the last 24h
+    func testSuccessIsItemRecent() {
+        // Given (Arrange)
+        let date = Date.now.addingTimeInterval(-86399)
+        let vc = ViewController()
+        // When (Act)
+        let recent = vc.isItemRecent(date)
+        // Then (Assert)
+        XCTAssertTrue(recent)
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+    
+    // check if item was not added in the last 24h
+    func testFailureIsItemRecent() {
+        // Given (Arrange)
+        let date = Date.now.addingTimeInterval(-86401)
+        let vc = ViewController()
+        // When (Act)
+        let recent = vc.isItemRecent(date)
+        // Then (Assert)
+        XCTAssertFalse(recent)
     }
 
 }

@@ -34,6 +34,7 @@
 		BC5CB87E293B7D870017AE69 /* TextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5CB87D293B7D870017AE69 /* TextFieldCell.swift */; };
 		BC5CB880293B7EF10017AE69 /* TextViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5CB87F293B7EF10017AE69 /* TextViewCell.swift */; };
 		BC611B9D29AA9C2C00F259FD /* ChangeUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC611B9C29AA9C2C00F259FD /* ChangeUnitView.swift */; };
+		BC63FB052B3F393F006520CC /* ViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC63FB042B3F393F006520CC /* ViewControllerTests.swift */; };
 		BC64DA302B14FF1300537A09 /* Chat.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC64DA2F2B14FF1300537A09 /* Chat.swift */; };
 		BC66A6E92929154B00F33E7D /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC66A6E82929154B00F33E7D /* Item.swift */; };
 		BC66A6EB29296D8900F33E7D /* AppStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC66A6EA29296D8900F33E7D /* AppStorage.swift */; };
@@ -61,6 +62,16 @@
 		BCF2F95A2926CFEB00930252 /* ItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2F9592926CFEB00930252 /* ItemCell.swift */; };
 		BCF2F95C2926D71E00930252 /* CategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2F95B2926D71E00930252 /* CategoryView.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BC63FAFF2B3F391E006520CC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BCF2F93A29266D2400930252 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BCF2F94129266D2400930252;
+			remoteInfo = TradeApp;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		9FAFE5942B45952937146DF2 /* Pods-TradeApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TradeApp.debug.xcconfig"; path = "Target Support Files/Pods-TradeApp/Pods-TradeApp.debug.xcconfig"; sourceTree = "<group>"; };
@@ -91,6 +102,8 @@
 		BC5CB87D293B7D870017AE69 /* TextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCell.swift; sourceTree = "<group>"; };
 		BC5CB87F293B7EF10017AE69 /* TextViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewCell.swift; sourceTree = "<group>"; };
 		BC611B9C29AA9C2C00F259FD /* ChangeUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeUnitView.swift; sourceTree = "<group>"; };
+		BC63FAFB2B3F391E006520CC /* TradeAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TradeAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC63FB042B3F393F006520CC /* ViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerTests.swift; sourceTree = "<group>"; };
 		BC64DA2F2B14FF1300537A09 /* Chat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chat.swift; sourceTree = "<group>"; };
 		BC66A6E82929154B00F33E7D /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		BC66A6EA29296D8900F33E7D /* AppStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStorage.swift; sourceTree = "<group>"; };
@@ -123,6 +136,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		BC63FAF82B3F391E006520CC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BCF2F93F29266D2400930252 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -173,6 +193,7 @@
 		BC019D272958A7B400EB04F8 /* Search */ = {
 			isa = PBXGroup;
 			children = (
+				BC66A6E82929154B00F33E7D /* Item.swift */,
 				BCF2F9592926CFEB00930252 /* ItemCell.swift */,
 				BC325C432986A0AD00EF83AB /* HeaderView.swift */,
 				BCF2F94929266D2400930252 /* ViewController.swift */,
@@ -232,6 +253,14 @@
 			path = Add;
 			sourceTree = "<group>";
 		};
+		BC63FAFC2B3F391E006520CC /* TradeAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				BC63FB042B3F393F006520CC /* ViewControllerTests.swift */,
+			);
+			path = TradeAppTests;
+			sourceTree = "<group>";
+		};
 		BCB234B72A03D25F000106EE /* Messages */ = {
 			isa = PBXGroup;
 			children = (
@@ -258,6 +287,7 @@
 			isa = PBXGroup;
 			children = (
 				BCF2F94429266D2400930252 /* TradeApp */,
+				BC63FAFC2B3F391E006520CC /* TradeAppTests */,
 				BCF2F94329266D2400930252 /* Products */,
 				7D322458405AC4BA7E1E82A9 /* Pods */,
 				99D1060FAC2C15D8AF3261D6 /* Frameworks */,
@@ -268,6 +298,7 @@
 			isa = PBXGroup;
 			children = (
 				BCF2F94229266D2400930252 /* TradeApp.app */,
+				BC63FAFB2B3F391E006520CC /* TradeAppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -289,7 +320,6 @@
 				BC2FD2D629EAD30200CAC8BA /* NoConnectionView.swift */,
 				BC5A4EEC292C1754003A20B7 /* Utilities.swift */,
 				BC66A6EA29296D8900F33E7D /* AppStorage.swift */,
-				BC66A6E82929154B00F33E7D /* Item.swift */,
 				BC5BB5C92AF2830A0065BE52 /* DataModel.xcdatamodeld */,
 				BCEFEE2029F6A8EB005D5776 /* CoreData */,
 				BCF2F94B29266D2400930252 /* Main.storyboard */,
@@ -304,6 +334,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		BC63FAFA2B3F391E006520CC /* TradeAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC63FB032B3F391E006520CC /* Build configuration list for PBXNativeTarget "TradeAppTests" */;
+			buildPhases = (
+				BC63FAF72B3F391E006520CC /* Sources */,
+				BC63FAF82B3F391E006520CC /* Frameworks */,
+				BC63FAF92B3F391E006520CC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BC63FB002B3F391E006520CC /* PBXTargetDependency */,
+			);
+			name = TradeAppTests;
+			productName = TradeAppTests;
+			productReference = BC63FAFB2B3F391E006520CC /* TradeAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		BCF2F94129266D2400930252 /* TradeApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BCF2F95629266D2600930252 /* Build configuration list for PBXNativeTarget "TradeApp" */;
@@ -330,9 +378,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1400;
+				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
+					BC63FAFA2B3F391E006520CC = {
+						CreatedOnToolsVersion = 15.0.1;
+						TestTargetID = BCF2F94129266D2400930252;
+					};
 					BCF2F94129266D2400930252 = {
 						CreatedOnToolsVersion = 14.0.1;
 					};
@@ -352,11 +404,19 @@
 			projectRoot = "";
 			targets = (
 				BCF2F94129266D2400930252 /* TradeApp */,
+				BC63FAFA2B3F391E006520CC /* TradeAppTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		BC63FAF92B3F391E006520CC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BCF2F94029266D2400930252 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -413,6 +473,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		BC63FAF72B3F391E006520CC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC63FB052B3F393F006520CC /* ViewControllerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BCF2F93E29266D2400930252 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -470,6 +538,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		BC63FB002B3F391E006520CC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BCF2F94129266D2400930252 /* TradeApp */;
+			targetProxy = BC63FAFF2B3F391E006520CC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		BCF2F94B29266D2400930252 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -490,6 +566,63 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		BC63FB012B3F391E006520CC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MVF9F6YPDL;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					HEADER_SEARCH_PATHS,
+					"=",
+					"\"${SRCROOT}/Pods/Firebase/CoreOnly/Sources\"",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deathlezz.TradeAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TradeApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TradeApp";
+			};
+			name = Debug;
+		};
+		BC63FB022B3F391E006520CC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MVF9F6YPDL;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					HEADER_SEARCH_PATHS,
+					"=",
+					"\"${SRCROOT}/Pods/Firebase/CoreOnly/Sources\"",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deathlezz.TradeAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TradeApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TradeApp";
+			};
+			name = Release;
+		};
 		BCF2F95429266D2600930252 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -681,6 +814,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		BC63FB032B3F391E006520CC /* Build configuration list for PBXNativeTarget "TradeAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC63FB012B3F391E006520CC /* Debug */,
+				BC63FB022B3F391E006520CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		BCF2F93D29266D2400930252 /* Build configuration list for PBXProject "TradeApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
