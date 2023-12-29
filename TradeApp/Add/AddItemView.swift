@@ -391,7 +391,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         guard let user = Auth.auth().currentUser?.uid else { return }
         sender.isUserInteractionEnabled = false
         
-        let imgs = images.filter {$0 != UIImage(systemName: "plus")}
+        let imgs = images.filter {$0 != UIImage(systemName: "plus")?.withTintColor(.systemGray)}
         
         let photos = imgs.map {$0.jpegData(compressionQuality: 0.6)!}
             
@@ -403,8 +403,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         if !photos.isEmpty && !title.isEmpty && !price.isEmpty && !category.isEmpty && !location.isEmpty && !description.isEmpty {
             
-            guard let intPrice = Int(price) else { return showAlert(.wrongFormat) }
-            guard intPrice >= 0 else { return showAlert(.negativeNumber) }
+            guard isPriceCorrect(price: price, sender: sender) else { return }
             
             Utilities.isCityValid(location) { [weak self] valid in
                 if valid {
@@ -414,7 +413,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             
                             self?.uploadImages(images: photos, itemID: item.id) { [weak self] urls in
                                 
-                                let newItem = Item(photosURL: urls, title: title, price: intPrice, category: category, location: location, description: description, date: Date(), views: item.views, saved: item.saved, lat: lat, long: long, id: item.id, owner: user)
+                                let newItem = Item(photosURL: urls, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: item.views, saved: item.saved, lat: lat, long: long, id: item.id, owner: user)
                                 
                                 if self?.isAdActive == true {
                                     self?.saveItem(user: user, item: newItem, isActive: true)
@@ -435,7 +434,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             self?.createItemID() { id in
                                 self?.uploadImages(images: photos, itemID: id) { [weak self] urls in
                                     
-                                    let newItem = Item(photosURL: urls, title: title, price: intPrice, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: user)
+                                    let newItem = Item(photosURL: urls, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: user)
                                     
                                     self?.saveItem(user: user, item: newItem, isActive: true)
                                     
@@ -532,7 +531,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             images[index] = image
         } else {
             for i in 0..<images.count {
-                if images[i] == UIImage(systemName: "plus") {
+                if images[i] == UIImage(systemName: "plus")?.withTintColor(.systemGray) {
                     images[i] = image
                     break
                 }
@@ -695,6 +694,22 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         } else {
             reference.child(user).child("endedItems").child("\(item.id)").setValue(newItem)
         }
+    }
+    
+    // check if price format is correct
+    func isPriceCorrect(price: String, sender: UIButton) -> Bool {
+        guard let intPrice = Int(price) else {
+            sender.isUserInteractionEnabled = true
+            showAlert(.wrongFormat)
+            return false
+        }
+        guard intPrice >= 0 else {
+            sender.isUserInteractionEnabled = true
+            showAlert(.negativeNumber)
+            return false
+        }
+        
+        return true
     }
     
 }

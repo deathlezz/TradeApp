@@ -61,7 +61,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
         
         delegate?.pushIndex(indexPath: indexPath.item)
         
-        if images[indexPath.item] == UIImage(systemName: "plus") {
+        if images[indexPath.item] == UIImage(systemName: "plus")?.withTintColor(.systemGray) {
             delegate?.addNewPhoto()
         } else {
             delegate?.editPhoto()
@@ -70,9 +70,9 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     
     // item has been dragged
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        guard images.filter({$0 != UIImage(systemName: "plus")}).count > 1 else { return [] }
+        guard images.filter({$0 != UIImage(systemName: "plus")?.withTintColor(.systemGray)}).count > 1 else { return [] }
         let item = images[indexPath.item]
-        guard item != UIImage(systemName: "plus") else { return [] }
+        guard item != UIImage(systemName: "plus")?.withTintColor(.systemGray) else { return [] }
         let itemProvider = NSItemProvider(object: item)
         let dragItem = UIDragItem(itemProvider: itemProvider)
         dragItem.localObject = item
@@ -91,7 +91,7 @@ class CollectionTableViewCell: UITableViewCell, UICollectionViewDelegate, UIColl
     // item has been dropped
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
         var destinationIndexPath: IndexPath
-        let numberOfPhotos = images.filter {$0 != UIImage(systemName: "plus")}.count
+        let numberOfPhotos = images.filter {$0 != UIImage(systemName: "plus")?.withTintColor(.systemGray)}.count
         
         if let indexPath = coordinator.destinationIndexPath {
             if indexPath.item < numberOfPhotos {
