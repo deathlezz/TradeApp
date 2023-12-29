@@ -13,6 +13,8 @@ import FirebaseAuth
 
 enum AlertType {
     case emptyField
+    case wrongFormat
+    case negativeNumber
     case cityError
     case success
     case edit
@@ -400,6 +402,10 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         guard let description = textViewCell?.textView.text else { return }
         
         if !photos.isEmpty && !title.isEmpty && !price.isEmpty && !category.isEmpty && !location.isEmpty && !description.isEmpty {
+            
+            guard let intPrice = Int(price) else { return showAlert(.wrongFormat) }
+            guard intPrice >= 0 else { return showAlert(.negativeNumber) }
+            
             Utilities.isCityValid(location) { [weak self] valid in
                 if valid {
                     Utilities.forwardGeocoding(address: location) { (lat, long) in
@@ -408,7 +414,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             
                             self?.uploadImages(images: photos, itemID: item.id) { [weak self] urls in
                                 
-                                let newItem = Item(photosURL: urls, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: item.views, saved: item.saved, lat: lat, long: long, id: item.id, owner: user)
+                                let newItem = Item(photosURL: urls, title: title, price: intPrice, category: category, location: location, description: description, date: Date(), views: item.views, saved: item.saved, lat: lat, long: long, id: item.id, owner: user)
                                 
                                 if self?.isAdActive == true {
                                     self?.saveItem(user: user, item: newItem, isActive: true)
@@ -429,7 +435,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                             self?.createItemID() { id in
                                 self?.uploadImages(images: photos, itemID: id) { [weak self] urls in
                                     
-                                    let newItem = Item(photosURL: urls, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: user)
+                                    let newItem = Item(photosURL: urls, title: title, price: intPrice, category: category, location: location, description: description, date: Date(), views: 0, saved: 0, lat: lat, long: long, id: id, owner: user)
                                     
                                     self?.saveItem(user: user, item: newItem, isActive: true)
                                     
@@ -456,6 +462,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     func showAlert(_ type: AlertType) {
         if type == .emptyField {
             let ac = UIAlertController(title: "Field empty", message: "Fill all text fields to continue.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .cancel))
+            present(ac, animated: true)
+        } else if type == .wrongFormat {
+            let ac = UIAlertController(title: "Wrong format", message: "Price can be a number only.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .cancel))
+            present(ac, animated: true)
+        } else if type == .negativeNumber {
+            let ac = UIAlertController(title: "Negative number", message: "Price can't be negative.", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .cancel))
             present(ac, animated: true)
         } else if type == .cityError {

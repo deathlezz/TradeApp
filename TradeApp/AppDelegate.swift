@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationControllerDel
       
         let userInfo = response.notification.request.content.userInfo
         
-        if let chatInfo = userInfo["info"] as? String {
+        if let _ = userInfo["info"] as? String {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
 
             if  let vc = storyboard.instantiateViewController(withIdentifier: "ChatView") as? ChatView,

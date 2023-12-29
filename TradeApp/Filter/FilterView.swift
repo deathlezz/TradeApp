@@ -200,6 +200,8 @@ class FilterView: UITableViewController {
         let sortText = filterCells[0].filterTextField.text ?? ""
         let radius = radiusStages[radiusCounter]
         
+        guard isPriceCorrect(priceFrom, priceTo) else { return }
+        
         if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
             AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
             AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
@@ -435,6 +437,61 @@ class FilterView: UITableViewController {
             radiusCell.radiusLabel.text = "+ 0 mi"
         } else {
             radiusCell.radiusLabel.text = "+ 0 km"
+        }
+    }
+    
+    // check if price format is correct
+    func isPriceCorrect(_ from: String, _ to: String) -> Bool {
+        if !from.isEmpty && !to.isEmpty {
+            guard let intPriceFrom = Int(from) else {
+                showAlert(.wrongFormat)
+                return false
+            }
+            guard let intPriceTo = Int(to) else {
+                showAlert(.wrongFormat)
+                return false
+            }
+            guard intPriceFrom >= 0 else {
+                showAlert(.negativeNumber)
+                return false
+            }
+            guard intPriceTo >= 0 else {
+                showAlert(.negativeNumber)
+                return false
+            }
+        } else if !from.isEmpty {
+            guard let intPriceFrom = Int(from) else {
+                showAlert(.wrongFormat)
+                return false
+            }
+            guard intPriceFrom >= 0 else {
+                showAlert(.negativeNumber)
+                return false
+            }
+        } else if !to.isEmpty {
+            guard let intPriceTo = Int(to) else {
+                showAlert(.wrongFormat)
+                return false
+            }
+            guard intPriceTo >= 0 else {
+                showAlert(.negativeNumber)
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    // show wrong price format alert
+    func showAlert(_ type: AlertType) {
+        if type == .wrongFormat {
+            let ac = UIAlertController(title: "Wrong format", message: "Price can be a number only.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .cancel))
+            present(ac, animated: true)
+        } else if type == .negativeNumber {
+            let ac = UIAlertController(title: "Negative number", message: "Price can't be negative.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .cancel))
+            present(ac, animated: true)
         }
     }
 
