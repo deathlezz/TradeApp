@@ -202,136 +202,28 @@ class FilterView: UITableViewController {
         
         guard isPriceCorrect(priceFrom, priceTo) else { return }
         
-        if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
-            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
-            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-        } else if currentFilters["Search"] != nil {
-            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-        } else if currentFilters["Category"] != nil {
-            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
-        }
+        // check if user is using filters
+        checkForFilters()
         
         // category filter
-        if !categoryText.isEmpty {
-            if categoryText == categories[0] && currentFilters["Search"] != nil {
-                AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-            } else if categoryText == categories[0] && currentFilters["Search"] == nil {
-                AppStorage.shared.filteredItems = AppStorage.shared.items
-            } else if categoryText != categories[0] && currentFilters["Search"] != nil {
-                AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-                AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.category == categoryText}
-            } else if categoryText != categories[0] && currentFilters["Search"] == nil {
-                AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == categoryText}
-            }
-
-            currentFilters["Category"] = categoryText
-        } else {
-            currentFilters["Search"] = nil
-            currentFilters["Category"] = nil
-        }
+        categoryFilter(categoryText: categoryText)
         
         // price filter
         if !priceFrom.isEmpty && !priceTo.isEmpty {
             if Int(priceFrom)! > Int(priceTo)! {
                 (priceFrom, priceTo) = (priceTo, priceFrom)
             }
-            
-            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price >= Int(priceFrom)! && $0.price <= Int(priceTo)!}
-            currentFilters["PriceFrom"] = priceFrom
-            currentFilters["PriceTo"] = priceTo
-        } else if !priceFrom.isEmpty {
-            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price >= Int(priceFrom)!}
-            currentFilters["PriceFrom"] = priceFrom
-            currentFilters["PriceTo"] = nil
-        } else if !priceTo.isEmpty {
-            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price <= Int(priceTo)!}
-            currentFilters["PriceTo"] = priceTo
-            currentFilters["PriceFrom"] = nil
-        } else {
-            currentFilters["PriceFrom"] = nil
-            currentFilters["PriceTo"] = nil
         }
+        priceFilter(priceFrom: priceFrom, priceTo: priceTo)
         
         // sort filter
-        if !sortText.isEmpty {
-            if sortText == "Lowest price" {
-                AppStorage.shared.filteredItems.sort(by: {$0.price < $1.price})
-            } else if sortText == "Highest price" {
-                AppStorage.shared.filteredItems.sort(by: {$0.price > $1.price})
-            } else if sortText == "Date added" {
-                AppStorage.shared.filteredItems.sort(by: {$0.date < $1.date})
-            }
-            
-            currentFilters["Sort"] = sortText
-        } else {
-            currentFilters["Sort"] = nil
-        }
+        sortFilter(sortText: sortText)
         
         // reset filters
-        if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
-            AppStorage.shared.filteredItems = AppStorage.shared.recentlyAdded
-            currentFilters.removeAll()
-            Utilities.saveFilters(currentFilters)
-            navigationController?.popToRootViewController(animated: true)
-            return
-        }
+        resetFilters()
         
         // location filter
-        if !locationText.isEmpty {
-            var matched = [Item]()
-            
-            let dispatchGroup = DispatchGroup()
-            dispatchGroup.enter()
-            
-            Utilities.isCityValid(locationText) { [weak self] valid in
-                if valid {
-                    Utilities.forwardGeocoding(address: locationText) { (lat, long) in
-                        let cityLocation = CLLocation(latitude: lat, longitude: long)
-                        
-                        var unit: Double
-                        
-                        if self?.currentUnit == "mi" {
-                            unit = 1609
-                        } else {
-                            unit = 1000
-                        }
-                        
-                        for item in AppStorage.shared.filteredItems {
-                            
-                            let itemLocation = CLLocation(latitude: item.lat!, longitude: item.long!)
-                            let distance = Int(cityLocation.distance(from: itemLocation) / unit)
-                            
-                            if Int(distance) <= radius {
-                                matched.append(item)
-                            }
-                        }
-                        
-                        dispatchGroup.leave()
-                    }
-                    
-                } else {
-                    let ac = UIAlertController(title: "Wrong city name", message: "Please enter valid city name", preferredStyle: .alert)
-                    ac.addAction(UIAlertAction(title: "OK", style: .default))
-                    self?.present(ac, animated: true)
-                }
-            }
-            
-            dispatchGroup.notify(queue: .main) {
-                AppStorage.shared.filteredItems = matched
-                self.currentFilters["Location"] = locationText
-                self.currentFilters["Radius"] = String(self.radiusCounter)
-                
-                Utilities.saveFilters(self.currentFilters)
-                self.navigationController?.popToRootViewController(animated: true)
-            }
-            
-        } else {
-            currentFilters["Location"] = nil
-            currentFilters["Radius"] = nil
-            
-            Utilities.saveFilters(currentFilters)
-            navigationController?.popToRootViewController(animated: true)
-        }
+        locationFilter(locationText: locationText, radius: radius)
     }
     
     // set action for clear button
@@ -492,6 +384,146 @@ class FilterView: UITableViewController {
             let ac = UIAlertController(title: "Negative number", message: "Price can't be negative.", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .cancel))
             present(ac, animated: true)
+        }
+    }
+    
+    // check if user is using filters
+    func checkForFilters() {
+        if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
+            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+        } else if currentFilters["Search"] != nil {
+            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+        } else if currentFilters["Category"] != nil {
+            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
+        }
+    }
+    
+    // category filter
+    func categoryFilter(categoryText: String) {
+        if !categoryText.isEmpty {
+            if categoryText == categories[0] && currentFilters["Search"] != nil {
+                AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+            } else if categoryText == categories[0] && currentFilters["Search"] == nil {
+                AppStorage.shared.filteredItems = AppStorage.shared.items
+            } else if categoryText != categories[0] && currentFilters["Search"] != nil {
+                AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+                AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.category == categoryText}
+            } else if categoryText != categories[0] && currentFilters["Search"] == nil {
+                AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == categoryText}
+            }
+
+            currentFilters["Category"] = categoryText
+        } else {
+            currentFilters["Search"] = nil
+            currentFilters["Category"] = nil
+        }
+    }
+    
+    // price filter
+    func priceFilter(priceFrom: String, priceTo: String) {
+        if !priceFrom.isEmpty && !priceTo.isEmpty {
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price >= Int(priceFrom)! && $0.price <= Int(priceTo)!}
+            currentFilters["PriceFrom"] = priceFrom
+            currentFilters["PriceTo"] = priceTo
+        } else if !priceFrom.isEmpty {
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price >= Int(priceFrom)!}
+            currentFilters["PriceFrom"] = priceFrom
+            currentFilters["PriceTo"] = nil
+        } else if !priceTo.isEmpty {
+            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.price <= Int(priceTo)!}
+            currentFilters["PriceTo"] = priceTo
+            currentFilters["PriceFrom"] = nil
+        } else {
+            currentFilters["PriceFrom"] = nil
+            currentFilters["PriceTo"] = nil
+        }
+    }
+    
+    // sort filter
+    func sortFilter(sortText: String) {
+        if !sortText.isEmpty {
+            if sortText == "Lowest price" {
+                AppStorage.shared.filteredItems.sort(by: {$0.price < $1.price})
+            } else if sortText == "Highest price" {
+                AppStorage.shared.filteredItems.sort(by: {$0.price > $1.price})
+            } else if sortText == "Date added" {
+                AppStorage.shared.filteredItems.sort(by: {$0.date < $1.date})
+            }
+            
+            currentFilters["Sort"] = sortText
+        } else {
+            currentFilters["Sort"] = nil
+        }
+    }
+    
+    // reset filters
+    func resetFilters() {
+        if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
+            AppStorage.shared.filteredItems = AppStorage.shared.recentlyAdded
+            currentFilters.removeAll()
+            Utilities.saveFilters(currentFilters)
+            navigationController?.popToRootViewController(animated: true)
+            return
+        }
+    }
+    
+    // location filter
+    func locationFilter(locationText: String, radius: Int) {
+        if !locationText.isEmpty {
+            var matched = [Item]()
+            
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            
+            Utilities.isCityValid(locationText) { [weak self] valid in
+                if valid {
+                    Utilities.forwardGeocoding(address: locationText) { (lat, long) in
+                        let cityLocation = CLLocation(latitude: lat, longitude: long)
+                        
+                        var unit: Double
+                        
+                        if self?.currentUnit == "mi" {
+                            unit = 1609
+                        } else {
+                            unit = 1000
+                        }
+                        
+                        for item in AppStorage.shared.filteredItems {
+                            
+                            let itemLocation = CLLocation(latitude: item.lat!, longitude: item.long!)
+                            let distance = Int(cityLocation.distance(from: itemLocation) / unit)
+                            
+                            if Int(distance) <= radius {
+                                matched.append(item)
+                            }
+                        }
+                        
+                        dispatchGroup.leave()
+                    }
+                    
+                } else {
+                    let ac = UIAlertController(title: "Wrong city name", message: "Please enter valid city name", preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "OK", style: .default))
+                    self?.present(ac, animated: true)
+                }
+            }
+            
+            dispatchGroup.notify(queue: .main) {
+                AppStorage.shared.filteredItems = matched
+                self.currentFilters["Location"] = locationText
+                self.currentFilters["Radius"] = String(self.radiusCounter)
+                
+                Utilities.saveFilters(self.currentFilters)
+                self.navigationController?.popToRootViewController(animated: true)
+            }
+            
+        } else {
+            currentFilters["Location"] = nil
+            currentFilters["Radius"] = nil
+            
+            Utilities.saveFilters(currentFilters)
+            navigationController?.popToRootViewController(animated: true)
         }
     }
 
