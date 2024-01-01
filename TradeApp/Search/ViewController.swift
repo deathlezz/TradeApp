@@ -251,7 +251,10 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                     
                     refreshControl.endRefreshing()
                     self?.isArrayEmpty()
-                    self?.collectionView.reloadData()
+                    
+                    if self?.currentFilters["Location"] == nil {
+                        self?.collectionView.reloadData()
+                    }
                 }
             }
         }
@@ -341,10 +344,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         checkPriceFilter()
         checkSortFilter()
         checkLocationFilter()
-        
-        if currentFilters["Location"] == nil {
-            collectionView.reloadData()
-        }
     }
     
     // stop double tap for all tab items
@@ -404,10 +403,10 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         
         var matched = [Item]()
         
-        let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-        
         if currentFilters["Location"] != nil {
+            
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
             
             Utilities.forwardGeocoding(address: currentFilters["Location"]!) { [weak self] (lat, long) in
                 let cityLocation = CLLocation(latitude: lat, longitude: long)

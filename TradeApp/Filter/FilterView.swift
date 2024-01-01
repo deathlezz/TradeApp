@@ -219,9 +219,6 @@ class FilterView: UITableViewController {
         // sort filter
         sortFilter(sortText: sortText)
         
-        // reset filters
-        resetFilters()
-        
         // location filter
         locationFilter(locationText: locationText, radius: radius)
     }
@@ -392,6 +389,12 @@ class FilterView: UITableViewController {
         if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
             AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
             AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+        } else if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
+            AppStorage.shared.filteredItems = AppStorage.shared.recentlyAdded
+            currentFilters.removeAll()
+            Utilities.saveFilters(currentFilters)
+            navigationController?.popToRootViewController(animated: true)
+            return
         } else if currentFilters["Search"] != nil {
             AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
         } else if currentFilters["Category"] != nil {
@@ -454,17 +457,6 @@ class FilterView: UITableViewController {
             currentFilters["Sort"] = sortText
         } else {
             currentFilters["Sort"] = nil
-        }
-    }
-    
-    // reset filters
-    func resetFilters() {
-        if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
-            AppStorage.shared.filteredItems = AppStorage.shared.recentlyAdded
-            currentFilters.removeAll()
-            Utilities.saveFilters(currentFilters)
-            navigationController?.popToRootViewController(animated: true)
-            return
         }
     }
     

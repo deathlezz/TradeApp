@@ -136,7 +136,7 @@ class ChangePasswordView: UITableViewController {
             return
         }
         
-        guard isPasswordValid() else {
+        guard isPasswordValid(newPassword) else {
             showAlert(title: "Error", message: "Incorrect password format")
             sender.isUserInteractionEnabled = true
             return
@@ -187,10 +187,10 @@ class ChangePasswordView: UITableViewController {
     
     // check password format
     // check if password has minimum 8 characters at least 1 uppercase alphabet, 1 lowercase alphabet and 1 number
-    func isPasswordValid() -> Bool {
+    func isPasswordValid(_ password: String) -> Bool {
         let passRegEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$"
         let passPred = NSPredicate(format:"SELF MATCHES %@", passRegEx)
-        return passPred.evaluate(with: cells[1].textField.text)
+        return passPred.evaluate(with: password)
     }
 
 }

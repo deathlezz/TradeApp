@@ -417,10 +417,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 
                                 if self?.isAdActive == true {
                                     self?.saveItem(user: user, item: newItem, isActive: true)
-                                    NotificationCenter.default.post(name: NSNotification.Name("reloadActiveAds"), object: nil)
                                 } else {
                                     self?.saveItem(user: user, item: newItem, isActive: false)
-                                    NotificationCenter.default.post(name: NSNotification.Name("reloadEndedAds"), object: nil)
                                 }
                                 
                                 self?.isEditMode = nil

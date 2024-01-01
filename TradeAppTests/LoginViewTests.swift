@@ -6,30 +6,52 @@
 //
 
 import XCTest
+@testable import TradeApp
 
 final class LoginViewTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    // check email address format
+    func testSuccessIsEmailValid() {
+        // Given (Arrange)
+        let email = "mail@icloud.com"
+        let vc = LoginView()
+        // When (Act)
+        let result = vc.isEmailValid(email)
+        // Then (Assert)
+        XCTAssertTrue(result)
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    
+    // check email address format
+    func testFailureIsEmailValid() {
+        // Given (Arrange)
+        let email = "mail@icloud@com"
+        let vc = LoginView()
+        // When (Act)
+        let result = vc.isEmailValid(email)
+        // Then (Assert)
+        XCTAssertFalse(result)
     }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    
+    // check password format
+    func testSuccessIsPasswordValid() {
+        // Given (Arrange)
+        let password = "passWord123"
+        let vc = LoginView()
+        // When (Act)
+        let result = vc.isPasswordValid(password)
+        // Then (Arrange)
+        XCTAssertTrue(result)
     }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+    
+    // check password format
+    func testFailureIsPasswordValid() {
+        // Given (Arrange)
+        let password = "password123"
+        let vc = LoginView()
+        // When (Act)
+        let result = vc.isPasswordValid(password)
+        // Then (Arrange)
+        XCTAssertFalse(result)
     }
 
 }

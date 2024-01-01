@@ -25,6 +25,11 @@
 		BC56DC822997B678002790B8 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC56DC812997B678002790B8 /* LoginView.swift */; };
 		BC56DC842997B6F4002790B8 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC56DC832997B6F4002790B8 /* AccountView.swift */; };
 		BC56DC872997C20C002790B8 /* SegmentedControlCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC56DC862997C20C002790B8 /* SegmentedControlCell.swift */; };
+		BC5814702B4311BA00796761 /* MessagesViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC58146F2B4311BA00796761 /* MessagesViewTests.swift */; };
+		BC5814722B43378B00796761 /* LoginViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5814712B43378B00796761 /* LoginViewTests.swift */; };
+		BC5814742B43453C00796761 /* ChangeNumberViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5814732B43453C00796761 /* ChangeNumberViewTests.swift */; };
+		BC5814762B434E8900796761 /* ChangeEmailViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5814752B434E8900796761 /* ChangeEmailViewTests.swift */; };
+		BC5814782B434F4600796761 /* ChangePasswordViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5814772B434F4600796761 /* ChangePasswordViewTests.swift */; };
 		BC5A4EE9292BAC3A003A20B7 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5A4EE8292BAC3A003A20B7 /* DetailView.swift */; };
 		BC5A4EED292C1754003A20B7 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5A4EEC292C1754003A20B7 /* Utilities.swift */; };
 		BC5BB5CB2AF2830A0065BE52 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BC5BB5C92AF2830A0065BE52 /* DataModel.xcdatamodeld */; };
@@ -93,6 +98,11 @@
 		BC56DC812997B678002790B8 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		BC56DC832997B6F4002790B8 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 		BC56DC862997C20C002790B8 /* SegmentedControlCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControlCell.swift; sourceTree = "<group>"; };
+		BC58146F2B4311BA00796761 /* MessagesViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewTests.swift; sourceTree = "<group>"; };
+		BC5814712B43378B00796761 /* LoginViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewTests.swift; sourceTree = "<group>"; };
+		BC5814732B43453C00796761 /* ChangeNumberViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNumberViewTests.swift; sourceTree = "<group>"; };
+		BC5814752B434E8900796761 /* ChangeEmailViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeEmailViewTests.swift; sourceTree = "<group>"; };
+		BC5814772B434F4600796761 /* ChangePasswordViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordViewTests.swift; sourceTree = "<group>"; };
 		BC5A4EE8292BAC3A003A20B7 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		BC5A4EEC292C1754003A20B7 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		BC5BB5CA2AF2830A0065BE52 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
@@ -257,6 +267,11 @@
 			isa = PBXGroup;
 			children = (
 				BC63FB042B3F393F006520CC /* ViewControllerTests.swift */,
+				BC58146F2B4311BA00796761 /* MessagesViewTests.swift */,
+				BC5814712B43378B00796761 /* LoginViewTests.swift */,
+				BC5814732B43453C00796761 /* ChangeNumberViewTests.swift */,
+				BC5814752B434E8900796761 /* ChangeEmailViewTests.swift */,
+				BC5814772B434F4600796761 /* ChangePasswordViewTests.swift */,
 			);
 			path = TradeAppTests;
 			sourceTree = "<group>";
@@ -477,7 +492,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC5814702B4311BA00796761 /* MessagesViewTests.swift in Sources */,
+				BC5814722B43378B00796761 /* LoginViewTests.swift in Sources */,
 				BC63FB052B3F393F006520CC /* ViewControllerTests.swift in Sources */,
+				BC5814742B43453C00796761 /* ChangeNumberViewTests.swift in Sources */,
+				BC5814762B434E8900796761 /* ChangeEmailViewTests.swift in Sources */,
+				BC5814782B434F4600796761 /* ChangePasswordViewTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

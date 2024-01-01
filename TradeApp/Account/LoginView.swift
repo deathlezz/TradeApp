@@ -198,13 +198,13 @@ class LoginView: UITableViewController {
         } else {
             guard let rePassText = repeatPassword.textField.text else { return }
             
-            guard isEmailValid() else {
+            guard isEmailValid(mail) else {
                 showAlert(title: "Invalid email format", message: "Use this format instead \n*mail@domain.com*")
                 sender.isUserInteractionEnabled = true
                 return
             }
             
-            guard isPasswordValid() else {
+            guard isPasswordValid(passText) else {
                 password.textField.text = nil
                 repeatPassword.textField.text = nil
                 showAlert(title: "Invalid password format", message: "Use this format instead \n*yourPassword123*")
@@ -224,18 +224,18 @@ class LoginView: UITableViewController {
     }
     
     // check email address format
-    func isEmailValid() -> Bool {
+    func isEmailValid(_ mail: String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        return emailPred.evaluate(with: email.textField.text)
+        return emailPred.evaluate(with: mail)
     }
     
     // check password format
     // check if password has minimum 8 characters at least 1 uppercase alphabet, 1 lowercase alphabet and 1 number
-    func isPasswordValid() -> Bool {
+    func isPasswordValid(_ password: String) -> Bool {
         let passRegEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$"
         let passPred = NSPredicate(format:"SELF MATCHES %@", passRegEx)
-        return passPred.evaluate(with: password.textField.text)
+        return passPred.evaluate(with: password)
     }
     
     // set alert for correct/incorect textField input

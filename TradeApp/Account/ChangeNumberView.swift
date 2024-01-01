@@ -92,7 +92,7 @@ class ChangeNumberView: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "NewNumberCell", for: indexPath) as? TextFieldCell {
             if sections[indexPath.section] == "New number" {
-                cell.textField.placeholder = "e.g. +44 123 4567890"
+                cell.textField.placeholder = "e.g. +441234567890"
                 cell.textField.addTarget(self, action: #selector(returnTapped), for: .primaryActionTriggered)
                 cell.textField.clearButtonMode = .whileEditing
                 cell.selectionStyle = .none
@@ -161,7 +161,7 @@ class ChangeNumberView: UITableViewController {
     @objc func submitTapped() {
         guard let phoneNumber = newNumber.textField.text else { return }
         
-        if isNumberValid() {
+        if isNumberValid(phoneNumber) {
             saveNumber(number: phoneNumber)
             newNumber.textField.text = nil
         } else {
@@ -181,10 +181,10 @@ class ChangeNumberView: UITableViewController {
     }
     
     // check phone number format
-    func isNumberValid() -> Bool {
-        let phoneRegex = "^[0-9+]{0,1}+[0-9]{6,14}$"
+    func isNumberValid(_ number: String) -> Bool {
+        let phoneRegex = #"^\+[0-9]{6,14}[0-9]$"#
         let phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneRegex)
-        return phoneTest.evaluate(with: newNumber.textField.text)
+        return phoneTest.evaluate(with: number)
     }
     
     // update table view rows

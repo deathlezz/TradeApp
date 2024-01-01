@@ -109,10 +109,10 @@ class ChangeEmailView: UITableViewController {
     }
     
     // check email address format
-    func isEmailValid() -> Bool {
+    func isEmailValid(_ mail: String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        return emailPred.evaluate(with: newEmail.textField.text)
+        return emailPred.evaluate(with: mail)
     }
     
     // set action for tapped button
@@ -134,7 +134,7 @@ class ChangeEmailView: UITableViewController {
             return
         }
         
-        guard isEmailValid() else {
+        guard isEmailValid(newMailText) else {
             sender.isUserInteractionEnabled = true
             showAlert(title: "Error", message: "Incorrect new email format")
             return

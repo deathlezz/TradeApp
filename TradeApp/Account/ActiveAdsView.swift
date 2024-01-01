@@ -29,8 +29,6 @@ class ActiveAdsView: UITableViewController {
         tableView.separatorStyle = .singleLine
         tableView.sectionHeaderTopPadding = 0
         
-        NotificationCenter.default.addObserver(self, selector: #selector(loadUserAds), name: NSNotification.Name("reloadActiveAds"), object: nil)
-        
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         addEmptyArrayView()

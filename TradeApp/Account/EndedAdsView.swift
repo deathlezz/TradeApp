@@ -32,8 +32,6 @@ class EndedAdsView: UITableViewController {
         
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(loadUserAds), name: NSNotification.Name("reloadEndedAds"), object: nil)
-        
         addEmptyArrayView()
     }
     
