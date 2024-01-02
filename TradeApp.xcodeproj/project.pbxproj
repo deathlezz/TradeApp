@@ -52,6 +52,8 @@
 		BC72B09429B0C92E00703FF4 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC72B09329B0C92E00703FF4 /* ChangePasswordView.swift */; };
 		BC78F72B295EED4F0006DDB6 /* MapViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */; };
 		BC7C44132B0EA1F800E3C0AA /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7C44122B0EA1F800E3C0AA /* ChatCell.swift */; };
+		BC953F262B44395D004C26A0 /* ActiveAdsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC953F252B44395D004C26A0 /* ActiveAdsViewTests.swift */; };
+		BC953F282B443FB9004C26A0 /* EndedAdsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC953F272B443FB9004C26A0 /* EndedAdsViewTests.swift */; };
 		BCB234B62A03D252000106EE /* MessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB234B52A03D252000106EE /* MessagesView.swift */; };
 		BCB234B92A03DBF7000106EE /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB234B82A03DBF7000106EE /* ChatView.swift */; };
 		BCCE154B293BE14F00C256E4 /* ButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCE154A293BE14F00C256E4 /* ButtonCell.swift */; };
@@ -126,6 +128,8 @@
 		BC72B09329B0C92E00703FF4 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
 		BC78F72A295EED4F0006DDB6 /* MapViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewCell.swift; sourceTree = "<group>"; };
 		BC7C44122B0EA1F800E3C0AA /* ChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
+		BC953F252B44395D004C26A0 /* ActiveAdsViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveAdsViewTests.swift; sourceTree = "<group>"; };
+		BC953F272B443FB9004C26A0 /* EndedAdsViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndedAdsViewTests.swift; sourceTree = "<group>"; };
 		BCB234B52A03D252000106EE /* MessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesView.swift; sourceTree = "<group>"; };
 		BCB234B82A03DBF7000106EE /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		BCCE154A293BE14F00C256E4 /* ButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCell.swift; sourceTree = "<group>"; };
@@ -272,6 +276,8 @@
 				BC5814732B43453C00796761 /* ChangeNumberViewTests.swift */,
 				BC5814752B434E8900796761 /* ChangeEmailViewTests.swift */,
 				BC5814772B434F4600796761 /* ChangePasswordViewTests.swift */,
+				BC953F252B44395D004C26A0 /* ActiveAdsViewTests.swift */,
+				BC953F272B443FB9004C26A0 /* EndedAdsViewTests.swift */,
 			);
 			path = TradeAppTests;
 			sourceTree = "<group>";
@@ -492,12 +498,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC953F282B443FB9004C26A0 /* EndedAdsViewTests.swift in Sources */,
 				BC5814702B4311BA00796761 /* MessagesViewTests.swift in Sources */,
 				BC5814722B43378B00796761 /* LoginViewTests.swift in Sources */,
 				BC63FB052B3F393F006520CC /* ViewControllerTests.swift in Sources */,
 				BC5814742B43453C00796761 /* ChangeNumberViewTests.swift in Sources */,
 				BC5814762B434E8900796761 /* ChangeEmailViewTests.swift in Sources */,
 				BC5814782B434F4600796761 /* ChangePasswordViewTests.swift in Sources */,
+				BC953F262B44395D004C26A0 /* ActiveAdsViewTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
