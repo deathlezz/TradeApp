@@ -290,10 +290,11 @@ class LoginView: UITableViewController {
     
     // set alert for created account
     func accountCreatedAlert() {
-        let ac = UIAlertController(title: "Success", message: "You can sign in now", preferredStyle: .alert)
+        let ac = UIAlertController(title: "Success", message: "Your account has been created", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
             self?.sendEmail()
             self?.resetView(after: .register)
+            self?.loginPush()
         })
         present(ac, animated: true)
     }
