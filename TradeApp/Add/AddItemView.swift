@@ -38,6 +38,8 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     var item: Item?
     
+    var footer: UILabel!
+    
     var textFieldCells = [TextFieldCell]()
     var textViewCell: TextViewCell?
     
@@ -82,20 +84,18 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // set footer as number of available characters to use in description
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        if section == 5 {
-            return "Characters left: \(200 - (textViewCell?.textView.text.count ?? 0))"
-        } else {
-            return nil
-        }
-    }
-    
-    // set footer alignment
-    override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
-        let footer: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
-        footer.textLabel?.textAlignment = .right
-        footer.textLabel?.font = .boldSystemFont(ofSize: 15)
-        footer.textLabel?.textColor = .systemGray
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard section == 5 else { return nil }
+        let headerX = view.readableContentGuide.layoutFrame.minX
+        let footerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 30))
+        let textLabel = UILabel(frame: CGRect(x: headerX, y: 0, width: tableView.frame.width - (2 * headerX), height: 30))
+        textLabel.text = "Characters left: \(200 - (textViewCell?.textView.text.count ?? 0))"
+        textLabel.textAlignment = .right
+        textLabel.font = .boldSystemFont(ofSize: 15)
+        textLabel.textColor = .systemGray
+        footer = textLabel
+        footerView.addSubview(textLabel)
+        return footerView
     }
     
     // set section footer height
@@ -314,12 +314,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
             return
         }
         
-        UIView.setAnimationsEnabled(false)
-        tableView.beginUpdates()
-        tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: \(200 - charsUsed)"
-        tableView.footerView(forSection: 5)?.sizeToFit()
-        tableView.endUpdates()
-        UIView.setAnimationsEnabled(true)
+        footer.text = "Characters left: \(200 - (textViewCell?.textView.text.count ?? 0))"
     }
     
     // set action for clear button
@@ -331,12 +326,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         textViewCell?.textView.text = nil
         
         if !isMovingFromParent {
-            UIView.setAnimationsEnabled(false)
-            tableView.beginUpdates()
-            tableView.footerView(forSection: 5)?.textLabel?.text = "Characters left: 200"
-            tableView.footerView(forSection: 5)?.sizeToFit()
-            tableView.endUpdates()
-            UIView.setAnimationsEnabled(true)
+            footer.text = "Characters left: 200"
         }
         
         images.removeAll()
@@ -356,7 +346,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     }
     
     // set "done" button for numeric keyboard
-    func addDoneButtonToKeyboard() {
+    func addDoneButtonToKeyboard() {        
         let doneToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
         doneToolbar.barStyle = .default
         
@@ -575,9 +565,9 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // remove photo
     func deletePhoto() {
         uploadedPhotos.remove(at: index)
-        images[index] = UIImage(systemName: "plus")!
-        let plusImages = images.filter {$0 == UIImage(systemName: "plus")}
-        images = images.filter {$0 != UIImage(systemName: "plus")}
+        images[index] = UIImage(systemName: "plus")!.withTintColor(.systemGray)
+        let plusImages = images.filter {$0 == UIImage(systemName: "plus")?.withTintColor(.systemGray)}
+        images = images.filter {$0 != UIImage(systemName: "plus")?.withTintColor(.systemGray)}
         images += plusImages
         action = nil
         index = nil

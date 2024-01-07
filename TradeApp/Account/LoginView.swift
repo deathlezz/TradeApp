@@ -230,7 +230,6 @@ class LoginView: UITableViewController {
         return emailPred.evaluate(with: mail)
     }
     
-    // check password format
     // check if password has minimum 8 characters at least 1 uppercase alphabet, 1 lowercase alphabet and 1 number
     func isPasswordValid(_ password: String) -> Bool {
         let passRegEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$"
@@ -250,9 +249,14 @@ class LoginView: UITableViewController {
         email.textField.text = nil
         password.textField.text = nil
         
+        if repeatPassword != nil {
+            if repeatPassword.textField.text != nil {
+                repeatPassword.textField.text = nil
+            }
+        }
+        
         guard after == .register else { return }
         segment.segment.selectedSegmentIndex = 0
-        repeatPassword.textField.text = nil
         handleSegmentChange(segment.segment)
     }
     

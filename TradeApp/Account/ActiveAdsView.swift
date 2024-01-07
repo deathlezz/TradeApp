@@ -168,9 +168,9 @@ class ActiveAdsView: UITableViewController {
     
     // update table view header
     func updateHeader() {
-        tableView.beginUpdates()
+//        tableView.beginUpdates()
         header.text = activeAds.count == 1 ? "Found 1 ad" : "Found \(activeAds.count) ads"
-        tableView.endUpdates()
+//        tableView.endUpdates()
     }
     
     // hide toolbar before view appears

@@ -170,9 +170,9 @@ class EndedAdsView: UITableViewController {
     
     // update table view header
     func updateHeader() {
-        tableView.beginUpdates()
+//        tableView.beginUpdates()
         header.text = endedAds.count == 1 ? "Found 1 ad" : "Found \(endedAds.count) ads"
-        tableView.endUpdates()
+//        tableView.endUpdates()
     }
     
     // load user's ended ads
