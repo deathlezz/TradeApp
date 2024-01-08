@@ -138,9 +138,11 @@ class FilterView: UITableViewController {
                 cell.firstTextField.placeholder = "From"
                 cell.firstTextField.text = currentFilters["PriceFrom"]
                 cell.firstTextField.clearButtonMode = .whileEditing
+                cell.firstTextField.keyboardType = .numberPad
                 cell.secondTextField.placeholder = "To"
                 cell.secondTextField.text = currentFilters["PriceTo"]
                 cell.secondTextField.clearButtonMode = .whileEditing
+                cell.secondTextField.keyboardType = .numberPad
                 cell.selectionStyle = .none
                 priceCell = cell
                 return cell
@@ -203,7 +205,7 @@ class FilterView: UITableViewController {
         guard isPriceCorrect(priceFrom, priceTo) else { return }
         
         // check if user is using filters
-        checkForFilters()
+//        checkForFilters()
         
         // category filter
         categoryFilter(categoryText: categoryText)
@@ -385,22 +387,22 @@ class FilterView: UITableViewController {
     }
     
     // check if user is using filters
-    func checkForFilters() {
-        if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
-            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
-            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-        } else if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
-            AppStorage.shared.filteredItems = AppStorage.shared.recentlyAdded
-            currentFilters.removeAll()
-            Utilities.saveFilters(currentFilters)
-            navigationController?.popToRootViewController(animated: true)
-            return
-        } else if currentFilters["Search"] != nil {
-            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-        } else if currentFilters["Category"] != nil {
-            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
-        }
-    }
+//    func checkForFilters() {
+//        if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
+//            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
+//            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+//        } else if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
+//            AppStorage.shared.filteredItems = AppStorage.shared.recentlyAdded
+//            currentFilters.removeAll()
+//            Utilities.saveFilters(currentFilters)
+//            navigationController?.popToRootViewController(animated: true)
+//            return
+//        } else if currentFilters["Search"] != nil {
+//            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
+//        } else if currentFilters["Category"] != nil {
+//            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
+//        }
+//    }
     
     // category filter
     func categoryFilter(categoryText: String) {
@@ -420,6 +422,8 @@ class FilterView: UITableViewController {
         } else {
             currentFilters["Search"] = nil
             currentFilters["Category"] = nil
+            
+            AppStorage.shared.filteredItems = AppStorage.shared.recentlyAdded
         }
     }
     

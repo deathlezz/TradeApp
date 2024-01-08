@@ -227,6 +227,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = item
+            vc.isOpenedByLink = true
+            vc.isAdActive = true
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
