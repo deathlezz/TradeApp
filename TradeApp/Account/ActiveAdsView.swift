@@ -29,9 +29,12 @@ class ActiveAdsView: UITableViewController {
         tableView.separatorStyle = .singleLine
         tableView.sectionHeaderTopPadding = 0
         
+        NotificationCenter.default.addObserver(self, selector: #selector(updateActiveAd), name: NSNotification.Name("updateActiveAd"), object: nil)
+        
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         addEmptyArrayView()
+        loadUserAds()
     }
     
     // set number of sections
@@ -115,8 +118,7 @@ class ActiveAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = activeAds[indexPath.row]
-            vc.images = [(activeAds[indexPath.row].thumbnail)!]
-            vc.isOpenedByLink = false
+            vc.isOpenedByActiveAds = true
             vc.isAdActive = true
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []
@@ -134,6 +136,7 @@ class ActiveAdsView: UITableViewController {
             ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
                 AppStorage.shared.items.removeAll(where: {$0.id == item.id})
                 AppStorage.shared.filteredItems.removeAll(where: {$0.id == item.id})
+                AppStorage.shared.recentlyAdded.removeAll(where: {$0.id == item.id})
                 
                 self?.deleteItem(item: item)
                 self?.activeAds.remove(at: indexPath.row)
@@ -168,15 +171,12 @@ class ActiveAdsView: UITableViewController {
     
     // update table view header
     func updateHeader() {
-//        tableView.beginUpdates()
         header.text = activeAds.count == 1 ? "Found 1 ad" : "Found \(activeAds.count) ads"
-//        tableView.endUpdates()
     }
     
     // hide toolbar before view appears
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadUserAds()
         navigationController?.isToolbarHidden = true
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
     }
@@ -220,6 +220,7 @@ class ActiveAdsView: UITableViewController {
         
         AppStorage.shared.items.removeAll(where: {$0.id == sender.tag})
         AppStorage.shared.filteredItems.removeAll(where: {$0.id == sender.tag})
+        AppStorage.shared.recentlyAdded.removeAll(where: {$0.id == sender.tag})
         
         let indexPath = IndexPath(row: itemIndex, section: 0)
         tableView.deleteRows(at: [indexPath], with: .fade)
@@ -231,6 +232,7 @@ class ActiveAdsView: UITableViewController {
     @objc func loadUserAds() {
         DispatchQueue.global().async { [weak self] in
             self?.getActiveAds() { dict in
+                guard let dict = dict else { return }
                 let ads = self?.toItemModel(dict: dict) ?? [Item]()
                 let sorted = ads.sorted {$0.date > $1.date}
                 self?.activeAds.removeAll()
@@ -331,13 +333,15 @@ class ActiveAdsView: UITableViewController {
     }
     
     // download active ads from Firebase
-    func getActiveAds(completion: @escaping ([String: [String: Any]]) -> Void) {
+    func getActiveAds(completion: @escaping ([String: [String: Any]]?) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("activeItems").observeSingleEvent(of: .value) { snapshot in
                 if let data = snapshot.value as? [String: [String: Any]] {
                     completion(data)
+                } else {
+                    completion(nil)
                 }
             }
         }
@@ -368,6 +372,23 @@ class ActiveAdsView: UITableViewController {
         }
         
         return result
+    }
+    
+    // update item after exiting DetailView()
+    @objc func updateActiveAd(_ notification: Notification) {
+        if let item = notification.object as? Item {
+            // update item here
+            guard let index = activeAds.firstIndex(where: {$0.id == item.id}) else { return }
+            let indexPath = IndexPath(row: index, section: 0)
+            activeAds[index] = item
+            tableView.reloadRows(at: [indexPath], with: .none)
+        } else if let id = notification.userInfo?["itemId"] as? Int {
+            // remove item here
+            guard let index = activeAds.firstIndex(where: {$0.id == id}) else { return }
+            let indexPath = IndexPath(row: index, section: 0)
+            activeAds.remove(at: index)
+            tableView.reloadRows(at: [indexPath], with: .none)
+        }
     }
     
 }

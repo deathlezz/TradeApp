@@ -36,7 +36,8 @@ class DetailView: UITableViewController, Index, Coordinates {
     var longitude: Double!
     
     var reference: DatabaseReference!
-    var isOpenedByLink: Bool!
+    var isOpenedByActiveAds = false
+    var isOpenedByEndedAds = false
     var isAdActive: Bool!
     
     var item: Item!
@@ -72,24 +73,34 @@ class DetailView: UITableViewController, Index, Coordinates {
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 83, right: 0)
         
         navigationController?.toolbar.layer.position.y = (self.tabBarController?.tabBar.layer.position.y)! - 17
-        
-        loadPhoneNumber { [weak self] in
-            self?.checkForMessage()
-        }
-        
-        isSaved()
-        increaseViews()
-        DetailView.isLoaded = true
  
         DispatchQueue.global().async { [weak self] in
-            guard let urls = self?.item.photosURL else { return }
-            
-            self?.convertImages(urls: urls) { imgs in
-                self?.images.append(contentsOf: imgs)
+            self?.getData() { dict in
+                guard let dict = dict else {
+                    self?.showItemNotFoundAlert()
+                    return
+                }
                 
-                DispatchQueue.main.async {
-                    // send notification to detail view cell
-                    NotificationCenter.default.post(name: NSNotification.Name("updateImages"), object: nil, userInfo: ["images": self?.images ?? [UIImage]()])
+                let item = self?.toItemModel(dict: dict)
+                guard let urls = item?.photosURL else { return }
+                
+                self?.convertImages(urls: urls) { imgs in
+                    self?.item = item
+                    self?.item?.thumbnail = imgs[0]
+                    self?.images = imgs
+                    
+                    self?.loadPhoneNumber {
+                        self?.checkForMessage()
+                        self?.isSaved()
+                        self?.increaseViews()
+                        DetailView.isLoaded = true
+                        
+                        DispatchQueue.main.async {
+                            NotificationCenter.default.post(name: NSNotification.Name("updateImages"), object: nil, userInfo: ["images": imgs])
+                            
+                            self?.tableView.reloadData()
+                        }
+                    }
                 }
             }
         }
@@ -125,7 +136,6 @@ class DetailView: UITableViewController, Index, Coordinates {
         switch sectionTitles[indexPath.section] {
         case "Image":
             if let cell = tableView.dequeueReusableCell(withIdentifier: "detailCollectionView") as? DetailViewCell {
-                cell.imgs = images
                 cell.delegate = self
                 cell.selectionStyle = .none
                 return cell
@@ -284,7 +294,6 @@ class DetailView: UITableViewController, Index, Coordinates {
             views = nil
             latitude = nil
             longitude = nil
-            item = nil
         }
         
         guard messageTextField != nil else { return }
@@ -297,6 +306,25 @@ class DetailView: UITableViewController, Index, Coordinates {
         let ac = UIAlertController(title: "You can't save more items.", message: "You've already saved 50 items.", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .cancel))
         present(ac, animated: true)
+    }
+    
+    // show item not found alert
+    func showItemNotFoundAlert() {
+        guard let isAdActive = isAdActive else { return }
+        let itemId = item.id
+        
+        DispatchQueue.main.async { [weak self] in
+            let ac = UIAlertController(title: "Item not found", message: "Item is not available anymore", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+                if isAdActive {
+                    AppStorage.shared.items.removeAll(where: {$0.id == itemId})
+                    AppStorage.shared.filteredItems.removeAll(where: {$0.id == itemId})
+                    AppStorage.shared.recentlyAdded.removeAll(where: {$0.id == itemId})
+                }
+                self?.navigationController?.popViewController(animated: true)
+            })
+            self?.present(ac, animated: true)
+        }
     }
     
     // set action for call button
@@ -346,6 +374,16 @@ class DetailView: UITableViewController, Index, Coordinates {
         super.viewDidDisappear(animated)
         if isMovingFromParent {
             NotificationCenter.default.post(name: NSNotification.Name("removeMap"), object: nil)
+            
+            if isOpenedByActiveAds {
+                NotificationCenter.default.post(name: NSNotification.Name("updateActiveAd"), object: item)
+                isOpenedByActiveAds = false
+            } else if isOpenedByEndedAds {
+                NotificationCenter.default.post(name: NSNotification.Name("updateEndedAd"), object: item)
+                isOpenedByEndedAds = false
+            }
+
+            item = nil
             DetailView.isLoaded = false
         }
     }
@@ -499,21 +537,21 @@ class DetailView: UITableViewController, Index, Coordinates {
     // update number of saved
     func updateSaved(action: SaveAction) {
         let owner = item.owner
-        let itemID = item.id
+        let itemId = item.id
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(owner).child("activeItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
+            self?.reference.child(owner).child("activeItems").child("\(itemId)").child("saved").observeSingleEvent(of: .value) { snapshot in
                 if let saved = snapshot.value as? Int {
                     if action == .save {
-                        self?.reference.child(owner).child("activeItems").child("\(itemID)").child("saved").setValue(saved + 1)
+                        self?.reference.child(owner).child("activeItems").child("\(itemId)").child("saved").setValue(saved + 1)
                     } else {
-                        self?.reference.child(owner).child("activeItems").child("\(itemID)").child("saved").setValue(saved - 1)
+                        self?.reference.child(owner).child("activeItems").child("\(itemId)").child("saved").setValue(saved - 1)
                     }
                 } else {
-                    self?.reference.child(owner).child("endedItems").child("\(itemID)").child("saved").observeSingleEvent(of: .value) { snapshot in
+                    self?.reference.child(owner).child("endedItems").child("\(itemId)").child("saved").observeSingleEvent(of: .value) { snapshot in
                         if let saved = snapshot.value as? Int {
                             if action == .remove {
-                                self?.reference.child(owner).child("endedItems").child("\(itemID)").child("saved").setValue(saved - 1)
+                                self?.reference.child(owner).child("endedItems").child("\(itemId)").child("saved").setValue(saved - 1)
                             }
                         }
                     }
@@ -632,16 +670,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     
     // convert URLs into images
     func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
-        var links = [URL]()
-        
-        if !isOpenedByLink {
-            // get all images except the thumbnail
-            guard urls.count > 1 else { return }
-            links = Array(urls.map {URL(string: $0)!}.dropFirst())
-        } else {
-            // get all images
-            links = urls.map {URL(string: $0)!}
-        }
+        let links = urls.map {URL(string: $0)!}
         
         var imagesDict = [String: UIImage]()
 
@@ -663,6 +692,64 @@ class DetailView: UITableViewController, Index, Coordinates {
                 task.resume()
             }
         }
+    }
+    
+    // download item data from Firebase
+    func getData(completion: @escaping ([String: Any]?) -> Void) {
+        guard let isAdActive = isAdActive else { return }
+        let owner = item.owner
+        let itemId = item.id
+        
+        DispatchQueue.global().async { [weak self] in
+            if isAdActive {
+                self?.reference.child(owner).child("activeItems").child("\(itemId)").observeSingleEvent(of: .value) { snapshot in
+                    if let value = snapshot.value as? [String: Any] {
+                        completion(value)
+                    } else {
+                        completion(nil)
+                    }
+                }
+            } else {
+                self?.reference.child(owner).child("endedItems").child("\(itemId)").observeSingleEvent(of: .value) { snapshot in
+                    if let value = snapshot.value as? [String: Any] {
+                        completion(value)
+                    } else {
+                        completion(nil)
+                    }
+                }
+            }
+        }
+    }
+    
+    // convert dictionary to Item() model
+    func toItemModel(dict: [String: Any]) -> Item {
+        let photosURL = dict["photosURL"] as? [String]
+        let title = dict["title"] as? String
+        let price = dict["price"] as? Int
+        let category = dict["category"] as? String
+        let location = dict["location"] as? String
+        let description = dict["description"] as? String
+        let date = dict["date"] as? String
+        let views = dict["views"] as? Int
+        let saved = dict["saved"] as? Int
+        let lat = dict["lat"] as? Double
+        let long = dict["long"] as? Double
+        let id = dict["id"] as? Int
+        let owner = dict["owner"] as? String
+        
+        let model = Item(photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
+        
+        if let index = AppStorage.shared.items.firstIndex(where: {$0.id == id}) {
+            AppStorage.shared.items[index] = model
+        }
+        if let index = AppStorage.shared.filteredItems.firstIndex(where: {$0.id == id}) {
+            AppStorage.shared.filteredItems[index] = model
+        }
+        if let index = AppStorage.shared.recentlyAdded.firstIndex(where: {$0.id == id}) {
+            AppStorage.shared.recentlyAdded[index] = model
+        }
+        
+        return model
     }
     
 }

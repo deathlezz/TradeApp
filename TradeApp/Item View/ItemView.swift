@@ -9,7 +9,7 @@ import UIKit
 
 class ItemView: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
-    var imgs = [UIImage]()
+    var imgs: [UIImage] = []
     var item: Item!
     static var isLoaded = false
     

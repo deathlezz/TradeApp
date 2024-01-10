@@ -30,9 +30,12 @@ class EndedAdsView: UITableViewController {
         tableView.sectionHeaderTopPadding = 0
         tableView.separatorInset.left = 17
         
+        NotificationCenter.default.addObserver(self, selector: #selector(updateEndedAd), name: NSNotification.Name("updateEndedAd"), object: nil)
+        
         reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
         
         addEmptyArrayView()
+        loadUserAds()
     }
     
     // set number of sections
@@ -117,8 +120,7 @@ class EndedAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = endedAds[indexPath.row]
-            vc.images = [(endedAds[indexPath.row].thumbnail)!]
-            vc.isOpenedByLink = false
+            vc.isOpenedByEndedAds = true
             vc.isAdActive = false
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []
@@ -134,9 +136,6 @@ class EndedAdsView: UITableViewController {
             let ac = UIAlertController(title: "Delete ad", message: "Are you sure, you want to delete this ad?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
-                AppStorage.shared.items.removeAll(where: {$0.id == item.id})
-                AppStorage.shared.filteredItems.removeAll(where: {$0.id == item.id})
-                
                 self?.deleteItem(item: item)
                 self?.endedAds.remove(at: indexPath.row)
                 
@@ -170,15 +169,14 @@ class EndedAdsView: UITableViewController {
     
     // update table view header
     func updateHeader() {
-//        tableView.beginUpdates()
         header.text = endedAds.count == 1 ? "Found 1 ad" : "Found \(endedAds.count) ads"
-//        tableView.endUpdates()
     }
     
     // load user's ended ads
     @objc func loadUserAds() {
         DispatchQueue.global().async { [weak self] in
             self?.getEndedAds() { dict in
+                guard let dict = dict else { return }
                 let ads = self?.toItemModel(dict: dict) ?? [Item]()
                 let sorted = ads.sorted {$0.date > $1.date}
                 self?.endedAds.removeAll()
@@ -195,7 +193,6 @@ class EndedAdsView: UITableViewController {
     // hide toolbar before view appears
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadUserAds()
         navigationController?.isToolbarHidden = true
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
     }
@@ -329,13 +326,15 @@ class EndedAdsView: UITableViewController {
     }
     
     // download ended ads from Firebase
-    func getEndedAds(completion: @escaping ([String: [String: Any]]) -> Void) {
+    func getEndedAds(completion: @escaping ([String: [String: Any]]?) -> Void) {
         guard let user = Auth.auth().currentUser?.uid else { return }
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("endedItems").observeSingleEvent(of: .value) { snapshot in
                 if let data = snapshot.value as? [String: [String: Any]] {
                     completion(data)
+                } else {
+                    completion(nil)
                 }
             }
         }
@@ -366,6 +365,23 @@ class EndedAdsView: UITableViewController {
         }
         
         return result
+    }
+    
+    // update item after exiting DetailView()
+    @objc func updateEndedAd(_ notification: Notification) {
+        if let item = notification.object as? Item {
+            // update item here
+            guard let index = endedAds.firstIndex(where: {$0.id == item.id}) else { return }
+            let indexPath = IndexPath(row: index, section: 0)
+            endedAds[index] = item
+            tableView.reloadRows(at: [indexPath], with: .none)
+        } else if let id = notification.userInfo?["itemId"] as? Int {
+            // remove item here
+            guard let index = endedAds.firstIndex(where: {$0.id == id}) else { return }
+            let indexPath = IndexPath(row: index, section: 0)
+            endedAds.remove(at: index)
+            tableView.reloadRows(at: [indexPath], with: .none)
+        }
     }
     
 }

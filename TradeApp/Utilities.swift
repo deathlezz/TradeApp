@@ -161,7 +161,6 @@ class Utilities {
         newAd.setValue(item.id, forKey: "id")
         newAd.setValue(item.owner, forKey: "owner")
 
-        print("item saved")
         AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
     }
     
@@ -176,7 +175,6 @@ class Utilities {
             for result in results {
                 for item in items {
                     if result.id == item.id {
-                        print("item \(result.id) removed")
                         managedContext.delete(result)
                         break
                     }
@@ -208,7 +206,6 @@ class Utilities {
                 let item = Item(thumbnail: thumbnail, photosURL: result.photosURL!, title: result.title!, price: Int(result.price), location: result.location!, date: date, id: Int(result.id), owner: result.owner!)
                 items.append(item)
             }
-            print("items loaded: \(items)")
             
         } catch let error as NSError {
             print("Fetch error: \(error) description: \(error.userInfo)")

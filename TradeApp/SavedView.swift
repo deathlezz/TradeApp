@@ -98,8 +98,8 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                 let item = savedItems[indexPath.item]
                 guard AppStorage.shared.items.first(where: {$0.id == item.id}) != nil else { return }
                 vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
-                vc.images = [item.thumbnail!]
-                vc.isOpenedByLink = false
+//                vc.images = [item.thumbnail!]
+//                vc.isOpenedByLink = false
                 vc.isAdActive = true
                 vc.hidesBottomBarWhenPushed = true
                 isDetailShown = true
