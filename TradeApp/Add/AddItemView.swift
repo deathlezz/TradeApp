@@ -37,6 +37,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     var uploadedPhotos = [UIImage]()
     
     var item: Item?
+    var updatedItem: Item?
     
     var footer: UILabel!
     
@@ -75,7 +76,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         } else {
             title = "Add"
         }
-        
     }
 
     // set number of rows in section
@@ -242,6 +242,22 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
     }
     
+    // update item after edit
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isEditMode && updatedItem != nil {
+            if isAdActive {
+                NotificationCenter.default.post(name: NSNotification.Name("updateActiveAd"), object: updatedItem)
+            } else {
+                NotificationCenter.default.post(name: NSNotification.Name("updateEndedAd"), object: updatedItem)
+            }
+            
+            updatedItem = nil
+            isEditMode = nil
+            isAdActive = nil
+        }
+    }
+    
     // set action for tapped cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if sections[indexPath.section] == "Category" {
@@ -331,6 +347,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         images.removeAll()
         uploadedPhotos.removeAll()
+        item = nil
         
         for _ in 0...7 {
             let image = UIImage(systemName: "plus")?.withTintColor(.systemGray)
@@ -338,6 +355,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
 
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
+//        tableView.reloadData()
     }
     
     // set action for "return" keyboard button
@@ -405,14 +423,14 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
                                 
                                 let newItem = Item(photosURL: urls, title: title, price: Int(price)!, category: category, location: location, description: description, date: Date(), views: item.views, saved: item.saved, lat: lat, long: long, id: item.id, owner: user)
                                 
+                                self?.updatedItem = newItem
+                                
                                 if self?.isAdActive == true {
                                     self?.saveItem(user: user, item: newItem, isActive: true)
                                 } else {
                                     self?.saveItem(user: user, item: newItem, isActive: false)
                                 }
                                 
-                                self?.isEditMode = nil
-                                self?.isAdActive = nil
                                 sender.isUserInteractionEnabled = true
                                 self?.showAlert(.edit)
                             }
