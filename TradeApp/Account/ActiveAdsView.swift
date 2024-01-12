@@ -387,7 +387,7 @@ class ActiveAdsView: UITableViewController {
             guard let index = activeAds.firstIndex(where: {$0.id == id}) else { return }
             let indexPath = IndexPath(row: index, section: 0)
             activeAds.remove(at: index)
-            tableView.reloadRows(at: [indexPath], with: .none)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
     

@@ -38,6 +38,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     var reference: DatabaseReference!
     var isOpenedByActiveAds = false
     var isOpenedByEndedAds = false
+    var itemFound: Bool!
     var isAdActive: Bool!
     
     var item: Item!
@@ -77,9 +78,12 @@ class DetailView: UITableViewController, Index, Coordinates {
         DispatchQueue.global().async { [weak self] in
             self?.getData() { dict in
                 guard let dict = dict else {
+                    self?.itemFound = false
                     self?.showItemNotFoundAlert()
                     return
                 }
+                
+                self?.itemFound = true
                 
                 let item = self?.toItemModel(dict: dict)
                 guard let urls = item?.photosURL else { return }
@@ -376,11 +380,26 @@ class DetailView: UITableViewController, Index, Coordinates {
             NotificationCenter.default.post(name: NSNotification.Name("removeMap"), object: nil)
             
             if isOpenedByActiveAds {
-                NotificationCenter.default.post(name: NSNotification.Name("updateActiveAd"), object: item)
-                isOpenedByActiveAds = false
+                if itemFound {
+                    NotificationCenter.default.post(name: NSNotification.Name("updateActiveAd"), object: item)
+                    isOpenedByActiveAds = false
+                    itemFound = nil
+                } else {
+                    NotificationCenter.default.post(name: NSNotification.Name("updateActiveAd"), object: nil, userInfo: ["itemId": item.id])
+                    isOpenedByActiveAds = false
+                    itemFound = nil
+                }
+                
             } else if isOpenedByEndedAds {
-                NotificationCenter.default.post(name: NSNotification.Name("updateEndedAd"), object: item)
-                isOpenedByEndedAds = false
+                if itemFound {
+                    NotificationCenter.default.post(name: NSNotification.Name("updateEndedAd"), object: item)
+                    isOpenedByEndedAds = false
+                    itemFound = nil
+                } else {
+                    NotificationCenter.default.post(name: NSNotification.Name("updateEndedAd"), object: nil, userInfo: ["itemId": item.id])
+                    isOpenedByEndedAds = false
+                    itemFound = nil
+                }
             }
 
             item = nil

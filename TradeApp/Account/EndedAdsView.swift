@@ -380,7 +380,7 @@ class EndedAdsView: UITableViewController {
             guard let index = endedAds.firstIndex(where: {$0.id == id}) else { return }
             let indexPath = IndexPath(row: index, section: 0)
             endedAds.remove(at: index)
-            tableView.reloadRows(at: [indexPath], with: .none)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
     

@@ -245,7 +245,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     // update item after edit
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        if isEditMode && updatedItem != nil {
+        if isEditMode != nil && updatedItem != nil {
             if isAdActive {
                 NotificationCenter.default.post(name: NSNotification.Name("updateActiveAd"), object: updatedItem)
             } else {
@@ -341,7 +341,7 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         textViewCell?.textView.text = nil
         
-        if !isMovingFromParent {
+        if !isMovingFromParent && footer != nil {
             footer.text = "Characters left: 200"
         }
         
