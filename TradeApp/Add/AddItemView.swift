@@ -697,6 +697,16 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         
         if isActive {
             reference.child(user).child("activeItems").child("\(item.id)").setValue(newItem)
+            
+            if let index = AppStorage.shared.items.firstIndex(where: {$0.id == item.id}) {
+                AppStorage.shared.items[index] = item
+            }
+            if let index = AppStorage.shared.filteredItems.firstIndex(where: {$0.id == item.id}) {
+                AppStorage.shared.filteredItems[index] = item
+            }
+            if let index = AppStorage.shared.recentlyAdded.firstIndex(where: {$0.id == item.id}) {
+                AppStorage.shared.recentlyAdded[index] = item
+            }
         } else {
             reference.child(user).child("endedItems").child("\(item.id)").setValue(newItem)
         }

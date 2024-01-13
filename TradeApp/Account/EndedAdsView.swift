@@ -120,7 +120,7 @@ class EndedAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = endedAds[indexPath.row]
-            vc.isOpenedByEndedAds = true
+//            vc.isOpenedByEndedAds = true
             vc.isAdActive = false
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []
@@ -375,12 +375,6 @@ class EndedAdsView: UITableViewController {
             let indexPath = IndexPath(row: index, section: 0)
             endedAds[index] = item
             tableView.reloadRows(at: [indexPath], with: .none)
-        } else if let id = notification.userInfo?["itemId"] as? Int {
-            // remove item here
-            guard let index = endedAds.firstIndex(where: {$0.id == id}) else { return }
-            let indexPath = IndexPath(row: index, section: 0)
-            endedAds.remove(at: index)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
     

@@ -118,7 +118,7 @@ class ActiveAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = activeAds[indexPath.row]
-            vc.isOpenedByActiveAds = true
+//            vc.isOpenedByActiveAds = true
             vc.isAdActive = true
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []
@@ -382,12 +382,6 @@ class ActiveAdsView: UITableViewController {
             let indexPath = IndexPath(row: index, section: 0)
             activeAds[index] = item
             tableView.reloadRows(at: [indexPath], with: .none)
-        } else if let id = notification.userInfo?["itemId"] as? Int {
-            // remove item here
-            guard let index = activeAds.firstIndex(where: {$0.id == id}) else { return }
-            let indexPath = IndexPath(row: index, section: 0)
-            activeAds.remove(at: index)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
     

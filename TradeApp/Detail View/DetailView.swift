@@ -38,7 +38,7 @@ class DetailView: UITableViewController, Index, Coordinates {
     var reference: DatabaseReference!
     var isOpenedByActiveAds = false
     var isOpenedByEndedAds = false
-    var itemFound: Bool!
+//    var itemFound: Bool!
     var isAdActive: Bool!
     
     var item: Item!
@@ -78,15 +78,16 @@ class DetailView: UITableViewController, Index, Coordinates {
         DispatchQueue.global().async { [weak self] in
             self?.getData() { dict in
                 guard let dict = dict else {
-                    self?.itemFound = false
+//                    self?.itemFound = false
                     self?.showItemNotFoundAlert()
                     return
                 }
                 
-                self?.itemFound = true
+//                self?.itemFound = true
                 
-                let item = self?.toItemModel(dict: dict)
-                guard let urls = item?.photosURL else { return }
+                guard let item = self?.toItemModel(dict: dict) else { return }
+                self?.updateItem(item: item)
+                let urls = item.photosURL
                 
                 self?.convertImages(urls: urls) { imgs in
                     self?.item = item
@@ -380,26 +381,11 @@ class DetailView: UITableViewController, Index, Coordinates {
             NotificationCenter.default.post(name: NSNotification.Name("removeMap"), object: nil)
             
             if isOpenedByActiveAds {
-                if itemFound {
-                    NotificationCenter.default.post(name: NSNotification.Name("updateActiveAd"), object: item)
-                    isOpenedByActiveAds = false
-                    itemFound = nil
-                } else {
-                    NotificationCenter.default.post(name: NSNotification.Name("updateActiveAd"), object: nil, userInfo: ["itemId": item.id])
-                    isOpenedByActiveAds = false
-                    itemFound = nil
-                }
-                
+                NotificationCenter.default.post(name: NSNotification.Name("updateActiveAd"), object: item)
+                isOpenedByActiveAds = false
             } else if isOpenedByEndedAds {
-                if itemFound {
-                    NotificationCenter.default.post(name: NSNotification.Name("updateEndedAd"), object: item)
-                    isOpenedByEndedAds = false
-                    itemFound = nil
-                } else {
-                    NotificationCenter.default.post(name: NSNotification.Name("updateEndedAd"), object: nil, userInfo: ["itemId": item.id])
-                    isOpenedByEndedAds = false
-                    itemFound = nil
-                }
+                NotificationCenter.default.post(name: NSNotification.Name("updateEndedAd"), object: item)
+                isOpenedByEndedAds = false
             }
 
             item = nil
@@ -758,17 +744,36 @@ class DetailView: UITableViewController, Index, Coordinates {
         
         let model = Item(photosURL: photosURL!, title: title!, price: price!, category: category!, location: location!, description: description!, date: date!.toDate(), views: views!, saved: saved!, lat: lat!, long: long!, id: id!, owner: owner!)
         
-        if let index = AppStorage.shared.items.firstIndex(where: {$0.id == id}) {
-            AppStorage.shared.items[index] = model
-        }
-        if let index = AppStorage.shared.filteredItems.firstIndex(where: {$0.id == id}) {
-            AppStorage.shared.filteredItems[index] = model
-        }
-        if let index = AppStorage.shared.recentlyAdded.firstIndex(where: {$0.id == id}) {
-            AppStorage.shared.recentlyAdded[index] = model
-        }
-        
         return model
+    }
+    
+    // update item entering to DetailView
+    func updateItem(item: Item) {
+        // user is logged in
+        if Auth.auth().currentUser?.uid != nil {
+            if item.owner != Auth.auth().currentUser?.uid {
+                if let index = AppStorage.shared.items.firstIndex(where: {$0.id == item.id}) {
+                    AppStorage.shared.items[index] = item
+                }
+                if let index = AppStorage.shared.filteredItems.firstIndex(where: {$0.id == item.id}) {
+                    AppStorage.shared.filteredItems[index] = item
+                }
+                if let index = AppStorage.shared.recentlyAdded.firstIndex(where: {$0.id == item.id}) {
+                    AppStorage.shared.recentlyAdded[index] = item
+                }
+            }
+        } else {
+            // user in not logged in
+            if let index = AppStorage.shared.items.firstIndex(where: {$0.id == item.id}) {
+                AppStorage.shared.items[index] = item
+            }
+            if let index = AppStorage.shared.filteredItems.firstIndex(where: {$0.id == item.id}) {
+                AppStorage.shared.filteredItems[index] = item
+            }
+            if let index = AppStorage.shared.recentlyAdded.firstIndex(where: {$0.id == item.id}) {
+                AppStorage.shared.recentlyAdded[index] = item
+            }
+        }
     }
     
 }

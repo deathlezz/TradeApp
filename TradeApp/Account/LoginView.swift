@@ -191,6 +191,9 @@ class LoginView: UITableViewController {
                     return
                 }
                 
+                // allow only one user to be logged in here
+                
+                
                 self?.resetView(after: .login)
                 sender.isUserInteractionEnabled = true
                 self?.loginPush()
