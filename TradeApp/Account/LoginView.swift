@@ -191,12 +191,7 @@ class LoginView: UITableViewController {
                     return
                 }
                 
-                // allow only one user to be logged in here
-                
-                
-                self?.resetView(after: .login)
-                sender.isUserInteractionEnabled = true
-                self?.loginPush()
+                self?.userLogin(sender: sender)
             }
         } else {
             guard let rePassText = repeatPassword.textField.text else { return }
@@ -367,6 +362,8 @@ class LoginView: UITableViewController {
             
             self?.accountCreatedAlert()
             sender.isUserInteractionEnabled = true
+            let user = Auth.auth().currentUser?.uid
+            self?.reference.child(user!).child("isOnline").setValue(true)
         }
     }
     
@@ -383,6 +380,39 @@ class LoginView: UITableViewController {
                 
                 // show email sent success alert
                 self?.showAlert(title: "Email sent", message: "Check your inbox to verify your account")
+            }
+        }
+    }
+    
+    // allow only one user to be logged in
+    func userLogin(sender: UIButton) {
+        let user = Auth.auth().currentUser?.uid
+
+        reference.child(user!).child("isOnline").observeSingleEvent(of: .value) { [weak self] snapshot in
+            if let value = snapshot.value as? Bool {
+                if value {
+                    // user can't log in
+                    let ac = UIAlertController(title: "Access denied", message: "Someone is already logged in", preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "OK", style: .cancel) { _ in
+                        do {
+                            try Auth.auth().signOut()
+                            self?.resetView(after: .login)
+                            sender.isUserInteractionEnabled = true
+                        } catch {
+                            self?.showAlert(title: "Error", message: "Sign out failed")
+                            self?.resetView(after: .login)
+                            sender.isUserInteractionEnabled = true
+                        }
+                    })
+                    self?.present(ac, animated: true)
+                    
+                } else {
+                    // user can log in
+                    self?.reference.child(user!).child("isOnline").setValue(true)
+                    self?.resetView(after: .login)
+                    sender.isUserInteractionEnabled = true
+                    self?.loginPush()
+                }
             }
         }
     }

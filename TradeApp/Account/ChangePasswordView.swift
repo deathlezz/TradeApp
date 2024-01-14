@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 import FirebaseAuth
 
 class ChangePasswordView: UITableViewController {
@@ -13,6 +14,8 @@ class ChangePasswordView: UITableViewController {
     let sections = ["Current password", "New password", "Repeat password", "Button"]
     
     var cells = [TextFieldCell]()
+    
+    var reference: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +25,8 @@ class ChangePasswordView: UITableViewController {
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
+        
+        reference = Database.database(url: "https://trade-app-4fc85-default-rtdb.europe-west1.firebasedatabase.app").reference()
     }
     
     // set number of sections
@@ -175,7 +180,9 @@ class ChangePasswordView: UITableViewController {
                 sender.isUserInteractionEnabled = true
                 
                 do {
+                    guard let user = Auth.auth().currentUser?.uid else { return }
                     try Auth.auth().signOut()
+                    self?.reference.child(user).child("isOnline").setValue(false)
                     self?.navigationController?.popToRootViewController(animated: true)
                 } catch {
                     self?.showAlert(title: "Sign out failed", message: "Internal error occurred")

@@ -160,14 +160,15 @@ class AccountView: UITableViewController {
             
         default:
             do {
+                guard let user = Auth.auth().currentUser?.uid else { return }
                 try Auth.auth().signOut()
+                reference.child(user).child("isOnline").setValue(false)
                 navigationController?.popToRootViewController(animated: true)
             } catch {
                 let ac = UIAlertController(title: "Sign out failed", message: "An internal error occurred", preferredStyle: .alert)
                 ac.addAction(UIAlertAction(title: "OK", style: .default))
                 present(ac, animated: true)
             }
-            
         }
     }
     
