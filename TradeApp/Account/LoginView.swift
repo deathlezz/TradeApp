@@ -187,6 +187,7 @@ class LoginView: UITableViewController {
                             self?.showAlert(title: "Sign in failed", message: "Internal error occurred")
                         }
                     }
+                    self?.password.textField.text = nil
                     sender.isUserInteractionEnabled = true
                     return
                 }

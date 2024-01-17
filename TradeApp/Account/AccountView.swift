@@ -174,7 +174,7 @@ class AccountView: UITableViewController {
     
     // show delete account alert
     func deleteAccount() {
-        let user = Auth.auth().currentUser!.uid
+        guard let user = Auth.auth().currentUser?.uid else { return }
         let ac = UIAlertController(title: "Delete account", message: "Are you sure, you want to delete your account?", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
             
@@ -193,6 +193,12 @@ class AccountView: UITableViewController {
                             Auth.auth().currentUser?.delete() { error in
                                 if let error = error {
                                     self?.showAlert(title: "Error", message: "Delete account failed: \(error.localizedDescription)")
+                                    do {
+                                        try Auth.auth().signOut()
+                                    } catch {
+                                        self?.showAlert(title: "Error", message: "Sign out failed")
+                                    }
+                                    
                                 } else {
                                     self?.showAlert(title: "Success", message: "Your account has been deleted")
                                 }
@@ -302,6 +308,9 @@ class AccountView: UITableViewController {
                     
                     let active = data["activeItems"] as? [String: [String: Any]] ?? [:]
                     let ended = data["endedItems"] as? [String: [String: Any]] ?? [:]
+                    
+                    guard !active.isEmpty || !ended.isEmpty else { return completion() }
+                    
                     let items = active.merging(ended) { (_, new) in new }
                     
                     let photos = items.map {$0.value["photosURL"]} as? [[String]]
@@ -388,6 +397,8 @@ class AccountView: UITableViewController {
                             }
                         }
                     }
+                } else {
+                    completion()
                 }
             }
         }
