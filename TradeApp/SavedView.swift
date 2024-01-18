@@ -98,8 +98,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
                 let item = savedItems[indexPath.item]
                 guard AppStorage.shared.items.first(where: {$0.id == item.id}) != nil else { return }
                 vc.item = AppStorage.shared.items.first(where: {$0.id == item.id})
-//                vc.images = [item.thumbnail!]
-//                vc.isOpenedByLink = false
                 vc.isAdActive = true
                 vc.hidesBottomBarWhenPushed = true
                 isDetailShown = true
@@ -133,7 +131,6 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     
     // set action for deselected cell
     override func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        
         guard let cell = collectionView.cellForItem(at: indexPath) else { return }
         
         if !cell.isSelected {
@@ -377,7 +374,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     func updateSavedItems(completion: @escaping () -> Void) {
         guard savedItems.count > 0 else { return completion() }
         
-        guard monitor.currentPath.status == .satisfied else { return }
+        guard monitor.currentPath.status == .satisfied else { return completion() }
         
         DispatchQueue.global().async { [weak self] in
             self?.getData() { dict in
