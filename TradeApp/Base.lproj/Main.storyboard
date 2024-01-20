@@ -196,11 +196,11 @@
                             <size key="itemSize" width="176" height="230"/>
                             <size key="headerReferenceSize" width="50" height="14"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                            <inset key="sectionInset" minX="15" minY="10" maxX="15" maxY="10"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
                         <cells>
                             <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="itemCell" id="6X4-n0-yfU" customClass="ItemCell" customModule="TradeApp" customModuleProvider="target">
-                                <rect key="frame" x="15" y="24" width="176" height="230"/>
+                                <rect key="frame" x="0.0" y="14" width="176" height="230"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Fbt-Jy-rZu">
                                     <rect key="frame" x="0.0" y="0.0" width="176" height="230"/>

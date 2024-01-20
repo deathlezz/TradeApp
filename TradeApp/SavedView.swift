@@ -34,6 +34,8 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
         title = "Saved"
         navigationController?.navigationBar.prefersLargeTitles = true
         
+        collectionView.alwaysBounceVertical = true
+        
         checkConnection()
         addEmptyArrayView()
         
@@ -179,7 +181,7 @@ class SavedView: UICollectionViewController, UICollectionViewDelegateFlowLayout 
     override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         if velocity.y > 0 {
             navigationController?.setNavigationBarHidden(true, animated: true)
-            setTabBarHidden(true, animated: false)
+            setTabBarHidden(true, animated: true)
         } else {
             navigationController?.setNavigationBarHidden(false, animated: true)
             setTabBarHidden(false, animated: true)
