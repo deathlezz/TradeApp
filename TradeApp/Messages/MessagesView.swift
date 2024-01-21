@@ -166,7 +166,7 @@ class MessagesView: UITableViewController {
         if case .text(let value) = messageKind {
             
             let width = UIScreen.main.bounds.width
-            let maxLetters = Int(width / 17)
+            let maxLetters = Int(width / 18)
             
             if value.count > maxLetters {
                 return value.prefix(maxLetters) + "..."
