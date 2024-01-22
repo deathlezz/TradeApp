@@ -95,6 +95,8 @@ class EndedAdsView: UITableViewController {
             }
             
             cell.thumbnail.layer.cornerRadius = 7
+            cell.thumbnail.layer.borderWidth = 0.2
+            cell.thumbnail.layer.borderColor = UIColor.lightGray.cgColor
             cell.title.text = endedAds[indexPath.row].title
             cell.price.text = "£\(endedAds[indexPath.row].price)"
             cell.availability.text = setExpiryDate(endedAds[indexPath.row].date)

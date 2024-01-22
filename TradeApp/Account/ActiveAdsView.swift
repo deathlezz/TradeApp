@@ -94,6 +94,8 @@ class ActiveAdsView: UITableViewController {
             }
             
             cell.thumbnail.layer.cornerRadius = 7
+            cell.thumbnail.layer.borderWidth = 0.2
+            cell.thumbnail.layer.borderColor = UIColor.lightGray.cgColor
             cell.title.text = activeAds[indexPath.row].title
             cell.price.text = "£\(activeAds[indexPath.row].price)"
             cell.availability.text = setExpiryDate(activeAds[indexPath.row].date)

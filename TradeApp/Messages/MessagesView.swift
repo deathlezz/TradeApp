@@ -67,6 +67,9 @@ class MessagesView: UITableViewController {
                 cell.accessoryView?.sizeToFit()
             }
             
+            cell.thumbnail.layer.borderWidth = 0.2
+            cell.thumbnail.layer.borderColor = UIColor.lightGray.cgColor
+            cell.thumbnail.layer.cornerRadius = 7
             cell.title.text = chats[indexPath.row].title
             cell.subtitle.text = "\(getMessageText((chats[indexPath.row].messages.last?.kind)!).trimmingCharacters(in: .whitespacesAndNewlines)) • \(convertDate((chats[indexPath.row].messages.last?.sentDate)!))"
             cell.subtitle.textColor = .darkGray
