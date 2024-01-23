@@ -38,7 +38,6 @@ class DetailView: UITableViewController, Index, Coordinates {
     var reference: DatabaseReference!
     var isOpenedByActiveAds = false
     var isOpenedByEndedAds = false
-//    var itemFound: Bool!
     var isAdActive: Bool!
     
     var item: Item!
@@ -580,7 +579,7 @@ class DetailView: UITableViewController, Index, Coordinates {
         textField.clearButtonMode = .whileEditing
         textField.placeholder = "Enter your message here"
         textField.inputAccessoryView = toolbar
-        textField.addTarget(self, action: #selector(sendMessage), for: .primaryActionTriggered)
+        textField.addTarget(self, action: #selector(prepareForSend), for: .primaryActionTriggered)
         messageTextField = textField
         view.addSubview(toolbar)
         let textFieldButton = UIBarButtonItem(customView: textField)
@@ -590,48 +589,21 @@ class DetailView: UITableViewController, Index, Coordinates {
         toolbar.sizeToFit()
     }
     
-    // send message function
-    @objc func sendMessage() {
+    // send message if item exists, otherwise show alert
+    @objc func prepareForSend() {
         guard !messageTextField.text!.isEmpty else { return }
         
         guard let user = Auth.auth().currentUser?.uid else { return }
-        let itemId = item.id
+        let itemId = String(item.id)
         let itemOwner = item.owner
-        
         let sender = Sender(senderId: user, displayName: "")
         
         DispatchQueue.global().async { [weak self] in
-            self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
-                
-                var ownerMessageId = 0
-                
-                if snapshot.hasChildren() {
-                    if let lastMessage = snapshot.value as? [String: [String: String]] {
-                        ownerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
-                        
-                        let timestamp = Int(Date().timeIntervalSince1970 * 1000)
-                        
-                        let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
-                        
-                        self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("messages").child("\(timestamp)").setValue(ownerMessage.toAnyObject())
-                        self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("read").setValue(false)
-                    }
+            self?.checkIfItemExists(id: itemId, owner: itemOwner) { exists in
+                if exists {
+                    self?.sendMessage(itemOwner: itemOwner, itemId: itemId, user: user, sender: sender)
                 } else {
-                    let ownerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
-                    let ownerChat = Chat(messages: [ownerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
-                    self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).setValue(ownerChat.toAnyObject())
-                    self?.reference.child(itemOwner).child("chats").child("\(itemId)").child(user).child("read").setValue(false)
-                }
-                
-                let buyerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
-                let buyerChat = Chat(messages: [buyerMessage], itemId: String(itemId), itemOwner: itemOwner, buyer: user)
-                self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).setValue(buyerChat.toAnyObject())
-                self?.reference.child(user).child("chats").child("\(itemId)").child(itemOwner).child("read").setValue(true)
-                
-                DispatchQueue.main.async {
-                    self?.messageSent = true
-                    self?.setToolbar()
-                    self?.messageTextField.resignFirstResponder()
+                    self?.showChatNotFoundAlert()
                 }
             }
         }
@@ -772,6 +744,74 @@ class DetailView: UITableViewController, Index, Coordinates {
             }
             if let index = AppStorage.shared.recentlyAdded.firstIndex(where: {$0.id == item.id}) {
                 AppStorage.shared.recentlyAdded[index] = item
+            }
+        }
+    }
+    
+    // show "chat not found" alert
+    func showChatNotFoundAlert() {
+        DispatchQueue.main.async { [weak self] in
+            let ac = UIAlertController(title: "Chat not found", message: "Item has been deleted", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .cancel) { _ in
+                self?.messageTextField.text = nil
+                self?.messageTextField.resignFirstResponder()
+                self?.navigationController?.popViewController(animated: true)
+            })
+            self?.present(ac, animated: true)
+        }
+    }
+    
+    // check if item exists
+    func checkIfItemExists(id: String, owner: String, completion: @escaping (Bool) -> Void) {
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(owner).child("activeItems").child(id).observeSingleEvent(of: .value) { snapshot in
+                if snapshot.exists() {
+                    completion(true)
+                    return
+                }
+
+                self?.reference.child(owner).child("endedItems").child(id).observeSingleEvent(of: .value) { snapshot in
+                    completion(snapshot.exists())
+                }
+            }
+        }
+    }
+    
+    // get last sent message id and send message
+    func sendMessage(itemOwner: String, itemId: String, user: String, sender: Sender) {
+        DispatchQueue.global().async { [weak self] in
+            self?.reference.child(itemOwner).child("chats").child(itemId).child(user).child("messages").queryLimited(toLast: 1).observeSingleEvent(of: .value) { snapshot in
+                
+                var ownerMessageId = 0
+                
+                if snapshot.hasChildren() {
+                    if let lastMessage = snapshot.value as? [String: [String: String]] {
+                        ownerMessageId = Int((lastMessage.values.first?["messageId"])!)! + 1
+                        
+                        let timestamp = Int(Date().timeIntervalSince1970 * 1000)
+                        
+                        let ownerMessage = Message(sender: sender, messageId: "\(ownerMessageId)", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                        
+                        self?.reference.child(itemOwner).child("chats").child(itemId).child(user).child("messages").child("\(timestamp)").setValue(ownerMessage.toAnyObject())
+                        self?.reference.child(itemOwner).child("chats").child(itemId).child(user).child("read").setValue(false)
+                    }
+                } else {
+                    let ownerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                    let ownerChat = Chat(messages: [ownerMessage], itemId: itemId, itemOwner: itemOwner, buyer: user)
+                    self?.reference.child(itemOwner).child("chats").child(itemId).child(user).setValue(ownerChat.toAnyObject())
+                    self?.reference.child(itemOwner).child("chats").child(itemId).child(user).child("read").setValue(false)
+                }
+                
+                let buyerMessage = Message(sender: sender, messageId: "0", sentDate: Date(), kind: .text((self?.messageTextField.text)!))
+                let buyerChat = Chat(messages: [buyerMessage], itemId: itemId, itemOwner: itemOwner, buyer: user)
+                self?.reference.child(user).child("chats").child(itemId).child(itemOwner).setValue(buyerChat.toAnyObject())
+                self?.reference.child(user).child("chats").child(itemId).child(itemOwner).child("read").setValue(true)
+                
+                DispatchQueue.main.async {
+                    self?.messageSent = true
+                    self?.setToolbar()
+                    self?.messageTextField.resignFirstResponder()
+                }
             }
         }
     }

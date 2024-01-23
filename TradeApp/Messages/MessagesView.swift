@@ -101,6 +101,9 @@ class MessagesView: UITableViewController {
     // swipe to delete cell
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
+            guard let user = Auth.auth().currentUser?.uid else { return }
+            guard user != chats[indexPath.row].itemOwner else { return }
+            
             let ac = UIAlertController(title: "Delete chat", message: "Are you sure, you want to delete this chat?", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
@@ -186,11 +189,10 @@ class MessagesView: UITableViewController {
             
         var result = [Chat]()
         
-        let dispatchGroup = DispatchGroup()
-        
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("chats").observeSingleEvent(of: .value) { snapshot in
                 if let chats = snapshot.value as? [String: [String: [String: Any]]] {
+                    let dispatchGroup = DispatchGroup()
                     
                     for (id, traders) in chats {
                         for trader in traders {
@@ -223,9 +225,13 @@ class MessagesView: UITableViewController {
                             result.sort {$0.messages.last!.sentDate > $1.messages.last!.sentDate}
                             result.sort {!$0.read! && $1.read!}
                         }
-
-                        completion(result)
+                        
+                        DispatchQueue.main.async {
+                            completion(result)
+                        }
                     }
+                } else {
+                    completion(result)
                 }
             }
         }
@@ -309,7 +315,10 @@ class MessagesView: UITableViewController {
         
         DispatchQueue.global().async { [weak self] in
             self?.reference.child(user).child("chats").child(itemId).child(child).removeValue() {error, _ in
-                guard error == nil else { return }
+                guard error == nil else {
+                    completion()
+                    return
+                }
                 
                 DispatchQueue.main.async {
                     completion()

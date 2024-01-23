@@ -88,20 +88,25 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         guard !text.isEmpty else { return }
         
-        sendMessage(seller: ChatView.seller, buyer: ChatView.buyer, itemId: itemId, text: text) { [weak self] in
-            guard let messagesCount = self?.messages.count else { return }
-            
-            var indexPath = IndexPath()
-            
-            if messagesCount > 0 {
-                indexPath = IndexPath(index: messagesCount - 1)
+        sendMessage(seller: ChatView.seller, buyer: ChatView.buyer, itemId: itemId, text: text) { [weak self] sent in
+            if sent {
+                guard let messagesCount = self?.messages.count else { return }
+                
+                var indexPath = IndexPath()
+                
+                if messagesCount > 0 {
+                    indexPath = IndexPath(index: messagesCount - 1)
+                } else {
+                    indexPath = IndexPath(index: 0)
+                }
+                
+                self?.messagesCollectionView.insertItems(at: [indexPath])
+                inputBar.inputTextView.text = nil
+                self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
             } else {
-                indexPath = IndexPath(index: 0)
+                inputBar.inputTextView.text = nil
+                self?.showAlert()
             }
-            
-            self?.messagesCollectionView.insertItems(at: [indexPath])
-            inputBar.inputTextView.text = nil
-            self?.messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
         }
     }
     
@@ -144,7 +149,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     }
     
     // send message function
-    @objc func sendMessage(seller: String, buyer: String, itemId: String, text: String, completion: @escaping () -> Void) {
+    @objc func sendMessage(seller: String, buyer: String, itemId: String, text: String, completion: @escaping (Bool) -> Void) {
         DispatchQueue.global().async { [weak self] in
             self?.checkIfItemExists(id: itemId, owner: seller) { exists in
                 if exists {
@@ -153,12 +158,13 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
                     let timestamp = Int(Date().timeIntervalSince1970 * 1000)
                     
                     self?.sendMessageToSeller(sender: sender, user: user, seller: seller, buyer: buyer, itemId: itemId, text: text, timestamp: timestamp) {
-                        self?.sendMessageToBuyer(sender: sender, user: user, seller: seller, buyer: buyer, itemId: itemId, text: text, timestamp: timestamp, completion: completion)
+                        self?.sendMessageToBuyer(sender: sender, user: user, seller: seller, buyer: buyer, itemId: itemId, text: text, timestamp: timestamp) {
+                            completion(true)
+                        }
                     }
                     
                 } else {
-                    // show alert and pop view back
-                    self?.showAlert()
+                    completion(false)
                 }
             }
         }
