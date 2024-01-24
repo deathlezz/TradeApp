@@ -109,11 +109,17 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                 cell.image.image = nil
                 
                 let url = AppStorage.shared.filteredItems[indexPath.item].photosURL[0]
-                convertThumbnail(url: url) { thumbnail in
-                    AppStorage.shared.filteredItems[indexPath.item].thumbnail = thumbnail
-
-                    DispatchQueue.main.async {
+                convertThumbnail(url: url) { [weak self] thumbnail in
+                    
+                    if let thumbnail = thumbnail {
+                        // item exists
+                        AppStorage.shared.filteredItems[indexPath.item].thumbnail = thumbnail
                         cell.image.image = thumbnail.resized(to: cell.image.frame.size)
+                    } else {
+                        // item has been removed
+                        let id = AppStorage.shared.filteredItems[indexPath.item].id
+                        self?.removeItem(id: id, index: indexPath.item)
+                        return
                     }
                 }
             }
@@ -136,8 +142,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             let item = AppStorage.shared.filteredItems[indexPath.item]
             vc.item = item
-//            vc.images = [item.thumbnail!]
-//            vc.isOpenedByLink = false
             vc.isAdActive = true
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
@@ -517,15 +521,19 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     }
     
     // convert URL to a thumbnail
-    func convertThumbnail(url: String, completion: @escaping (UIImage) -> Void) {
+    func convertThumbnail(url: String, completion: @escaping (UIImage?) -> Void) {
         guard let link = URL(string: url) else { return }
         
         DispatchQueue.global().async {
             let task = URLSession.shared.dataTask(with: link) { (data, _, _) in
                 if let data = data {
                     DispatchQueue.main.async {
-                        let thumbnail = UIImage(data: data)!
-                        completion(thumbnail)
+                        if let thumbnail = UIImage(data: data) {
+                            completion(thumbnail)
+                        } else {
+                            completion(nil)
+                        }
+                        
                     }
                 }
             }
@@ -629,4 +637,13 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         return UIEdgeInsets(top: 10, left: minX, bottom: 10, right: minX)
     }
 
+    // remove not existing item
+    func removeItem(id: Int, index: Int) {
+        AppStorage.shared.filteredItems.removeAll(where: {$0.id == id})
+        AppStorage.shared.items.removeAll(where: {$0.id == id})
+        AppStorage.shared.recentlyAdded.removeAll(where: {$0.id == id})
+        let indexPath = IndexPath(item: index, section: 0)
+        collectionView.deleteItems(at: [indexPath])
+    }
+    
 }
