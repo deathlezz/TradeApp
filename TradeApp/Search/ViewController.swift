@@ -119,6 +119,8 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                         // item has been removed
                         let id = AppStorage.shared.filteredItems[indexPath.item].id
                         self?.removeItem(id: id, index: indexPath.item)
+                        self?.updateHeader()
+                        self?.isArrayEmpty()
                         return
                     }
                 }
@@ -644,6 +646,14 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
         AppStorage.shared.recentlyAdded.removeAll(where: {$0.id == id})
         let indexPath = IndexPath(item: index, section: 0)
         collectionView.deleteItems(at: [indexPath])
+    }
+    
+    // update collection view header
+    func updateHeader() {
+        let header = collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader)
+        let label = header[0].subviews[0] as? UILabel
+        let itemsNumber = collectionView.numberOfItems(inSection: 0)
+        label?.text = itemsNumber == 1 ? "Found 1 ad" : "Found \(itemsNumber) ads"
     }
     
 }

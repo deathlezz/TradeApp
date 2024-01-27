@@ -52,6 +52,8 @@ class DetailView: UITableViewController, Index, Coordinates {
         navigationItem.backButtonTitle = " "
         navigationController?.hidesBarsOnSwipe = false
         
+        NotificationCenter.default.addObserver(self, selector: #selector(popBack), name: NSNotification.Name("popBackDetailView"), object: nil)
+        
         tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "HeaderView")
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Text")
         
@@ -77,12 +79,9 @@ class DetailView: UITableViewController, Index, Coordinates {
         DispatchQueue.global().async { [weak self] in
             self?.getData() { dict in
                 guard let dict = dict else {
-//                    self?.itemFound = false
                     self?.showItemNotFoundAlert()
                     return
                 }
-                
-//                self?.itemFound = true
                 
                 guard let item = self?.toItemModel(dict: dict) else { return }
                 self?.updateItem(item: item)
@@ -814,6 +813,11 @@ class DetailView: UITableViewController, Index, Coordinates {
                 }
             }
         }
+    }
+    
+    // pop view back
+    @objc func popBack() {
+        navigationController?.popViewController(animated: true)
     }
     
 }

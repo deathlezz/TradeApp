@@ -254,7 +254,13 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         DispatchQueue.main.async { [weak self] in
             let ac = UIAlertController(title: "Chat not found", message: "Item has been deleted", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .cancel) { _ in
-                self?.navigationController?.popViewController(animated: true)
+                if self?.tabBarController?.selectedIndex == 3 {
+                    self?.navigationController?.popViewController(animated: true)
+                } else {
+                    self?.dismiss(animated: true) {
+                        NotificationCenter.default.post(name: NSNotification.Name("popBackDetailView"), object: nil)
+                    }
+                }
             })
             self?.present(ac, animated: true)
         }
