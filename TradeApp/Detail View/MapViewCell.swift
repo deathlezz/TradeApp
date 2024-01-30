@@ -43,14 +43,11 @@ class MapViewCell: UITableViewCell, CLLocationManagerDelegate, MKMapViewDelegate
 
         NotificationCenter.default.addObserver(self, selector: #selector(pushLocation), name: NSNotification.Name("pushLocation"), object: nil)
         
-        DispatchQueue.global().async { [weak self] in
-            self?.currentUnit = Utilities.loadDistanceUnit()
-        }
+        currentUnit = Utilities.loadDistanceUnit()
     }
 
     // set action for changed authorization
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-
         if status == .authorizedWhenInUse {
             locationManager.requestLocation()
         }

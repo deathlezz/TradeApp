@@ -192,7 +192,6 @@ class ChangePasswordView: UITableViewController {
         }
     }
     
-    // check password format
     // check if password has minimum 8 characters at least 1 uppercase alphabet, 1 lowercase alphabet and 1 number
     func isPasswordValid(_ password: String) -> Bool {
         let passRegEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$"

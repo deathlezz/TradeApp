@@ -274,11 +274,15 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
     
     // convert URLs into images
     func convertImages(urls: [String], completion: @escaping ([UIImage]) -> Void) {
-        guard urls.count > 1 else { return }
-        
         var imagesDict = [String: UIImage]()
         
         imagesDict["image0"] = self.item?.thumbnail!
+        
+        guard urls.count > 1 else {
+            let image = [imagesDict["image0"]!]
+            completion(image)
+            return
+        }
         
         // get all images except the thumbnail
         let links = urls.map {URL(string: $0)}.dropFirst()
@@ -355,7 +359,6 @@ class AddItemView: UITableViewController, ImagePicker, UIImagePickerControllerDe
         }
 
         NotificationCenter.default.post(name: NSNotification.Name("loadImages"), object: nil, userInfo: ["images": images])
-//        tableView.reloadData()
     }
     
     // set action for "return" keyboard button

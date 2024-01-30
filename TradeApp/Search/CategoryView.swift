@@ -20,9 +20,7 @@ class CategoryView: UITableViewController {
         title = "Categories"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        DispatchQueue.global().async { [weak self] in
-            self?.currentFilters = Utilities.loadFilters()
-        }
+        currentFilters = Utilities.loadFilters()
     }
 
     // number of sections

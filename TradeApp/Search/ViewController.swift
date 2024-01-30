@@ -489,7 +489,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
     func isItemRecent(_ itemDate: Date) -> Bool {
         let now = Date.now
         let soon = itemDate.addingTimeInterval(86400)
-        
         return soon >= now
     }
     
@@ -535,7 +534,6 @@ class ViewController: UICollectionViewController, UITabBarControllerDelegate, UI
                         } else {
                             completion(nil)
                         }
-                        
                     }
                 }
             }

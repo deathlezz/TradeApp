@@ -31,15 +31,10 @@ class SearchView: UITableViewController {
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 20
         
-        DispatchQueue.global().async { [weak self] in
-            self?.currentFilters = Utilities.loadFilters()
-            self?.loadHistory()
-            
-            DispatchQueue.main.async {
-                self?.textField.text = self?.currentFilters["Search"]
-                self?.isArrayEmpty()
-            }
-        }
+        currentFilters = Utilities.loadFilters()
+        loadHistory()
+        textField.text = currentFilters["Search"]
+        isArrayEmpty()
     }
 
     // set number of sections

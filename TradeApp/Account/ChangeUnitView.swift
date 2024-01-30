@@ -30,7 +30,6 @@ class ChangeUnitView: UITableViewController {
                 self?.updateSegment()
             }
         }
-
     }
     
     // set number of sections

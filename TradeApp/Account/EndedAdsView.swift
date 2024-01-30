@@ -122,7 +122,6 @@ class EndedAdsView: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detailView") as? DetailView {
             vc.item = endedAds[indexPath.row]
-//            vc.isOpenedByEndedAds = true
             vc.isAdActive = false
             vc.hidesBottomBarWhenPushed = true
             vc.toolbarItems = []

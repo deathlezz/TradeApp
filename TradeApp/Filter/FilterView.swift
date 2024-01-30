@@ -41,11 +41,9 @@ class FilterView: UITableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateRadius), name: UIResponder.keyboardWillShowNotification, object: nil)
         
-        DispatchQueue.global().async { [weak self] in
-            self?.currentUnit = Utilities.loadDistanceUnit()
-            self?.currentFilters = Utilities.loadFilters()
-            self?.radiusCounter = Int(self?.currentFilters["Radius"] ?? "0") ?? 0
-        }
+        currentUnit = Utilities.loadDistanceUnit()
+        currentFilters = Utilities.loadFilters()
+        radiusCounter = Int(currentFilters["Radius"] ?? "0") ?? 0
     }
 
     // set number of sections
@@ -203,10 +201,7 @@ class FilterView: UITableViewController {
         let radius = radiusStages[radiusCounter]
         
         guard isPriceCorrect(priceFrom, priceTo) else { return }
-        
-        // check if user is using filters
-//        checkForFilters()
-        
+                
         // category filter
         categoryFilter(categoryText: categoryText)
         
@@ -385,24 +380,6 @@ class FilterView: UITableViewController {
             present(ac, animated: true)
         }
     }
-    
-    // check if user is using filters
-//    func checkForFilters() {
-//        if currentFilters["Search"] != nil && currentFilters["Category"] != nil {
-//            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
-//            AppStorage.shared.filteredItems = AppStorage.shared.filteredItems.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-//        } else if currentFilters["Category"] == nil && currentFilters["Search"] == nil {
-//            AppStorage.shared.filteredItems = AppStorage.shared.recentlyAdded
-//            currentFilters.removeAll()
-//            Utilities.saveFilters(currentFilters)
-//            navigationController?.popToRootViewController(animated: true)
-//            return
-//        } else if currentFilters["Search"] != nil {
-//            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.title.lowercased().contains(currentFilters["Search"]!.lowercased())}
-//        } else if currentFilters["Category"] != nil {
-//            AppStorage.shared.filteredItems = AppStorage.shared.items.filter {$0.category == currentFilters["Category"]}
-//        }
-//    }
     
     // category filter
     func categoryFilter(categoryText: String) {
