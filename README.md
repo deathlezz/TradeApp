@@ -1,6 +1,6 @@
-# TradeApp is a marketplace app written in [Swift](https://developer.apple.com/swift) using [UIKit](https://developer.apple.com/documentation/uikit). Allows users to create account, search through items for sale, save items to favourites, add new items, send messages between users, manage user items, manage user account data and many more.
+## TradeApp is a marketplace app written in [Swift](https://developer.apple.com/swift) using [UIKit](https://developer.apple.com/documentation/uikit). Allows users to create account, search through items for sale, save items to favourites, add new items, send messages between users, manage user items, manage user account data and many more.
 
-## Frameworks:
+### Frameworks:
 - [UIKit](https://developer.apple.com/documentation/uikit)
 - [Network](https://developer.apple.com/documentation/network)
 - [Firebase](https://firebase.google.com/docs)
@@ -123,9 +123,8 @@
 <img src="https://github.com/deathlezz/TradeApp/blob/main/Screenshots/Edit_top.png" width=250> ‎ <img src="https://github.com/deathlezz/TradeApp/blob/main/Screenshots/Edit_bottom.png" width=250> ‎ <img src="https://github.com/deathlezz/TradeApp/blob/main/Screenshots/Edit_actions.png" width=250>
 
 *UnitView*
-Change unit used in:
-- calculating distance between user and item location
-- filtering items by location
+- Change unit used to calculate distance between user and item location
+- Change unit used to filter items by location
 
 <img src="https://github.com/deathlezz/TradeApp/blob/main/Screenshots/Unit.png" width=250>
 
@@ -156,4 +155,4 @@ Change unit used in:
 *EmptyView*
 - Appears when view has no items to show
 
-<img src="https://github.com/deathlezz/TradeApp/blob/main/Screenshots/Ended_empty.png"width=250>
+<img src="https://github.com/deathlezz/TradeApp/blob/main/Screenshots/Ended_empty.png" width=250>
